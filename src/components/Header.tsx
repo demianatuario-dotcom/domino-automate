@@ -1,10 +1,11 @@
 import React from 'react';
+import Image from 'next/image';
 
 export default function Header() {
   return (
     <header className="glass-panel" style={{ position: 'fixed', top: 0, width: '100%', zIndex: 100, padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div style={{ fontFamily: 'Space Grotesk', fontSize: '1.25rem', fontWeight: 700, color: 'var(--on-surface)' }}>
-        Domino <span style={{ color: 'var(--secondary)' }}>Automate</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => window.scrollTo(0,0)}>
+        <Image src="/logo.png" alt="Domino Automate Logo" width={150} height={50} style={{ objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(233, 193, 118, 0.2))' }} priority />
       </div>
       <nav style={{ display: 'flex', gap: '2rem' }}>
         <a href="#solucoes" className="label-md">Soluções</a>
