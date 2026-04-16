@@ -1,0 +1,53 @@
+Construa uma plataforma web de alta conversão, focada em PMEs, que posicione a Domino Automate como autoridade em soluções de automação (N8N, Python e Sites).
+
+--------------------------------------------------------------------------------
+1. Arquitetura de Informação e Estrutura Core
+A estrutura do site deve ser desenhada para guiar o usuário B2B em uma jornada lógica, desde a descoberta da dor até a solicitação e envio de uma proposta de orçamento. Abaixo estão os blocos essenciais que o Antigravity deve implementar:
+Hero Section (Proposta de Valor): Mensagem clara e direta sobre economia de tempo e aumento de produtividade.
+Bloco de Soluções (Os 3 Pilares):
+N8N: Foco na orquestração visual e conexão de sistemas sem atrito.
+Python: Destaque para o processamento de dados complexos e superação das limitações do "no-code".
+Agentes de IA: Assistentes autônomos para vendas e atendimento 24/7.
+Vitrine de ROI e Cases: Componentes dinâmicos mostrando horas salvas e aumento de receita dos clientes.
+Página de Integrações (Ecossistema): Uma grade expansível mostrando as ferramentas que a Domino conecta.
+Seção de Proteção de Dados (LGPD): Bloco obrigatório garantindo que todas as automações respeitam a privacidade e governança de dados.
+
+--------------------------------------------------------------------------------
+2. Funcionalidade Interativa de Orçamento Automatizado (Novo Core)
+O site não terá o agendamento de reuniões como via primária de conversão, mas sim um sistema inteligente de geração de propostas comerciais enviadas diretamente por e-mail
+. O Antigravity deve desenvolver uma seção dedicada (ou modal) com a seguinte mecânica:
+Seleção de Dores do Negócio: Uma interface interativa (como cards ou checkboxes amigáveis) onde o usuário deverá escolher as dores específicas do seu negócio que ele deseja resolver (ex: "Perda de leads", "Processos manuais lentos", "Atendimento demorado").
+Mapeamento de Funcionalidades: O front-end deve atrelar (visualmente ou no backend) as dores escolhidas às funcionalidades desenvolvidas pela Domino Automate (Agentes de IA, fluxos em N8N, scripts Python).
+Campo de Descrição Textual: Um campo de texto aberto (opcional) onde o usuário pode descrever com suas próprias palavras as necessidades e particularidades da sua operação.
+Integração Backend (Geração de Proposta): Ao submeter as informações, os dados do usuário serão enviados via Webhook para o n8n da Domino Automate. O fluxo no n8n preencherá automaticamente um template de proposta de trabalho com base nas dores selecionadas e na descrição textual, e realizará o envio automático da proposta comercial para o e-mail do potencial cliente em minutos
+.
+
+--------------------------------------------------------------------------------
+3. Integração Contínua de Vídeos
+A Domino Automate utilizará vídeos gerados por IA postados no YouTube como motor de marketing. O Antigravity deve desenvolver um componente de galeria ou carrossel inteligente posicionado em um local estratégico do site.
+Regras de Comportamento:
+Autoplay e Loop: Os vídeos devem iniciar automaticamente e rodar de forma contínua e ininterrupta. Para garantir o funcionamento nos navegadores, eles devem iniciar sem som (muted).
+Escalabilidade Modular: O número de vídeos irá aumentar com o tempo. A estrutura deve aceitar facilmente a inserção de novos links sem quebrar a página.
+Links Iniciais para Implementação:
+https://youtube.com/shorts/hAUls5AiT8k
+https://youtu.be/hFweHBAO53U
+https://youtube.com/shorts/P_EGjm4tx8I
+
+--------------------------------------------------------------------------------
+4. O Assistente Virtual Integrado (Botão de Chat)
+A triagem e a interação com o visitante também serão apoiadas pelo nosso Consultor Estratégico de Inovação (SDR de IA).
+Componente UI: Um botão flutuante persistente no canto inferior direito contendo a chamada "Como posso te ajudar?".
+Comportamento: Ao clicar, abre-se uma janela de chat limpa conectada ao nosso modelo de IA.
+Objetivo de Conversão Atualizado: O prompt da IA será configurado para descobrir os gargalos da PME. Em vez de tentar agendar uma reunião, o objetivo final do assistente será direcionar o usuário para a funcionalidade de orçamento do site ou coletar diretamente ali as dores dele para disparar o e-mail da proposta de trabalho via integração n8n.
+Utilize o arquivo em anexo "Prompt_Agente_Domino.txt" para a definição do prompt do assistente de IA.
+
+--------------------------------------------------------------------------------
+5. Requisitos de Performance e UX B2B
+Para garantir a conversão corporativa, as melhores práticas técnicas devem ser respeitadas:
+Velocidade Extrema (Performance-First): O carregamento deve ser otimizado (idealmente sub-segundo) para que a experiência B2B seja fluida.
+UX Adaptativa e Direta: Para usuários corporativos, o fluxo para preencher as dores no módulo de orçamento deve ser indolor e claro. Respostas imediatas após o clique em "Solicitar Proposta" são obrigatórias.
+Arquitetura Modular e Responsiva: A experiência deve ser perfeitamente responsiva, permitindo que donos de negócio peçam seus orçamentos e interajam com a plataforma confortavelmente tanto pelo celular quanto pelo desktop.
+
+A paleta de cores, design e disposição do site deve seguir as instruções contidas no arquivo design.md, em anexo.
+
+na pasta C:\Users\Demian\OneDrive\Desktop\Projetos\Demian\Domino_Automate\Imagens_Trabalhos contém prints de trabalhos que realizei, use a criatividade para demonstrar meus trabalhos realizados para quem visita o site.

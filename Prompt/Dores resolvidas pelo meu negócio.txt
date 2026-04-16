@@ -1,0 +1,40 @@
+Dor	Justificativa
+Lentidão no atendimento inicial	que faz a empresa perder potenciais clientes imediatos para a concorrência
+Falta de disponibilidade 24 horas por dia	deixando clientes sem respostas fora do horário comercial, feriados ou finais de semana
+Tempo desperdiçado com triagem manual	sobrecarregando a equipe de vendas e SDRs com contatos desqualificados ou curiosos
+Esquecimento de follow-ups (retornos)	deixando dinheiro na mesa por não acompanhar o lead de forma persistente e estruturada
+Agendamentos desorganizados e manuais	sujeitos a conflitos de horários e falhas humanas
+Alto índice de não comparecimento	devido à ausência de lembretes automatizados de reuniões ou consultas
+Equipes de suporte sufocadas por dúvidas repetitivas (FAQs)	que poderiam ser facilmente resolvidas por um agente inteligente
+Comunicação fria e engessada de chatbots antigos	que frustram o consumidor por não possuírem processamento de linguagem natural (PLN) humano e empático
+Falta de histórico contínuo (Omnichannel)	obrigando o cliente a repetir sua solicitação ao transitar entre o site, o WhatsApp e o e-mail
+Dificuldade em gerir objeções de vendas	precisando de um agente IA treinado para consultar tabelas e contornar dúvidas de preço ou serviço em segundos
+Taxa de cancelamento (churn) elevada no pós-venda	devido à falta de pesquisas de feedback, nutrição e acompanhamento proativo
+Incapacidade de oferecer suporte multilíngue	limitando o atendimento a clientes que falam outros idiomas
+Desperdício do potencial de Cross-selling e Up-selling	perdendo a chance de oferecer produtos complementares baseados no histórico do cliente
+Trabalho braçal de "copiar e colar" dados	como passar informações do e-mail ou do Calendly diretamente para o CRM e Slack
+Desperdício de dezenas de horas semanais da equipe	com tarefas administrativas e burocráticas repetitivas
+Sistemas isolados que não conversam entre si	ex: o ERP, o e-commerce e a plataforma de marketing operando em silos
+Erros frequentes e retrabalho na digitação de dados	causados por falhas inerentes à operação humana
+Limitações estruturais de ferramentas "no-code"	que travam quando a empresa precisa processar volumes massivos de dados ou lógicas complexas
+Geração demorada de propostas comerciais e contratos	atrasando o envio de orçamentos para os clientes
+Processo de onboarding de clientes burocrático e lento	prejudicando a experiência logo no início da prestação do serviço
+Ausência de notificações internas em tempo real	demorando a avisar a equipe no Slack ou WhatsApp quando um novo lead ou problema crítico surge
+Caixas de e-mail corporativas caóticas	perdendo faturas ou solicitações importantes em meio ao volume de mensagens
+Falta de acompanhamento de menções à marca	perdendo a oportunidade de responder rapidamente a comentários em redes sociais
+Atrasos na reconciliação de dados logísticos ou de estoque	entre a loja virtual, o fornecedor e o sistema interno
+Falta de lembretes automáticos de cobrança	o que aumenta a inadimplência por não avisar o cliente antes do vencimento
+Dificuldade em gerenciar e distribuir relatórios periódicos	dependendo de alguém para extrair planilhas toda semana e enviá-las aos gestores
+Altos custos operacionais com folha de pagamento	contratando mais pessoas apenas para lidar com picos de demanda administrativa
+Sites corporativos extremamente lentos	que fazem o visitante abandonar a página antes mesmo dela carregar
+Experiência do usuário (UX/UI) confusa em aplicações B2B	dificultando o uso por parte dos colaboradores e exigindo longos treinamentos
+Sites não otimizados para dispositivos móveis (falta de Mobile-First)	perdendo a conversão da maioria dos usuários que navegam por smartphones
+Baixa taxa de conversão de visitantes em leads	devido a layouts que não guiam o usuário de forma intuitiva para a ação
+Falta de provas sociais estruturadas no site (selos, depoimentos, LGPD)	o que afasta decisores de negócios que buscam confiança e credibilidade
+Plataformas e sites difíceis de atualizar	dependendo de desenvolvedores externos até para mudar um simples texto ou imagem
+Falta de acessibilidade digital	limitando o alcance da marca a pessoas com deficiência e sendo penalizado pelos motores de busca
+Exposição de dados sensíveis em IAs públicas	arriscando a propriedade intelectual e a segurança da empresa por não utilizar uma IA Privada
+Insegurança jurídica e risco de multas pesadas por violar a LGPD	tratando dados de clientes sem consentimento, documentação ou proteção criptografada adequada
+Ausência de análise de dados e dashboards em tempo real	forçando os gestores a tomarem decisões baseadas em intuição ao invés de métricas concretas
+Desperdício de orçamento de marketing digital	por falta de segmentação preditiva e incapacidade de agrupar clientes pelo comportamento
+Incapacidade de prever comportamentos ou gargalos futuros (análise preditiva)	operando de forma 100% reativa aos problemas do mercado

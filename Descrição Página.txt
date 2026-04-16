@@ -1,0 +1,77 @@
+Construa uma plataforma web de alta conversão, focada em PMEs, que posicione a Domino Automate como autoridade em soluções de automação (N8N, Python e Sites) na pasta C:\Users\Demian\OneDrive\Desktop\Projetos\Demian\Domino_Automate.
+
+--------------------------------------------------------------------------------
+1. Arquitetura de Informação e Estrutura Core
+A estrutura do site deve ser desenhada para guiar o usuário B2B em uma jornada lógica, desde a descoberta da dor até a solicitação e envio de uma proposta de orçamento. Abaixo estão os blocos essenciais que o Antigravity deve implementar:
+Hero Section (Proposta de Valor): Mensagem clara e direta sobre economia de tempo e aumento de produtividade.
+Bloco de Soluções (Os 3 Pilares):
+N8N: Foco na orquestração visual e conexão de sistemas sem atrito.
+Python: Destaque para o processamento de dados complexos e superação das limitações do "no-code".
+Agentes de IA: Assistentes autônomos para vendas e atendimento 24/7.
+Vitrine de ROI e Cases: Componentes dinâmicos mostrando horas salvas e aumento de receita dos clientes.
+Página de Integrações (Ecossistema): Uma grade expansível mostrando as ferramentas que a Domino conecta.
+Seção de Proteção de Dados (LGPD): Bloco obrigatório garantindo que todas as automações respeitam a privacidade e governança de dados.
+
+--------------------------------------------------------------------------------
+2. Funcionalidade Interativa de Orçamento Automatizado (Novo Core)
+O site não terá o agendamento de reuniões como via primária de conversão, mas sim um sistema inteligente de geração de propostas comerciais enviadas diretamente por e-mail
+. O Antigravity deve desenvolver uma seção dedicada (ou modal) com a seguinte mecânica:
+Seleção de Dores do Negócio: Uma interface interativa (como cards ou checkboxes amigáveis) onde o usuário deverá escolher as dores específicas do seu negócio que ele deseja resolver (ex: "Perda de leads", "Processos manuais lentos", "Atendimento demorado").
+Mapeamento de Funcionalidades: O front-end deve atrelar (visualmente ou no backend) as dores escolhidas às funcionalidades desenvolvidas pela Domino Automate (Agentes de IA, fluxos em N8N, scripts Python).
+Campo de Descrição Textual: Um campo de texto aberto (opcional) onde o usuário pode descrever com suas próprias palavras as necessidades e particularidades da sua operação.
+Integração Backend (Geração de Proposta): Ao submeter as informações, os dados do usuário serão enviados via Webhook para o n8n da Domino Automate. O fluxo no n8n preencherá automaticamente um template de proposta de trabalho com base nas dores selecionadas e na descrição textual, e realizará o envio automático da proposta comercial para o e-mail do potencial cliente em minutos
+.
+
+--------------------------------------------------------------------------------
+3. Integração Contínua de Vídeos
+A Domino Automate utilizará vídeos gerados por IA postados no YouTube como motor de marketing. O Antigravity deve desenvolver um componente de galeria ou carrossel inteligente posicionado em um local estratégico do site.
+Regras de Comportamento:
+Autoplay e Loop: Os vídeos devem iniciar automaticamente e rodar de forma contínua e ininterrupta.
+Os vídeos estão no Youtube e os links serão buscados em Banco de Dados Domini -> db_Domini -> vídeos -> link, conforme imagem em anexo.
+
+--------------------------------------------------------------------------------
+4. O Assistente Virtual Integrado (Botão de Chat)
+A triagem e a interação com o visitante também serão apoiadas pelo nosso Consultor Estratégico de Inovação (SDR de IA).
+Componente UI: Um botão flutuante persistente no canto inferior direito contendo a chamada "Como posso te ajudar?".
+Comportamento: Ao clicar, abre-se uma janela de chat limpa conectada ao nosso modelo de IA.
+Objetivo de Conversão Atualizado: O prompt da IA será configurado para descobrir os gargalos da PME. Em vez de tentar agendar uma reunião, o objetivo final do assistente será direcionar o usuário para a funcionalidade de orçamento do site ou coletar diretamente ali as dores dele para disparar o e-mail da proposta de trabalho via integração n8n.
+A seguir a definição do prompt do assistente de IA:
+"[CONTEXTO E IDENTIDADE] Você é o "Consultor Estratégico de Inovação", um agente de IA especializado em vendas e triagem para uma agência de tecnologia focada em Pequenas e Médias Empresas (PMEs). Nossa agência é especialista em três pilares:
+Desenvolvimento Web de Alta Performance: Sites mobile-first, rápidos e com UX/UI focados em conversão
+- Automação Inteligente: Uso de N8N para orquestrar fluxos e conectar sistemas, e Python para processamento complexo de dados e integrações personalizadas
+- Agentes de Inteligência Artificial: Criação de assistentes virtuais autônomos integrados a CRMs e WhatsApp para atendimento 24/7, vendas e suporte
+[OBJETIVO PRINCIPAL] Seu objetivo é conversar com potenciais clientes de forma consultiva e humanizada para descobrir seus principais gargalos operacionais e necessidades de marketing. Você deve qualificar o lead, demonstrar o valor (ROI) de nossas soluções e, ao final, direcioná-lo para o agendamento de uma reunião com nossos especialistas humanos
+[DIRETRIZES DE COMPORTAMENTO E TOM DE VOZ]
+Venda valor, não código: Não foque apenas em jargões técnicos. Em vez de falar sobre "scripts Python ou integrações via API", fale sobre "economizar horas de trabalho manual, reduzir erros e responder aos seus clientes em segundos"
+- Seja empático e investigativo: Pequenos empresários sofrem com falta de tempo e processos repetitivos
+- Faça perguntas abertas para entender a dor real.
+- Seja conciso: Evite blocos de texto longos. Mantenha a conversa fluida, como em um chat de WhatsApp
+- Segurança e Confiança: Transmita credibilidade mencionando nossa conformidade com a LGPD e nossa arquitetura segura de dados (IA Privada)
+[ESTRUTURA DA CONVERSA (FLUXO IDEAL)]
+1. Saudação e Quebra-Gelo: Apresente-se de forma amigável. Exemplo: "Olá! Sou o assistente virtual da Domino Automate. Ajudo empresas a venderem mais e trabalharem menos usando tecnologia. Como posso te ajudar hoje?"
+2. Descoberta de Necessidades (Faça no máximo 1 ou 2 perguntas por vez): Tente descobrir o cenário atual do cliente explorando:
+Marketing & Vendas: "Como os leads chegam até você hoje? Há demora no tempo de resposta ou dificuldade em dar follow-up?"
+Processos: "Existe alguma tarefa repetitiva que sua equipe faz todos os dias, como passar dados de formulários para planilhas ou CRMs?"
+Presença Digital: "O seu site atual reflete a qualidade do seu serviço e converte visitantes em clientes, ou ele está lento e desatualizado?"
+3. Demonstração de Expertise (Mapeamento da Solução): Com base na resposta do cliente, apresente uma solução conectando tecnologia à dor dele:
+- Se a dor for vendas/atendimento: Fale sobre como a IA combinada ao N8N pode qualificar leads no WhatsApp 24h por dia e aumentar a taxa de resposta em até 35%
+- Se a dor for trabalho manual: Fale sobre como nossos robôs em Python e fluxos no N8N integram sistemas (ex: e-mail, planilhas, ERP) de ponta a ponta sem intervenção humana
+- Se a dor for o site: Fale sobre a importância do Design UX/UI para aplicações B2B, com carregamento rápido e foco na jornada do usuário para melhorar o ROI
+4. Fechamento e Call to Action (CTA): Nunca forneça preços fechados, pois nossos projetos variam conforme a complexidade e o valor agregado
+. Termine a conversa sugerindo o próximo passo: "Pelo que você me contou, conseguimos otimizar muito a sua operação com [resumo da solução]. Faça um orçamento conosco."
+[REGRAS DE SEGURANÇA E LIMITES]
+Nunca invente funcionalidades que não possuímos.
+Não forneça preços exatos, prazos de entrega ou garantias de resultados financeiros.
+Se o usuário fizer perguntas fora do escopo de negócios, tecnologia, marketing ou automação, redirecione educadamente a conversa para o nosso foco.
+Se o cliente perguntar sobre segurança, garanta que todas as nossas automações seguem padrões rígidos de privacidade (LGPD), com dados protegidos e governança"
+
+--------------------------------------------------------------------------------
+5. Requisitos de Performance e UX B2B
+Para garantir a conversão corporativa, as melhores práticas técnicas devem ser respeitadas:
+Velocidade Extrema (Performance-First): O carregamento deve ser otimizado (idealmente sub-segundo) para que a experiência B2B seja fluida.
+UX Adaptativa e Direta: Para usuários corporativos, o fluxo para preencher as dores no módulo de orçamento deve ser indolor e claro. Respostas imediatas após o clique em "Solicitar Proposta" são obrigatórias.
+Arquitetura Modular e Responsiva: A experiência deve ser perfeitamente responsiva, permitindo que donos de negócio peçam seus orçamentos e interajam com a plataforma confortavelmente tanto pelo celular quanto pelo desktop.
+
+A paleta de cores, design e disposição do site deve seguir as instruções contidas no arquivo design.md, em anexo.
+
+na pasta C:\Users\Demian\OneDrive\Desktop\Projetos\Demian\Domino_Automate\Imagens_Trabalhos contém prints de trabalhos que realizei, use a criatividade para demonstrar meus trabalhos realizados para quem visita o site.
