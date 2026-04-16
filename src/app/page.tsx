@@ -7,6 +7,8 @@ import Portfolio from '@/components/Portfolio';
 import AIChat from '@/components/AIChat';
 import Footer from '@/components/Footer';
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   return (
     <>
