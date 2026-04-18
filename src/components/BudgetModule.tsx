@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 
 export default function BudgetModule() {
-  const [dores, setDores] = useState<{dor: string, justificativa: string}[]>([]);
+  const [dores, setDores] = useState<{dor: string, justificativa: string, pergunta?: string}[]>([]);
 
   useEffect(() => {
     fetch('/api/servicos')
@@ -10,7 +10,7 @@ export default function BudgetModule() {
       .then(data => {
         if(Array.isArray(data)) {
           // Mapeamos gargalo para dor, mantendo compatibilidade com o layout existente
-          setDores(data.map((item: any) => ({ dor: item.gargalo, justificativa: item.justificativa })));
+          setDores(data.map((item: any) => ({ dor: item.gargalo, justificativa: item.justificativa, pergunta: item.pergunta })));
         }
       })
       .catch(err => console.error("Error fetching servicos:", err));
@@ -23,9 +23,13 @@ export default function BudgetModule() {
   const [descricao, setDescricao] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [respostas, setRespostas] = useState<{[key: string]: string}>({});
 
   const toggleDor = (dor: string) => {
     setSelectedDores(prev => prev.includes(dor) ? prev.filter(d => d !== dor) : [...prev, dor]);
+    if (selectedDores.includes(dor)) {
+      setRespostas(prev => { const next = {...prev}; delete next[dor]; return next; });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +40,7 @@ export default function BudgetModule() {
       const res = await fetch('/api/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, telefone, descricao, dores: selectedDores.join(', ') })
+        body: JSON.stringify({ nome, email, telefone, descricao, dores: selectedDores.join(', '), perguntas_respostas: respostas })
       });
       
       if(res.ok) setSuccess(true);
@@ -84,6 +88,30 @@ export default function BudgetModule() {
               <input required type="email" placeholder="E-mail de Contato" className="input-field" value={email} onChange={e => setEmail(e.target.value)} />
               <input type="text" placeholder="WhatsApp (Opcional)" className="input-field" value={telefone} onChange={e => setTelefone(e.target.value)} />
             </div>
+
+            {selectedDores.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {selectedDores.map(dor => {
+                  const dObj = dores.find(d => d.dor === dor);
+                  if(!dObj || !dObj.pergunta) return null;
+                  return (
+                    <div key={`resp-${dor}`}>
+                      <label className="label-md" style={{ marginBottom: '0.5rem', display: 'block', color: 'var(--secondary)' }}>
+                        {dObj.pergunta} (Obrigatório)
+                      </label>
+                      <textarea
+                        required
+                        placeholder="Sua resposta..."
+                        className="input-field"
+                        style={{ resize: 'vertical', minHeight: '80px' }}
+                        value={respostas[dor] || ''}
+                        onChange={e => setRespostas(prev => ({ ...prev, [dor]: e.target.value }))}
+                      ></textarea>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             <div>
               <label className="label-md" style={{ marginBottom: '0.5rem', display: 'block' }}>2. Detalhes Adicionais (Opcional)</label>
