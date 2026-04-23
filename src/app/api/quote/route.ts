@@ -55,7 +55,7 @@ export async function POST(req: Request) {
         // Check if client exists
         const clientRes = await dbClient.query('SELECT id FROM clientes WHERE email = $1', [data.email]);
         
-        if (clientRes.rowCount > 0) {
+        if (clientRes.rows.length > 0) {
           // Client exists, update "proposta"
           await dbClient.query(
             'UPDATE clientes SET proposta = $1 WHERE email = $2',
