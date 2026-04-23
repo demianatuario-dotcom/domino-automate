@@ -40,7 +40,7 @@ export default function BudgetModule() {
       const res = await fetch('/api/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, email, telefone, descricao, dores: selectedDores.join(', '), perguntas_respostas: respostas })
+        body: JSON.stringify({ nome, email, telefone, descricao, dores: selectedDores.join(', '), doresArray: selectedDores, perguntas_respostas: respostas })
       });
       
       if(res.ok) setSuccess(true);

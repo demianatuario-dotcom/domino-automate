@@ -22,7 +22,7 @@ export default function Pillars() {
   return (
     <section id="solucoes" style={{ padding: '6rem 2rem', position: 'relative' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <h2 className="display-lg" style={{ textAlign: 'center', marginBottom: '4rem', fontSize: '2.5rem' }}>Nossos Pilar Arquiteturais</h2>
+        <h2 className="display-lg" style={{ textAlign: 'center', marginBottom: '4rem' }}>Nossos Pilares Arquiteturais</h2>
         
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
           {pillars.map((pillar, i) => (

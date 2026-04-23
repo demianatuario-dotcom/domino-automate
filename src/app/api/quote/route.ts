@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Client } from 'pg';
 
 export async function POST(req: Request) {
   try {
@@ -36,6 +37,44 @@ export async function POST(req: Request) {
       }
     } else {
       console.log("Mocking N8N Push. Webhook URL not set. Data:", data);
+    }
+
+    // Database logic
+    if (data.email && data.doresArray && data.doresArray.length > 0) {
+      const dbClient = new Client({ connectionString: process.env.DATABASE_URL });
+      try {
+        await dbClient.connect();
+        
+        // Find the ids of the services that match the "dores"
+        const servicosRes = await dbClient.query(
+          'SELECT id FROM servicos WHERE gargalo = ANY($1)',
+          [data.doresArray]
+        );
+        const servicosIds = servicosRes.rows.map(row => row.id).join(', ');
+        
+        // Check if client exists
+        const clientRes = await dbClient.query('SELECT id FROM clientes WHERE email = $1', [data.email]);
+        
+        if (clientRes.rowCount > 0) {
+          // Client exists, update "proposta"
+          await dbClient.query(
+            'UPDATE clientes SET proposta = $1 WHERE email = $2',
+            [servicosIds, data.email]
+          );
+        } else {
+          // Client doesn't exist, insert
+          await dbClient.query(
+            'INSERT INTO clientes (email, whatsapp, proposta) VALUES ($1, $2, $3)',
+            [data.email, data.telefone || null, servicosIds]
+          );
+        }
+      } catch (dbError) {
+        console.error("Database operation failed:", dbError);
+        // We might not want to fail the whole request if only DB fails, 
+        // since the webhook was already sent, but logging it is important.
+      } finally {
+        await dbClient.end();
+      }
     }
 
     return NextResponse.json({ success: true, message: 'Proposta encaminhada via N8N.' });

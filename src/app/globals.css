@@ -172,3 +172,38 @@ button, input, textarea {
   background-color: var(--primary-container);
   color: var(--secondary);
 }
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+  
+  header {
+    padding: 0.5rem 1rem !important;
+  }
+
+  .header-nav {
+    gap: 0.5rem !important;
+  }
+
+  .mobile-logo-img {
+    width: 120px !important;
+    height: auto !important;
+  }
+
+  .display-lg {
+    font-size: 2.25rem !important;
+    line-height: 1.2;
+    hyphens: auto;
+  }
+
+  h2.display-lg {
+    font-size: 2rem !important;
+  }
+  
+  .btn-primary.header-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap;
+  }
+}
