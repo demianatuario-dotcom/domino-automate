@@ -8,7 +8,9 @@ export default function AIChat() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -24,9 +26,59 @@ export default function AIChat() {
     return () => window.removeEventListener('open-ai-chat', handleOpenChat);
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+        recognitionRef.current.lang = 'pt-BR';
+
+        recognitionRef.current.onresult = (event: any) => {
+          const transcript = event.results[0][0].transcript;
+          setInput(prev => prev + (prev ? ' ' : '') + transcript);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error('Speech recognition error', event.error);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+  }, []);
+
+  const toggleListen = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.start();
+          setIsListening(true);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        alert("Desculpe, seu navegador não suporta reconhecimento de voz.");
+      }
+    }
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    }
 
     const userMessage = input.trim();
     setInput('');
@@ -107,17 +159,39 @@ export default function AIChat() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSend} style={{ padding: '1rem', backgroundColor: 'var(--surface-container-highest)', borderTop: '1px solid var(--outline-variant)', display: 'flex', gap: '0.5rem' }}>
+          <form onSubmit={handleSend} style={{ padding: '1rem', backgroundColor: 'var(--surface-container-highest)', borderTop: '1px solid var(--outline-variant)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <input 
               type="text" 
               className="input-field" 
               style={{ flex: 1, minHeight: '40px', padding: '0.5rem 1rem' }} 
-              placeholder="Digite sua dúvida..." 
+              placeholder={isListening ? "Ouvindo..." : "Digite sua dúvida..."}
               value={input}
               onChange={e => setInput(e.target.value)}
               disabled={isLoading}
             />
-            <button type="submit" disabled={isLoading} className="btn-primary" style={{ padding: '0.5rem 1rem', borderRadius: '8px' }}>
+            <button 
+              type="button" 
+              onClick={toggleListen}
+              style={{ 
+                padding: '0.5rem', 
+                borderRadius: '8px', 
+                background: 'transparent', 
+                border: isListening ? '1px solid var(--error)' : '1px solid var(--outline-variant)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: '40px',
+                minHeight: '40px',
+                animation: isListening ? 'pulse 2s infinite' : 'none'
+              }}
+              title={isListening ? "Parar gravação" : "Falar"}
+            >
+              <span style={{ fontSize: '1.2rem', color: isListening ? 'var(--error)' : 'var(--secondary)' }}>
+                {isListening ? '🛑' : '🎤'}
+              </span>
+            </button>
+            <button type="submit" disabled={isLoading} className="btn-primary" style={{ padding: '0.5rem 1rem', borderRadius: '8px', minWidth: '40px', minHeight: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               ▶
             </button>
           </form>
