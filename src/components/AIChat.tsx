@@ -106,6 +106,16 @@ export default function AIChat() {
     }
   };
 
+  const formatMessage = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={index} style={{ color: 'var(--secondary)' }}>{part.slice(2, -2)}</strong>;
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   return (
     <>
       {/* Floating Button Container */}
@@ -147,7 +157,7 @@ export default function AIChat() {
           <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {messages.map((m, i) => (
               <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%', backgroundColor: m.role === 'user' ? 'var(--primary-container)' : 'var(--surface-container)', padding: '0.75rem 1rem', borderRadius: '8px', border: m.role === 'user' ? '1px solid var(--secondary)' : '1px solid var(--outline-variant)' }}>
-                <p className="body-sm">{m.content}</p>
+                <p className="body-sm">{formatMessage(m.content)}</p>
               </div>
             ))}
             {isLoading && (
