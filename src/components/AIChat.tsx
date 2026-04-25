@@ -11,6 +11,12 @@ export default function AIChat() {
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const messagesRef = useRef(messages);
+
+  // Sync ref with state
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -37,8 +43,13 @@ export default function AIChat() {
 
         recognitionRef.current.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
-          setInput(prev => prev + (prev ? ' ' : '') + transcript);
+          setInput(transcript);
           setIsListening(false);
+          
+          // Envio automático após transcrição com um pequeno delay visual
+          setTimeout(() => {
+            handleSendInternal(transcript);
+          }, 500);
         };
 
         recognitionRef.current.onerror = (event: any) => {
@@ -73,14 +84,18 @@ export default function AIChat() {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    handleSendInternal(input);
+  };
+
+  const handleSendInternal = async (text: string) => {
+    if (!text.trim()) return;
 
     if (isListening) {
       recognitionRef.current?.stop();
       setIsListening(false);
     }
 
-    const userMessage = input.trim();
+    const userMessage = text.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
@@ -89,7 +104,7 @@ export default function AIChat() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history: messages.slice(1), message: userMessage })
+        body: JSON.stringify({ history: messagesRef.current.slice(1), message: userMessage })
       });
       const data = await res.json();
       
