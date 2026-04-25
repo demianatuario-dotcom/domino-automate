@@ -16,3 +16,16 @@ export async function getVideos() {
     client.release();
   }
 }
+
+export async function getServicos() {
+  const client = await pool.connect();
+  try {
+    const res = await client.query('SELECT gargalo, justificativa, atividades, implantacao, manutencao FROM servicos');
+    return res.rows;
+  } catch(e) {
+    console.error("DB Fetch Error: ", e);
+    return [];
+  } finally {
+    client.release();
+  }
+}

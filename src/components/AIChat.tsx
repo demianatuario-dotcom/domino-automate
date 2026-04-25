@@ -50,13 +50,27 @@ export default function AIChat() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button Container */}
       <div 
-        className="floating-shadow glass-panel"
-        style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000, padding: '1rem', borderRadius: '50%', cursor: 'pointer', display: isOpen ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--primary-container)', border: '1px solid var(--secondary)' }}
-        onClick={() => setIsOpen(true)}
+        style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000, display: isOpen ? 'none' : 'flex', alignItems: 'flex-end', gap: '1rem' }}
       >
-        <span style={{ fontSize: '1.5rem' }}>💬</span>
+        {/* Welcome Message Bubble */}
+        <div 
+          className="glass-panel"
+          style={{ padding: '0.75rem 1.25rem', borderRadius: '1rem 1rem 0 1rem', backgroundColor: 'var(--surface-container-highest)', border: '1px solid var(--secondary)', boxShadow: '0 4px 15px rgba(0,0,0,0.2)', cursor: 'pointer', position: 'relative', top: '-10px' }}
+          onClick={() => setIsOpen(true)}
+        >
+          <p className="body-sm" style={{ margin: 0, fontWeight: 500, color: 'var(--on-surface)', textAlign: 'center' }}>Fale com nosso<br/><span style={{color: 'var(--secondary)'}}>assistente virtual!</span></p>
+        </div>
+
+        {/* Floating Button */}
+        <div 
+          className="floating-shadow glass-panel"
+          style={{ width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--primary-container)', border: '2px solid var(--secondary)', animation: 'pulse 2s infinite' }}
+          onClick={() => setIsOpen(true)}
+        >
+          <span style={{ fontSize: '1.75rem' }}>💬</span>
+        </div>
       </div>
 
       {/* Chat Window */}
