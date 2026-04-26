@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function ValueProposition() {
   const diffs = [
-    { title: "Setup Ultra Rápido", desc: "Sua primeira automação rodando em menos de 7 dias." },
+    { title: "Melhor Custo-Benefício", desc: "Preço reduzido em relação à concorrência. Cobrimos ofertas e não perdemos negócio por orçamento." },
     { title: "ROI Curto", desc: "A maioria dos nossos clientes recupera o investimento nos primeiros 30-60 dias." },
     { title: "IA Privada e Segura", desc: "Seus dados não são usados para treinar modelos públicos. Segurança total." },
     { title: "Infraestrutura Própria", desc: "Não dependemos apenas de ferramentas terceiras. Criamos motores customizados." }
