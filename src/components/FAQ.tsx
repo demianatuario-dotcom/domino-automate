@@ -9,7 +9,7 @@ export default function FAQ() {
     },
     {
       q: "Quanto tempo demora para a solução estar no ar?",
-      a: "Nossa metodologia de 'Setup Rápido' permite que sua primeira automação esteja rodando em média em 7 dias úteis após o diagnóstico."
+      a: "A automação deve estar rodando entre 30 e 60 dias, dependendo da complexidade do pedido."
     },
     {
       q: "A Domino Automate substitui minha equipe atual?",
