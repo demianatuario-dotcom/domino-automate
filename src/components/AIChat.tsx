@@ -87,6 +87,9 @@ export default function AIChat() {
     handleSendInternal(input);
   };
 
+  const [leadStage, setLeadStage] = useState<'neutral' | 'collect_name' | 'collect_email' | 'collect_phone'>('neutral');
+  const [leadData, setLeadData] = useState({ nome: '', email: '', telefone: '', dores: [] as string[], detalhes: '' });
+
   const handleSendInternal = async (text: string) => {
     if (!text.trim()) return;
 
@@ -98,6 +101,13 @@ export default function AIChat() {
     const userMessage = text.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+
+    // Lógica de captura de leads no frontend
+    if (leadStage !== 'neutral') {
+      processLeadCapture(userMessage);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -109,7 +119,25 @@ export default function AIChat() {
       const data = await res.json();
       
       if (res.ok && data.reply) {
-        setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+        let cleanReply = data.reply;
+        const automateMatch = cleanReply.match(/\[\[AUTOMATE: (.*?)\]\]/);
+        
+        if (automateMatch) {
+          try {
+            const automateData = JSON.parse(automateMatch[1]);
+            setLeadData(prev => ({ ...prev, dores: automateData.gargalos, detalhes: automateData.detalhes }));
+            cleanReply = cleanReply.replace(/\[\[AUTOMATE: .*?\]\]/, '').trim();
+          } catch (e) {
+            console.error("Erro ao processar dados de automação", e);
+          }
+        }
+
+        setMessages(prev => [...prev, { role: 'assistant', content: cleanReply }]);
+
+        // Detectar se a IA perguntou sobre o orçamento
+        if (cleanReply.toLowerCase().includes('posso fazer seu pedido de orçamento')) {
+          // O fluxo de confirmação será tratado na próxima resposta do usuário
+        }
       } else {
         setMessages(prev => [...prev, { role: 'assistant', content: 'Desculpe, meu sistema está passando por uma manutenção no momento.' }]);
       }
@@ -121,8 +149,48 @@ export default function AIChat() {
     }
   };
 
+  const processLeadCapture = (text: string) => {
+    if (leadStage === 'neutral') return;
+
+    if (leadStage === 'collect_name') {
+      setLeadData(prev => ({ ...prev, nome: text }));
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Perfeito! Qual o melhor e-mail para enviarmos a proposta?' }]);
+      setLeadStage('collect_email');
+    } else if (leadStage === 'collect_email') {
+      setLeadData(prev => ({ ...prev, email: text }));
+      setMessages(prev => [...prev, { role: 'assistant', content: 'E por último, qual o seu WhatsApp? (Se preferir não informar, basta digitar "não")' }]);
+      setLeadStage('collect_phone');
+    } else if (leadStage === 'collect_phone') {
+      const phone = text.toLowerCase().includes('não') ? '' : text;
+      const finalData = { ...leadData, telefone: phone };
+      setLeadData(finalData);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Tudo pronto! Estou gerando sua proposta analítica agora mesmo. Você receberá um e-mail em instantes.' }]);
+      setLeadStage('neutral');
+      
+      // Disparar Automação Silenciosa
+      window.dispatchEvent(new CustomEvent('automate-budget', { detail: finalData }));
+    }
+  };
+
+  // Interceptar respostas de confirmação do orçamento
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === 'user' && leadStage === 'neutral') {
+      const lastAssistant = messages[messages.length - 2];
+      if (lastAssistant?.content.toLowerCase().includes('posso fazer seu pedido de orçamento')) {
+        const text = lastMessage.content.toLowerCase();
+        if (text.includes('sim') || text.includes('pode') || text.includes('claro') || text.includes('com certeza')) {
+          setLeadStage('collect_name');
+          setMessages(prev => [...prev, { role: 'assistant', content: 'Ótimo! Para começar, qual o nome da sua empresa ou o seu nome de contato?' }]);
+        }
+      }
+    }
+  }, [messages, leadStage]);
+
   const formatMessage = (text: string) => {
-    const parts = text.split(/(\*\*.*?\*\*)/g);
+    // Remove tags de automação da exibição
+    const cleanText = text.replace(/\[\[AUTOMATE: .*?\]\]/g, '').trim();
+    const parts = cleanText.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
         return <strong key={index} style={{ color: 'var(--secondary)' }}>{part.slice(2, -2)}</strong>;

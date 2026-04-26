@@ -32,8 +32,47 @@ export default function BudgetModule() {
     }
   };
 
+  useEffect(() => {
+    const handleAutomate = (e: any) => {
+      const data = e.detail;
+      if (data) {
+        setNome(data.nome || '');
+        setEmail(data.email || '');
+        setTelefone(data.telefone || '');
+        setDescricao(data.detalhes || '');
+        setSelectedDores(data.dores || []);
+        
+        // Disparar o envio após um pequeno delay para garantir que os estados foram atualizados
+        setTimeout(() => {
+          setLoading(true);
+          fetch('/api/quote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              nome: data.nome, 
+              email: data.email, 
+              telefone: data.telefone, 
+              descricao: data.detalhes, 
+              dores: (data.dores || []).join(', '), 
+              doresArray: data.dores || [], 
+              perguntas_respostas: {} // O assistente preenche os detalhes no campo de descrição
+            })
+          })
+          .then(res => {
+            if(res.ok) setSuccess(true);
+          })
+          .catch(err => console.error(err))
+          .finally(() => setLoading(false));
+        }, 100);
+      }
+    };
+
+    window.addEventListener('automate-budget', handleAutomate);
+    return () => window.removeEventListener('automate-budget', handleAutomate);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     
     try {
