@@ -3,9 +3,11 @@ import React from 'react';
 export default function ValueProposition() {
   const diffs = [
     { title: "Melhor Custo-Benefício", desc: "Preço reduzido em relação à concorrência. Cobrimos ofertas e não perdemos negócio por orçamento." },
-    { title: "ROI Curto", desc: "A maioria dos nossos clientes recupera o investimento nos primeiros 30-60 dias." },
+    { title: "ROI Curto", desc: "Recuperação do investimento projetada em até 120 dias." },
     { title: "IA Privada e Segura", desc: "Seus dados não são usados para treinar modelos públicos. Segurança total." },
-    { title: "Infraestrutura Própria", desc: "Não dependemos apenas de ferramentas terceiras. Criamos motores customizados." }
+    { title: "Infraestrutura Própria", desc: "Não dependemos apenas de ferramentas terceiras. Criamos motores customizados." },
+    { title: "Foco em Resultados", desc: "Nosso sucesso é medido pelo seu faturamento. Acompanhamos de perto para garantir que você atinja suas metas." },
+    { title: "Satisfação Garantida", desc: "Se você não ficar satisfeito com nossos serviços, devolvemos o valor integral investido." }
   ];
 
   const steps = [
@@ -17,7 +19,7 @@ export default function ValueProposition() {
   return (
     <section style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface-container)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        
+
         {/* Why Domino? */}
         <div style={{ marginBottom: '6rem' }}>
           <h2 className="display-sm" style={{ textAlign: 'center', marginBottom: '3rem' }}>Por que escolher a <span style={{ color: 'var(--secondary)' }}>Domino Automate?</span></h2>
