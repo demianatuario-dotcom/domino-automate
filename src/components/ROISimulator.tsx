@@ -80,16 +80,18 @@ export default function ROISimulator() {
 
           {/* Results */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div className="card-base glass-panel" style={{ borderLeft: '4px solid var(--error)', backgroundColor: 'rgba(255, 0, 0, 0.05)' }}>
-              <p className="label-sm" style={{ opacity: 0.7, textTransform: 'uppercase', letterSpacing: '1px' }}>Perda Anual Estimada (Inércia)</p>
+            <div className="card-base glass-panel" style={{ borderLeft: '8px solid var(--error)', backgroundColor: 'rgba(255, 0, 0, 0.08)', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '5rem', opacity: 0.05, transform: 'rotate(15deg)' }}>📉</div>
+              <p className="label-sm" style={{ opacity: 0.7, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>Custo da Inação (Anual)</p>
               <h3 className="display-sm" style={{ color: 'var(--error)', margin: '0.5rem 0' }}>- R$ {perdaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
-              <p className="body-sm" style={{ opacity: 0.6 }}>Dinheiro perdido por demora no atendimento inicial.</p>
+              <p className="body-sm" style={{ opacity: 0.8, fontWeight: 500 }}>Este é o valor que sua empresa está queimando mensalmente por demora e falta de follow-up.</p>
             </div>
 
-            <div className="card-base glass-panel" style={{ borderLeft: '4px solid var(--secondary)', backgroundColor: 'rgba(0, 255, 0, 0.05)' }}>
-              <p className="label-sm" style={{ opacity: 0.7, textTransform: 'uppercase', letterSpacing: '1px' }}>Ganho Extra Anual (Automação)</p>
+            <div className="card-base glass-panel" style={{ borderLeft: '8px solid var(--secondary)', backgroundColor: 'rgba(0, 255, 0, 0.08)', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '5rem', opacity: 0.05, transform: 'rotate(15deg)' }}>📈</div>
+              <p className="label-sm" style={{ opacity: 0.7, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>Potencial de Recuperação (Anual)</p>
               <h3 className="display-sm" style={{ color: 'var(--secondary)', margin: '0.5rem 0' }}>+ R$ {ganhoPotencial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
-              <p className="body-sm" style={{ opacity: 0.6 }}>Faturamento recuperado com follow-up e SDR 24/7.</p>
+              <p className="body-sm" style={{ opacity: 0.8, fontWeight: 500 }}>Faturamento extra gerado por atendimento 24/7 e cadência automática de vendas.</p>
             </div>
 
             <div style={{ marginTop: '1rem', textAlign: 'center' }}>

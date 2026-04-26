@@ -5,12 +5,12 @@ export default function Hero() {
     <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6rem 2rem 2rem', textAlign: 'center', position: 'relative', background: 'var(--surface)' }}>
       <div style={{ maxWidth: '900px', zIndex: 10 }}>
         <h1 className="display-lg" style={{ marginBottom: '1.5rem', lineHeight: '1.1' }}>
-          Sua empresa perde vendas todos os dias por <br/>
-          <span style={{ color: 'var(--secondary)' }}>processos manuais e demora no atendimento.</span>
+          Sua empresa perde vendas diariamente por <br/>
+          <span style={{ color: 'var(--secondary)' }}>atendimento lento e processos manuais.</span>
         </h1>
         <p className="body-md" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '700px', margin: '0 auto 2.5rem', fontSize: '1.25rem' }}>
-          Recupere faturamento em até 30 dias com automação comercial e 
-          Inteligência Artificial de alta performance. Atendimento instantâneo 24/7.
+          Automatize seu comercial agora e recupere seu faturamento em até 30 dias. 
+          Soluções de IA de alta performance para quem não pode perder nenhum lead.
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
           <a href="#orcamento" className="btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>Solicitar Diagnóstico Gratuito</a>
