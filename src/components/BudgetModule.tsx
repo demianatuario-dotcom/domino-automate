@@ -95,14 +95,13 @@ export default function BudgetModule() {
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         <h2 className="display-lg" style={{ marginBottom: '1rem', fontSize: '2.5rem', textAlign: 'center' }}>Projete Sua Solução</h2>
         <p className="body-md" style={{ opacity: 0.8, textAlign: 'center', marginBottom: '3rem' }}>
-          Selecione os gargalos da sua operação. Nossa inteligência desenhará a solução exata e 
-          lhe enviaremos uma proposta comercial inteligente direto no e-mail.
+          Selecione os gargalos da sua operação. Nossa equipe analisará seu cenário para desenhar a melhor solução estratégica e entraremos em contato após a análise.
         </p>
 
         {success ? (
           <div className="card-base ghost-border" style={{ textAlign: 'center', padding: '4rem' }}>
             <h3 className="headline-sm" style={{ color: 'var(--secondary)' }}>Solicitação Recebida!</h3>
-            <p className="body-md" style={{ marginTop: '1rem' }}>Sua proposta será gerada e enviada via N8N para o seu contato de e-mail em instantes.</p>
+            <p className="body-md" style={{ marginTop: '1rem' }}>Seu formulário será analisado pela Domino Automate e entraremos em contato após a análise.</p>
           </div>
         ) : (
           <form className="card-base ghost-border floating-shadow" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

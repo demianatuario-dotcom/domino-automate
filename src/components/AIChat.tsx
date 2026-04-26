@@ -164,7 +164,7 @@ export default function AIChat() {
       const phone = text.toLowerCase().includes('não') ? '' : text;
       const finalData = { ...leadData, telefone: phone };
       setLeadData(finalData);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Tudo pronto! Estou gerando sua proposta analítica agora mesmo. Você receberá um e-mail em instantes.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Tudo pronto! O formulário será analisado pela Domino Automate e entraremos em contato após a análise.' }]);
       setLeadStage('neutral');
       
       // Disparar Automação Silenciosa
