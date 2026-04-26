@@ -2,19 +2,32 @@ import React from 'react';
 
 export default function Hero() {
   return (
-    <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6rem 2rem 2rem', textAlign: 'center', position: 'relative' }}>
-      <div style={{ maxWidth: '800px', zIndex: 10 }}>
-        <h1 className="display-lg" style={{ marginBottom: '1.5rem' }}>
-          Otimize sua Operação. <br/>
-          <span style={{ color: 'var(--secondary)' }}>Escale sua Receita.</span>
+    <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6rem 2rem 2rem', textAlign: 'center', position: 'relative', background: 'var(--surface)' }}>
+      <div style={{ maxWidth: '900px', zIndex: 10 }}>
+        <h1 className="display-lg" style={{ marginBottom: '1.5rem', lineHeight: '1.1' }}>
+          Sua empresa perde vendas todos os dias por <br/>
+          <span style={{ color: 'var(--secondary)' }}>processos manuais e demora no atendimento.</span>
         </h1>
-        <p className="body-md" style={{ marginBottom: '2.5rem', opacity: 0.8, maxWidth: '600px', margin: '0 auto 2.5rem' }}>
-          A Domino Automate é o braço de engenharia da sua PME. Transformamos processos manuais 
-          em sistemas automatizados através de N8N, Python e Inteligência Artificial.
+        <p className="body-md" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '700px', margin: '0 auto 2.5rem', fontSize: '1.25rem' }}>
+          Recupere faturamento em até 30 dias com automação comercial e 
+          Inteligência Artificial de alta performance. Atendimento instantâneo 24/7.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <a href="#orcamento" className="btn-primary">Criar Solução Agora</a>
-          <a href="#solucoes" className="btn-secondary">Explorar Serviços</a>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
+          <a href="#orcamento" className="btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>Solicitar Diagnóstico Gratuito</a>
+          <a href="#simulador" className="btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>Simular Economia da Minha Empresa</a>
+        </div>
+
+        {/* Rapid Proof Badges */}
+        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap', opacity: 0.7 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: 'var(--secondary)' }}>✓</span> <span className="label-md">Atendimento 24/7</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: 'var(--secondary)' }}>✓</span> <span className="label-md">Resposta Instantânea</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ color: 'var(--secondary)' }}>✓</span> <span className="label-md">Follow-up Automático</span>
+          </div>
         </div>
       </div>
       

@@ -10,6 +10,7 @@ export default function Header() {
       </Link>
       <nav className="header-nav" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
         <a href="#solucoes" className="label-md desktop-only">Soluções</a>
+        <a href="#simulador" className="label-md desktop-only">Simular Ganhos</a>
         <a href="#portfolio" className="label-md desktop-only">Casos Reais</a>
         <a href="#orcamento" className="btn-primary header-btn" style={{ padding: '0.5rem 1rem' }}>Solicitar Proposta</a>
       </nav>
