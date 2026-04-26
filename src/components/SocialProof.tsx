@@ -28,7 +28,6 @@ export default function SocialProof() {
             <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>N8N</span>
             <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>PYTHON</span>
             <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>OPENAI</span>
-            <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>MAKE</span>
             <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>ANTHROPIC</span>
           </div>
         </div>
