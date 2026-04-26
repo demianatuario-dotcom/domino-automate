@@ -21,10 +21,22 @@ export default function NicheSolutions() {
       roi: "Recuperação de até 15% das vendas perdidas."
     },
     {
-      title: "Serviços e B2B",
-      pain: "Processos manuais de orçamento e contratos.",
-      solution: "Automação de propostas e integração total com CRM.",
-      roi: "Economia de 20+ horas semanais da equipe."
+      title: "Salões de Beleza",
+      pain: "Gestão de agenda e cancelamentos de última hora.",
+      solution: "IA para agendamento automático e lembretes inteligentes via WhatsApp.",
+      roi: "Aumento de 30% na taxa de ocupação."
+    },
+    {
+      title: "Clínicas de Estética",
+      pain: "Perda de leads por demora no primeiro contato.",
+      solution: "SDR de IA para qualificação e venda de pacotes 24/7.",
+      roi: "Aumento de 25% na venda de procedimentos."
+    },
+    {
+      title: "Barbearia",
+      pain: "Fluxo intenso de mensagens e marcações manuais.",
+      solution: "Autoconsulta de horários e agendamento instantâneo via IA.",
+      roi: "Redução total de custos com recepção."
     }
   ];
 
