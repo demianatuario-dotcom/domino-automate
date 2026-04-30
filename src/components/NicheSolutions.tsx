@@ -37,6 +37,18 @@ export default function NicheSolutions() {
       pain: "Fluxo intenso de mensagens e marcações manuais.",
       solution: "Autoconsulta de horários e agendamento instantâneo via IA.",
       roi: "Redução total de custos com recepção."
+    },
+    {
+      title: "Escritório de Advocacia",
+      pain: "Demora na triagem inicial de clientes e dúvidas repetitivas.",
+      solution: "IA para triagem jurídica, agendamento de consultas e respostas automáticas 24/7.",
+      roi: "Aumento de 35% na conversão de novos clientes."
+    },
+    {
+      title: "Farmácias",
+      pain: "Atendimento lento em pedidos via WhatsApp e cotações manuais.",
+      solution: "IA para cotação automática de medicamentos e finalização de pedidos.",
+      roi: "Redução de 50% no tempo médio de atendimento."
     }
   ];
 
