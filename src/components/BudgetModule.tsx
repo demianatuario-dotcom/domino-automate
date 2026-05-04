@@ -162,8 +162,13 @@ export default function BudgetModule() {
               ></textarea>
             </div>
 
-            <button type="submit" className="btn-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
-              {loading ? 'Calculando Arquitetura...' : 'Solicitar Proposta Analítica'}
+            <button type="submit" className="btn-primary" disabled={loading} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {loading ? (
+                <>
+                  <span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid rgba(10,14,20,0.3)', borderTopColor: 'var(--on-secondary)', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
+                  Processando...
+                </>
+              ) : 'Solicitar Proposta Analítica'}
             </button>
           </form>
         )}

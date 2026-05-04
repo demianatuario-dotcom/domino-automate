@@ -9,7 +9,13 @@ function getYouTubeID(url: string) {
 }
 
 export default async function VideoGallery() {
-  const videos = await getVideos();
+  let videos: any[] = [];
+  try {
+    videos = await getVideos();
+  } catch (e) {
+    console.error("VideoGallery: DB connection failed, skipping.", (e as Error).message);
+    return <></>;
+  }
 
   if (!videos || videos.length === 0) {
     return <></>;

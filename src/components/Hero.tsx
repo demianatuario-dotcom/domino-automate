@@ -5,7 +5,7 @@ export default function Hero() {
     <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6rem 2rem 2rem', textAlign: 'center', position: 'relative', background: 'var(--surface)' }}>
       <div style={{ maxWidth: '900px', zIndex: 10 }}>
         <h1 className="display-lg" style={{ marginBottom: '1.5rem', lineHeight: '1.1' }}>
-          Sua empresa perde vendas diariamente por <br/>
+          Sua empresa perde vendas diariamente por{' '}
           <span style={{ color: 'var(--secondary)' }}>atendimento lento e processos manuais.</span>
         </h1>
         <p className="body-md" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '700px', margin: '0 auto 2.5rem', fontSize: '1.25rem' }}>

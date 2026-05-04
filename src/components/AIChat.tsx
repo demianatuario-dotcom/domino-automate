@@ -207,7 +207,7 @@ export default function AIChat() {
       >
         {/* Welcome Message Bubble */}
         <div 
-          className="glass-panel"
+          className="glass-panel chat-welcome-bubble"
           style={{ padding: '0.75rem 1.25rem', borderRadius: '1rem 1rem 0 1rem', backgroundColor: 'var(--surface-container-highest)', border: '1px solid var(--secondary)', boxShadow: '0 4px 15px rgba(0,0,0,0.2)', cursor: 'pointer', position: 'relative', top: '-10px' }}
           onClick={() => setIsOpen(true)}
         >
@@ -227,7 +227,7 @@ export default function AIChat() {
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className="card-base floating-shadow ghost-border" 
+          className="card-base floating-shadow ghost-border chat-window-mobile" 
           style={{ position: 'fixed', bottom: '2rem', right: '2rem', width: '350px', height: '500px', zIndex: 1000, display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}
         >
           {/* Header */}

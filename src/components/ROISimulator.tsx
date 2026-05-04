@@ -47,7 +47,7 @@ export default function ROISimulator() {
                 step="10" 
                 value={leads} 
                 onChange={(e) => setLeads(Number(e.target.value))} 
-                style={{ width: '100%', accentColor: 'var(--secondary)' }}
+                style={{ width: '100%' }}
               />
             </div>
             
@@ -60,7 +60,7 @@ export default function ROISimulator() {
                 step="100" 
                 value={ticket} 
                 onChange={(e) => setTicket(Number(e.target.value))} 
-                style={{ width: '100%', accentColor: 'var(--secondary)' }}
+                style={{ width: '100%' }}
               />
             </div>
 
@@ -73,7 +73,7 @@ export default function ROISimulator() {
                 step="0.5" 
                 value={conversao} 
                 onChange={(e) => setConversao(Number(e.target.value))} 
-                style={{ width: '100%', accentColor: 'var(--secondary)' }}
+                style={{ width: '100%' }}
               />
             </div>
           </div>
