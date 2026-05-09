@@ -1,0 +1,151 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { useSession, signIn } from 'next-auth/react';
+import CommentItem from './CommentItem';
+
+export type CommentType = {
+  id: number;
+  user_name: string;
+  user_image: string | null;
+  provider: string;
+  content: string;
+  parent_id: number | null;
+  created_at: string;
+};
+
+export default function CommentsSection() {
+  const { data: session, status } = useSession();
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchComments = async () => {
+    try {
+      const res = await fetch('/api/comments');
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data.comments);
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, []);
+
+  const handleSubmit = async (content: string, parentId: number | null = null) => {
+    if (!content.trim()) return;
+    setIsSubmitting(true);
+    
+    try {
+      const res = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, parentId }),
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setComments(prev => [...prev, data.comment]);
+        if (parentId === null) {
+          setNewComment('');
+        }
+      }
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const rootComments = comments.filter(c => c.parent_id === null).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  return (
+    <section id="comentarios" style={{ padding: '4rem 2rem', backgroundColor: 'var(--surface)' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <h2 className="display-sm" style={{ marginBottom: '2rem', textAlign: 'center' }}>Experiência dos Nossos Clientes</h2>
+        
+        {/* Comment Input Area */}
+        <div className="card-base ghost-border" style={{ marginBottom: '3rem' }}>
+          {status === 'loading' ? (
+            <p style={{ textAlign: 'center', opacity: 0.6 }}>Carregando...</p>
+          ) : session ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {session.user?.image ? (
+                  <img src={session.user.image} alt={session.user.name || 'User'} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                ) : (
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--surface-container-highest)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>
+                )}
+                <span className="label-md" style={{ opacity: 0.8 }}>Comentando como <strong>{session.user?.name}</strong></span>
+              </div>
+              <textarea 
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Compartilhe sua experiência..."
+                className="input-field ghost-border"
+                style={{ minHeight: '120px', resize: 'vertical' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button 
+                  className="btn-primary" 
+                  onClick={() => handleSubmit(newComment)}
+                  disabled={isSubmitting || !newComment.trim()}
+                >
+                  {isSubmitting ? 'Enviando...' : 'Publicar Comentário'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+              <h3 className="headline-sm" style={{ marginBottom: '1rem' }}>Junte-se à conversa</h3>
+              <p className="body-md" style={{ opacity: 0.8, marginBottom: '2rem' }}>Faça login com sua rede social para deixar um comentário.</p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <button onClick={() => signIn('google')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span>Google</span>
+                </button>
+                <button onClick={() => signIn('facebook')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span>Facebook</span>
+                </button>
+                <button onClick={() => signIn('instagram')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span>Instagram</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Comments List */}
+        <div>
+          <h3 className="label-md" style={{ marginBottom: '1.5rem', opacity: 0.8, borderBottom: '1px solid var(--outline-variant)', paddingBottom: '0.5rem' }}>
+            {comments.length} {comments.length === 1 ? 'Comentário' : 'Comentários'}
+          </h3>
+          
+          {isLoading ? (
+            <p style={{ textAlign: 'center', opacity: 0.6 }}>Carregando comentários...</p>
+          ) : rootComments.length === 0 ? (
+            <p style={{ textAlign: 'center', opacity: 0.6, padding: '3rem 0' }}>Seja o primeiro a comentar!</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+              {rootComments.map(comment => (
+                <CommentItem 
+                  key={comment.id} 
+                  comment={comment} 
+                  replies={comments.filter(c => c.parent_id === comment.id)} 
+                  allComments={comments}
+                  onReplySubmit={handleSubmit}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}

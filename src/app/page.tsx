@@ -6,10 +6,11 @@ import NicheSolutions from '@/components/NicheSolutions';
 import Pillars from '@/components/Pillars';
 import ROISimulator from '@/components/ROISimulator';
 import AIAssistantHighlight from '@/components/AIAssistantHighlight';
+import Portfolio from '@/components/Portfolio';
+import CommentsSection from '@/components/CommentsSection';
 import FAQ from '@/components/FAQ';
 import BudgetModule from '@/components/BudgetModule';
 import VideoGallery from '@/components/VideoGallery';
-import Portfolio from '@/components/Portfolio';
 import AIChat from '@/components/AIChat';
 import Footer from '@/components/Footer';
 
@@ -27,6 +28,7 @@ export default function Home() {
       <ROISimulator />
       <AIAssistantHighlight />
       <Portfolio />
+      <CommentsSection />
       <FAQ />
       <VideoGallery />
       <BudgetModule />
