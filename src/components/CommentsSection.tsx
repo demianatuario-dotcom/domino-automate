@@ -20,6 +20,7 @@ export default function CommentsSection() {
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAuthOptions, setShowAuthOptions] = useState(false);
 
   const fetchComments = async () => {
     try {
@@ -38,6 +39,32 @@ export default function CommentsSection() {
   useEffect(() => {
     fetchComments();
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      const pending = localStorage.getItem('pendingComment');
+      if (pending) {
+        setNewComment(pending);
+        localStorage.removeItem('pendingComment');
+      }
+
+      const pendingReply = localStorage.getItem('pendingReply');
+      const pendingReplyParentId = localStorage.getItem('pendingReplyParentId');
+      
+      if (pendingReply && pendingReplyParentId) {
+        handleSubmit(pendingReply, parseInt(pendingReplyParentId, 10));
+        localStorage.removeItem('pendingReply');
+        localStorage.removeItem('pendingReplyParentId');
+      }
+    }
+  }, [session]);
+
+  const handleLogin = (provider: string) => {
+    if (newComment.trim()) {
+      localStorage.setItem('pendingComment', newComment);
+    }
+    signIn(provider);
+  };
 
   const handleSubmit = async (content: string, parentId: number | null = null) => {
     if (!content.trim()) return;
@@ -75,48 +102,66 @@ export default function CommentsSection() {
         <div className="card-base ghost-border" style={{ marginBottom: '3rem' }}>
           {status === 'loading' ? (
             <p style={{ textAlign: 'center', opacity: 0.6 }}>Carregando...</p>
-          ) : session ? (
+          ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                {session.user?.image ? (
+                {session?.user?.image ? (
                   <img src={session.user.image} alt={session.user.name || 'User'} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                 ) : (
                   <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--surface-container-highest)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>
                 )}
-                <span className="label-md" style={{ opacity: 0.8 }}>Comentando como <strong>{session.user?.name}</strong></span>
+                {session ? (
+                  <span className="label-md" style={{ opacity: 0.8 }}>Comentando como <strong>{session.user?.name}</strong></span>
+                ) : (
+                  <span className="label-md" style={{ opacity: 0.8 }}>Deixe seu comentário</span>
+                )}
               </div>
+              
               <textarea 
                 value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
+                onChange={(e) => {
+                  setNewComment(e.target.value);
+                  if (showAuthOptions && e.target.value.trim() === '') {
+                    setShowAuthOptions(false);
+                  }
+                }}
                 placeholder="Compartilhe sua experiência..."
                 className="input-field ghost-border"
                 style={{ minHeight: '120px', resize: 'vertical' }}
               />
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button 
-                  className="btn-primary" 
-                  onClick={() => handleSubmit(newComment)}
-                  disabled={isSubmitting || !newComment.trim()}
-                >
-                  {isSubmitting ? 'Enviando...' : 'Publicar Comentário'}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-              <h3 className="headline-sm" style={{ marginBottom: '1rem' }}>Junte-se à conversa</h3>
-              <p className="body-md" style={{ opacity: 0.8, marginBottom: '2rem' }}>Faça login com sua rede social para deixar um comentário.</p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                <button onClick={() => signIn('google')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>Google</span>
-                </button>
-                <button onClick={() => signIn('facebook')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>Facebook</span>
-                </button>
-                <button onClick={() => signIn('instagram')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>Instagram</span>
-                </button>
-              </div>
+              
+              {!session && showAuthOptions ? (
+                <div style={{ animation: 'fadeIn 0.3s ease', marginTop: '0.5rem', backgroundColor: 'var(--surface-container)', padding: '1.5rem', borderRadius: '8px' }}>
+                  <p className="label-md" style={{ marginBottom: '1rem', textAlign: 'center' }}>Faça login com sua rede social para publicar:</p>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                    <button onClick={() => handleLogin('google')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span>Google</span>
+                    </button>
+                    <button onClick={() => handleLogin('facebook')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span>Facebook</span>
+                    </button>
+                    <button onClick={() => handleLogin('instagram')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span>Instagram</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button 
+                    className="btn-primary" 
+                    onClick={() => {
+                      if (!session) {
+                        setShowAuthOptions(true);
+                      } else {
+                        handleSubmit(newComment);
+                      }
+                    }}
+                    disabled={isSubmitting || !newComment.trim()}
+                  >
+                    {isSubmitting ? 'Enviando...' : (session ? 'Publicar Comentário' : 'Inserir Comentário')}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
