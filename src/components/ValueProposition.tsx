@@ -7,7 +7,7 @@ export default function ValueProposition() {
     { title: "IA Privada e Segura", desc: "Seus dados não são usados para treinar modelos públicos. Segurança total." },
     { title: "Infraestrutura Própria", desc: "Não dependemos apenas de ferramentas terceiras. Criamos motores customizados." },
     { title: "Foco em Resultados", desc: "Nosso sucesso é medido pelo seu faturamento. Acompanhamos de perto para garantir que você atinja suas metas." },
-    { title: "Satisfação Garantida", desc: "Se você não ficar satisfeito com nossos serviços, devolvemos o valor integral investido." }
+    { title: "Período de Degustação", desc: "Avalie na prática o valor gerado pela nossa solução. A finalização do contrato e o pagamento só ocorrem após esse período de teste." }
   ];
 
   const steps = [

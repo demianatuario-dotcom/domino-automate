@@ -25,6 +25,7 @@ export default function Header() {
         </Link>
         <nav className="header-nav" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
           <a href="#solucoes" className="label-md desktop-only">Soluções</a>
+          <a href="#quem-somos" className="label-md desktop-only">Quem Somos</a>
           <a href="#simulador" className="label-md desktop-only">Simular Ganhos</a>
           <a href="#portfolio" className="label-md desktop-only">Casos Reais</a>
           <a href="#orcamento" className="btn-primary header-btn desktop-only" style={{ padding: '0.5rem 1rem' }}>Solicitar Proposta</a>
@@ -44,6 +45,7 @@ export default function Header() {
       {/* Mobile menu */}
       <nav className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
         <a href="#solucoes" onClick={closeMenu}>Soluções</a>
+        <a href="#quem-somos" onClick={closeMenu}>Quem Somos</a>
         <a href="#simulador" onClick={closeMenu}>Simular Ganhos</a>
         <a href="#portfolio" onClick={closeMenu}>Casos Reais</a>
         <a href="#orcamento" onClick={closeMenu} style={{ color: 'var(--secondary)', fontWeight: 700 }}>Solicitar Proposta</a>

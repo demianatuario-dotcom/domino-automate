@@ -7,7 +7,15 @@ export default function Footer() {
         <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '2rem' }}>
           <div>
             <h4 className="headline-sm" style={{ color: 'var(--secondary)', marginBottom: '1rem' }}>Domino Automate</h4>
-            <p className="body-sm" style={{ maxWidth: '300px', opacity: 0.7 }}>Desenvolvimento Web, Integrações com Python & Agentes de IA autônomos para escalar seu negócio.</p>
+            <p className="body-sm" style={{ maxWidth: '320px', opacity: 0.7, marginBottom: '1rem' }}>
+              Desenvolvimento Web, Integrações com Python & Agentes de IA autônomos para escalar seu negócio.
+            </p>
+            <div className="body-sm" style={{ opacity: 0.6, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <strong>DOMINO AUTOMATE DESENVOLVIMENTO DE SERVICOS DE AUTOMACAO LTDA</strong>
+              <span>CNPJ: 66.699.218/0001-94</span>
+              <span>Águas Claras, Brasília - DF</span>
+              <span>demian.pereira@gmail.com | (61) 8117-1564</span>
+            </div>
             
             {/* Social Links */}
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>

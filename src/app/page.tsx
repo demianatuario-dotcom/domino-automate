@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import SocialProof from '@/components/SocialProof';
+import QuemSomos from '@/components/QuemSomos';
 import ValueProposition from '@/components/ValueProposition';
 import NicheSolutions from '@/components/NicheSolutions';
 import Pillars from '@/components/Pillars';
@@ -22,6 +23,7 @@ export default function Home() {
       <Header />
       <Hero />
       <SocialProof />
+      <QuemSomos />
       <ValueProposition />
       <NicheSolutions />
       <Pillars />
