@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import Script from 'next/script';
 import './globals.css';
 import React from 'react';
-import NextAuthProvider from '@/components/NextAuthProvider';
 
 export const metadata: Metadata = {
   title: 'Domino Automate | Automação, IA e Web',
@@ -31,11 +30,9 @@ export default function RootLayout({
         `}
       </Script>
       <body>
-        <NextAuthProvider>
-          <main>
-            {children}
-          </main>
-        </NextAuthProvider>
+        <main>
+          {children}
+        </main>
       </body>
     </html>
   );

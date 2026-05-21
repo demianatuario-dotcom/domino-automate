@@ -1,22 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useSession, signIn } from 'next-auth/react';
 import { CommentType } from './CommentsSection';
 
 interface CommentItemProps {
   comment: CommentType;
   replies: CommentType[];
   allComments: CommentType[];
-  onReplySubmit: (content: string, parentId: number) => Promise<void>;
+  onReplySubmit: (content: string, parentId: number) => Promise<void> | void;
+  isAuthenticated: boolean;
 }
 
-export default function CommentItem({ comment, replies, allComments, onReplySubmit }: CommentItemProps) {
-  const { data: session } = useSession();
+export default function CommentItem({ comment, replies, allComments, onReplySubmit, isAuthenticated }: CommentItemProps) {
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showAuthOptions, setShowAuthOptions] = useState(false);
 
   const formattedDate = new Date(comment.created_at).toLocaleString('pt-BR', {
     day: '2-digit', month: '2-digit', year: 'numeric',
@@ -66,44 +64,22 @@ export default function CommentItem({ comment, replies, allComments, onReplySubm
             <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               <textarea 
                 value={replyContent}
-                onChange={(e) => {
-                  setReplyContent(e.target.value);
-                  if (showAuthOptions && e.target.value.trim() === '') {
-                    setShowAuthOptions(false);
-                  }
-                }}
+                onChange={(e) => setReplyContent(e.target.value)}
                 placeholder={`Respondendo a ${comment.user_name}...`}
                 className="input-field ghost-border"
                 style={{ minHeight: '80px', resize: 'vertical' }}
               />
               
-              {!session && showAuthOptions ? (
-                <div style={{ animation: 'fadeIn 0.3s ease', marginTop: '0.5rem', backgroundColor: 'var(--surface-container)', padding: '1rem', borderRadius: '8px' }}>
-                  <p className="label-sm" style={{ marginBottom: '1rem', textAlign: 'center' }}>Faça login para responder:</p>
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button onClick={() => { localStorage.setItem('pendingReply', replyContent); localStorage.setItem('pendingReplyParentId', comment.id.toString()); signIn('google'); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem' }}>Google</button>
-                    <button onClick={() => { localStorage.setItem('pendingReply', replyContent); localStorage.setItem('pendingReplyParentId', comment.id.toString()); signIn('facebook'); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem' }}>Facebook</button>
-                    <button onClick={() => { localStorage.setItem('pendingReply', replyContent); localStorage.setItem('pendingReplyParentId', comment.id.toString()); signIn('instagram'); }} className="btn-secondary" style={{ padding: '0.25rem 0.75rem', fontSize: '0.875rem' }}>Instagram</button>
-                  </div>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <button 
-                    className="btn-primary" 
-                    onClick={() => {
-                      if (!session) {
-                        setShowAuthOptions(true);
-                      } else {
-                        handleReply();
-                      }
-                    }}
-                    disabled={isSubmitting || !replyContent.trim()}
-                    style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
-                  >
-                    {isSubmitting ? 'Enviando...' : (session ? 'Enviar Resposta' : 'Responder')}
-                  </button>
-                </div>
-              )}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button 
+                  className="btn-primary" 
+                  onClick={handleReply}
+                  disabled={isSubmitting || !replyContent.trim()}
+                  style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+                >
+                  {isSubmitting ? 'Enviando...' : (isAuthenticated ? 'Enviar Resposta' : 'Responder')}
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -118,6 +94,7 @@ export default function CommentItem({ comment, replies, allComments, onReplySubm
               replies={allComments.filter(c => c.parent_id === reply.id)} 
               allComments={allComments}
               onReplySubmit={onReplySubmit}
+              isAuthenticated={isAuthenticated}
             />
           ))}
         </div>

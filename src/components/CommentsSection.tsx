@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useSession, signIn } from 'next-auth/react';
+import { auth } from '@/lib/firebase';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut, User } from 'firebase/auth';
 import CommentItem from './CommentItem';
 
 export type CommentType = {
@@ -15,12 +16,21 @@ export type CommentType = {
 };
 
 export default function CommentsSection() {
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [comments, setComments] = useState<CommentType[]>([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showAuthOptions, setShowAuthOptions] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const fetchComments = async () => {
     try {
@@ -41,7 +51,7 @@ export default function CommentsSection() {
   }, []);
 
   useEffect(() => {
-    if (session) {
+    if (user) {
       const pending = localStorage.getItem('pendingComment');
       if (pending) {
         setNewComment(pending);
@@ -57,24 +67,49 @@ export default function CommentsSection() {
         localStorage.removeItem('pendingReplyParentId');
       }
     }
-  }, [session]);
+  }, [user]);
 
-  const handleLogin = (provider: string) => {
+  const handleLogin = async (providerName: string) => {
     if (newComment.trim()) {
       localStorage.setItem('pendingComment', newComment);
     }
-    signIn(provider);
+    
+    try {
+      if (providerName === 'google') {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } else {
+        alert('Este provedor será configurado em breve.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const handleSubmit = async (content: string, parentId: number | null = null) => {
-    if (!content.trim()) return;
+    if (!content.trim() || !user) return;
     setIsSubmitting(true);
     
     try {
       const res = await fetch('/api/comments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, parentId }),
+        body: JSON.stringify({ 
+          content, 
+          parentId,
+          userName: user.displayName || 'Usuário',
+          userEmail: user.email,
+          userImage: user.photoURL,
+          provider: 'firebase'
+        }),
       });
       
       if (res.ok) {
@@ -95,23 +130,30 @@ export default function CommentsSection() {
 
   return (
     <section id="comentarios" style={{ padding: '4rem 2rem', backgroundColor: 'var(--surface)' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h2 className="display-sm" style={{ marginBottom: '2rem', textAlign: 'center' }}>Experiência dos Nossos Clientes</h2>
+      <div style={{ maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
+        {user && (
+          <div style={{ position: 'absolute', top: 0, right: 0 }}>
+            <button onClick={handleLogout} className="btn-secondary" style={{ padding: '4px 12px', fontSize: '0.85rem' }}>
+              Sair
+            </button>
+          </div>
+        )}
+        <h2 className="display-sm" style={{ marginBottom: '2rem', textAlign: 'center' }}>Conte-nos a sua Experiência</h2>
         
         {/* Comment Input Area */}
         <div className="card-base ghost-border" style={{ marginBottom: '3rem' }}>
-          {status === 'loading' ? (
+          {authLoading || isLoading ? (
             <p style={{ textAlign: 'center', opacity: 0.6 }}>Carregando...</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                {session?.user?.image ? (
-                  <img src={session.user.image} alt={session.user.name || 'User'} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                {user?.photoURL ? (
+                  <img src={user.photoURL} alt={user.displayName || 'User'} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
                 ) : (
                   <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--surface-container-highest)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👤</div>
                 )}
-                {session ? (
-                  <span className="label-md" style={{ opacity: 0.8 }}>Comentando como <strong>{session.user?.name}</strong></span>
+                {user ? (
+                  <span className="label-md" style={{ opacity: 0.8 }}>Comentando como <strong>{user.displayName}</strong></span>
                 ) : (
                   <span className="label-md" style={{ opacity: 0.8 }}>Deixe seu comentário</span>
                 )}
@@ -130,19 +172,14 @@ export default function CommentsSection() {
                 style={{ minHeight: '120px', resize: 'vertical' }}
               />
               
-              {!session && showAuthOptions ? (
+              {!user && showAuthOptions ? (
                 <div style={{ animation: 'fadeIn 0.3s ease', marginTop: '0.5rem', backgroundColor: 'var(--surface-container)', padding: '1.5rem', borderRadius: '8px' }}>
                   <p className="label-md" style={{ marginBottom: '1rem', textAlign: 'center' }}>Faça login com sua rede social para publicar:</p>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                     <button onClick={() => handleLogin('google')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <span>Google</span>
                     </button>
-                    <button onClick={() => handleLogin('facebook')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span>Facebook</span>
-                    </button>
-                    <button onClick={() => handleLogin('instagram')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span>Instagram</span>
-                    </button>
+                    {/* Add more providers if configured in Firebase */}
                   </div>
                 </div>
               ) : (
@@ -150,7 +187,7 @@ export default function CommentsSection() {
                   <button 
                     className="btn-primary" 
                     onClick={() => {
-                      if (!session) {
+                      if (!user) {
                         setShowAuthOptions(true);
                       } else {
                         handleSubmit(newComment);
@@ -158,7 +195,7 @@ export default function CommentsSection() {
                     }}
                     disabled={isSubmitting || !newComment.trim()}
                   >
-                    {isSubmitting ? 'Enviando...' : (session ? 'Publicar Comentário' : 'Inserir Comentário')}
+                    {isSubmitting ? 'Enviando...' : (user ? 'Publicar Comentário' : 'Inserir Comentário')}
                   </button>
                 </div>
               )}
@@ -184,7 +221,17 @@ export default function CommentsSection() {
                   comment={comment} 
                   replies={comments.filter(c => c.parent_id === comment.id)} 
                   allComments={comments}
-                  onReplySubmit={handleSubmit}
+                  isAuthenticated={!!user}
+                  onReplySubmit={(content, parentId) => {
+                    if (!user) {
+                      localStorage.setItem('pendingReply', content);
+                      localStorage.setItem('pendingReplyParentId', String(parentId));
+                      setShowAuthOptions(true);
+                      // In a real scenario we'd scroll to auth options or show a modal
+                    } else {
+                      handleSubmit(content, parentId);
+                    }
+                  }}
                 />
               ))}
             </div>
