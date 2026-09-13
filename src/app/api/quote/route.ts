@@ -5,12 +5,27 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
     
-    // Format the Q&A into the description so N8N can just use 'descricao' field as is.
-    let formattedDescricao = data.descricao ? data.descricao.trim() : "";
+    // Format Organization type, Demand and Q&A into the description so N8N/DB receives full context
+    let formattedDescricao = "";
+    if (data.tipo_organizacao) {
+      formattedDescricao += `Tipo de Organização: ${data.tipo_organizacao}\n`;
+    }
+    if (data.demanda) {
+      formattedDescricao += `Demanda Principal: ${data.demanda}\n`;
+    }
+    if (data.empresa) {
+      formattedDescricao += `Empresa / Órgão: ${data.empresa}\n`;
+    }
+    if (formattedDescricao) {
+      formattedDescricao += "\n";
+    }
+
+    if (data.descricao) {
+      formattedDescricao += `Detalhamento da Demanda / Litígio:\n${data.descricao.trim()}\n\n`;
+    }
     
     if (data.perguntas_respostas && Object.keys(data.perguntas_respostas).length > 0) {
-      if (formattedDescricao) formattedDescricao += "\n\n";
-      formattedDescricao += "Respostas aos questionamentos da IA:\n";
+      formattedDescricao += "Respostas aos questionamentos específicos:\n";
       for (const [dor, resposta] of Object.entries(data.perguntas_respostas)) {
          formattedDescricao += `- Referente a: "${dor}"\n  Resposta: ${resposta}\n\n`;
       }

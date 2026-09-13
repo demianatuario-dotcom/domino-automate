@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 export default function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'user' | 'assistant', content: string}[]>([
-    { role: 'assistant', content: 'Olá! Sou o assistente virtual da Domino Automate. Ajudo empresas a venderem mais e trabalharem menos usando tecnologia. Como posso te ajudar hoje?' }
+    { role: 'assistant', content: 'Olá! Sou o assistente técnico da Domino Automate. Presto consultoria preliminar sobre inteligência atuarial, perícias judiciais (TRT10/TJDFT), conformidade CPC 33 / PREVIC e engenharia de automação corporativa. Como posso orientar sua demanda hoje?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -232,7 +232,9 @@ export default function AIChat() {
         >
           {/* Header */}
           <div style={{ backgroundColor: 'var(--primary-container)', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--outline-variant)' }}>
-            <span className="label-md" style={{ color: 'var(--secondary)' }}>Consultor Estratégico</span>
+            <span className="label-md" style={{ color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span>🏛️</span> Consultor Atuarial & IA
+            </span>
             <button onClick={() => setIsOpen(false)} style={{ background: 'transparent', color: 'var(--on-surface)', cursor: 'pointer', fontSize: '1.5rem', lineHeight: 1 }}>×</button>
           </div>
 

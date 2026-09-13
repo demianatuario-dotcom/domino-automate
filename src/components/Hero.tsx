@@ -3,30 +3,39 @@ import React from 'react';
 export default function Hero() {
   return (
     <section style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '6rem 2rem 2rem', textAlign: 'center', position: 'relative', background: 'var(--surface)' }}>
-      <div style={{ maxWidth: '900px', zIndex: 10 }}>
-        <h1 className="display-lg" style={{ marginBottom: '1.5rem', lineHeight: '1.1' }}>
-          Sua empresa perde vendas diariamente por{' '}
-          <span style={{ color: 'var(--secondary)' }}>atendimento lento e processos manuais.</span>
+      <div style={{ maxWidth: '960px', zIndex: 10 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', borderRadius: '50px', background: 'rgba(233, 193, 118, 0.1)', border: '1px solid rgba(233, 193, 118, 0.25)', marginBottom: '1.5rem' }}>
+          <span style={{ color: 'var(--secondary)', fontSize: '0.875rem', fontWeight: 600 }}>🏛️ Boutique de Engenharia Digital & Inteligência Atuarial</span>
+        </div>
+        <h1 className="display-lg" style={{ marginBottom: '1.5rem', lineHeight: '1.15', fontSize: 'clamp(2.25rem, 4.5vw, 3.75rem)' }}>
+          Inteligência Atuarial, Governança de Riscos e{' '}
+          <span style={{ color: 'var(--secondary)' }}>Engenharia de Automação com IA.</span>
         </h1>
-        <p className="body-md" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '700px', margin: '0 auto 2.5rem', fontSize: '1.25rem' }}>
-          Automatize seu comercial agora e recupere seu faturamento em até 30 dias. 
-          Soluções de IA de alta performance para quem não pode perder nenhum lead.
+        <p className="body-md" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '820px', margin: '0 auto 2.5rem', fontSize: '1.2rem', lineHeight: '1.7' }}>
+          Unimos a precisão regulatória do cálculo atuarial (MIBA) à escalabilidade dos sistemas autônomos de IA e n8n. Mitigação de passivos, perícias complexas e hiperautomação para o mercado jurídico e corporativo.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
-          <a href="#orcamento" className="btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>Solicitar Diagnóstico Gratuito</a>
-          <a href="#simulador" className="btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>Simular Economia da Minha Empresa</a>
+        <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3.5rem' }}>
+          <a href="#orcamento" className="btn-primary" style={{ padding: '1rem 2.25rem', fontSize: '1.05rem', fontWeight: 600, letterSpacing: '0.01em' }}>
+            Agendar Reunião Técnica
+          </a>
+          <a href="#pilares" className="btn-secondary" style={{ padding: '1rem 2.25rem', fontSize: '1.05rem', fontWeight: 600 }}>
+            Explorar Áreas de Atuação
+          </a>
         </div>
 
         {/* Rapid Proof Badges */}
-        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap', opacity: 0.7 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: 'var(--secondary)' }}>✓</span> <span className="label-md">Atendimento 24/7</span>
+        <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="card-base ghost-border" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.25rem', borderRadius: '30px', background: 'rgba(27, 33, 43, 0.5)' }}>
+            <span style={{ color: 'var(--secondary)', fontSize: '1.1rem' }}>⚖️</span> 
+            <span className="label-md" style={{ fontSize: '0.875rem' }}>MIBA Registrado: <strong>1807</strong></span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: 'var(--secondary)' }}>✓</span> <span className="label-md">Resposta Instantânea</span>
+          <div className="card-base ghost-border" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.25rem', borderRadius: '30px', background: 'rgba(27, 33, 43, 0.5)' }}>
+            <span style={{ color: 'var(--secondary)', fontSize: '1.1rem' }}>🏛️</span> 
+            <span className="label-md" style={{ fontSize: '0.875rem' }}>+15 Anos em EFPC e Setor Bancário</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ color: 'var(--secondary)' }}>✓</span> <span className="label-md">Follow-up Automático</span>
+          <div className="card-base ghost-border" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.25rem', borderRadius: '30px', background: 'rgba(27, 33, 43, 0.5)' }}>
+            <span style={{ color: 'var(--secondary)', fontSize: '1.1rem' }}>🔒</span> 
+            <span className="label-md" style={{ fontSize: '0.875rem' }}>Segurança de Dados & LGPD Bancária</span>
           </div>
         </div>
       </div>

@@ -23,12 +23,15 @@ export default function Header() {
         <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
           <Image src="/logo.png" alt="Domino Automate Logo" width={150} height={50} className="mobile-logo-img" style={{ objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(233, 193, 118, 0.2))' }} priority />
         </Link>
-        <nav className="header-nav" style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-          <a href="#solucoes" className="label-md desktop-only">Soluções</a>
-          <a href="#quem-somos" className="label-md desktop-only">Quem Somos</a>
-          <a href="#simulador" className="label-md desktop-only">Simular Ganhos</a>
-          <a href="#portfolio" className="label-md desktop-only">Casos Reais</a>
-          <a href="#orcamento" className="btn-primary header-btn desktop-only" style={{ padding: '0.5rem 1rem' }}>Solicitar Proposta</a>
+        <nav className="header-nav" style={{ display: 'flex', gap: '1.75rem', alignItems: 'center' }}>
+          <a href="#pilares" className="label-md desktop-only">Pilares</a>
+          <a href="#autoridade" className="label-md desktop-only">Autoridade</a>
+          <a href="#atuaria-riscos" className="label-md desktop-only">Atuária & Riscos</a>
+          <a href="#automacao-ia" className="label-md desktop-only">Automação & IA</a>
+          <a href="#casos-solucoes" className="label-md desktop-only">Obras & Estudos</a>
+          <a href="#orcamento" className="btn-primary header-btn desktop-only" style={{ padding: '0.6rem 1.25rem', fontSize: '0.875rem' }}>
+            Solicitar Parecer / Diagnóstico Estratégico
+          </a>
           <button
             className="hamburger-btn"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -44,11 +47,14 @@ export default function Header() {
 
       {/* Mobile menu */}
       <nav className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
-        <a href="#solucoes" onClick={closeMenu}>Soluções</a>
-        <a href="#quem-somos" onClick={closeMenu}>Quem Somos</a>
-        <a href="#simulador" onClick={closeMenu}>Simular Ganhos</a>
-        <a href="#portfolio" onClick={closeMenu}>Casos Reais</a>
-        <a href="#orcamento" onClick={closeMenu} style={{ color: 'var(--secondary)', fontWeight: 700 }}>Solicitar Proposta</a>
+        <a href="#pilares" onClick={closeMenu}>Pilares</a>
+        <a href="#autoridade" onClick={closeMenu}>Autoridade</a>
+        <a href="#atuaria-riscos" onClick={closeMenu}>Atuária & Riscos</a>
+        <a href="#automacao-ia" onClick={closeMenu}>Automação & IA</a>
+        <a href="#casos-solucoes" onClick={closeMenu}>Obras & Estudos</a>
+        <a href="#orcamento" onClick={closeMenu} style={{ color: 'var(--secondary)', fontWeight: 700 }}>
+          Solicitar Parecer / Diagnóstico
+        </a>
       </nav>
     </>
   );

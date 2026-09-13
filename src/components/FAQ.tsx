@@ -4,20 +4,24 @@ import React, { useState } from 'react';
 export default function FAQ() {
   const faqs = [
     {
-      q: "A automação é segura para os meus dados?",
-      a: "Sim. Utilizamos infraestrutura de IA Privada e seguimos rigorosamente as normas da LGPD. Seus dados não são compartilhados com modelos públicos para treinamento."
+      q: "Como funciona a atuação em perícias judiciais e assistência técnica atuarial?",
+      a: "Atuamos tanto como Perito do Juízo quanto como Assistente Técnico indicado por escritórios de advocacia e departamentos jurídicos corporativos. Elaboramos quesitos preliminares estratégicos, pareceres de viabilidade, cálculos de liquidação de sentença e impugnações técnicas fundamentadas a laudos divergentes perante o TRT10, TJDFT e demais jurisdições."
     },
     {
-      q: "Quanto tempo demora para a solução estar no ar?",
-      a: "A automação deve estar rodando entre 30 e 60 dias, dependendo da complexidade do pedido."
+      q: "Qual a metodologia aplicada na auditoria independente de CPC 33 (R1) e IAS 19?",
+      a: "Realizamos a revisão rigorosa de tábuas biométricas, premissas econômico-financeiras (taxas de juros reais, inflação, crescimento de benefícios), apuração do valor presente das obrigações atuariais (VPA) e conciliação de passivos para notas explicativas de balanço de patrocinadoras e fundos de pensão (EFPCs), em conformidade com as normas contábeis e da PREVIC."
     },
     {
-      q: "A Domino Automate substitui minha equipe atual?",
-      a: "Não. Nossas soluções visam eliminar tarefas repetitivas e burocráticas para que sua equipe foque no que realmente traz faturamento: o fechamento comercial e a estratégia."
+      q: "Como é garantida a segurança dos dados e o sigilo atuarial/bancário (LGPD)?",
+      a: "Nossa infraestrutura opera sob padrões de sigilo bancário e governança de dados. Em automações e agentes de IA, implementamos ambientes privados onde dados confidenciais, cadastros de participantes e litígios nunca são utilizados para treinar modelos públicos de terceiros, atendendo com total rigor à Lei Geral de Proteção de Dados (LGPD)."
     },
     {
-      q: "Qual o investimento necessário?",
-      a: "O investimento varia conforme a complexidade, mas trabalhamos com um modelo de Implantação + Suporte Mensal focado em gerar ROI positivo nos primeiros 60 dias."
+      q: "É possível integrar bases legadas e ERPs com automações em Python e n8n?",
+      a: "Sim. Construímos pipelines que conectam bancos legados, planilhas e sistemas de folha/benefícios a motores de cálculo em Python e orquestradores em n8n. O resultado é a geração de relatórios e conciliações automáticas com auditoria completa de cada etapa, eliminando retrabalho e inconsistências materiais."
+    },
+    {
+      q: "Quais são as modalidades de contratação dos serviços?",
+      a: "Atendemos sob demanda (por parecer técnico atuarial, laudo pericial judicial ou projeto específico de engenharia de automação) e também em regime de assessoria técnica corporativa continuada para suporte permanente a comitês de risco, conselhos deliberativos e bancas de advocacia."
     }
   ];
 

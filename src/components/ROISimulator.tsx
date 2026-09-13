@@ -1,105 +1,149 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 
 export default function ROISimulator() {
-  const [leads, setLeads] = useState(100);
-  const [ticket, setTicket] = useState(1000);
-  const [conversao, setConversao] = useState(5);
-  
-  const [perdaAnual, setPerdaAnual] = useState(0);
-  const [ganhoPotencial, setGanhoPotencial] = useState(0);
+  // Inputs tailored for law firms, pension funds (EFPCs), and corporate sponsors
+  const [demandas, setDemandas] = useState(25); // volume mensal de processos / cálculos / relatórios
+  const [horasPorDemanda, setHorasPorDemanda] = useState(12); // horas manuais gastas por caso
+  const [custoHoraTecnica, setCustoHoraTecnica] = useState(250); // R$ / hora de especialista/advogado/perito
 
-  useEffect(() => {
-    // Premissa: 30% dos leads são perdidos por demora no atendimento manual
-    const leadsPerdidosPelaDemora = leads * 0.3;
-    const vendasPerdidasMes = leadsPerdidosPelaDemora * (conversao / 100);
-    const valorPerdidoMes = vendasPerdidasMes * ticket;
-    
-    setPerdaAnual(valorPerdidoMes * 12);
-    
-    // Ganho potencial: Melhoria de 20% na conversão total por follow-up automático
-    const novaConversao = conversao * 1.2;
-    const novasVendasMes = leads * (novaConversao / 100);
-    const ganhoExtraMes = (novasVendasMes - (leads * conversao / 100)) * ticket;
-    
-    setGanhoPotencial(ganhoExtraMes * 12);
-  }, [leads, ticket, conversao]);
+  // Calculations
+  const stats = useMemo(() => {
+    const totalHorasMes = demandas * horasPorDemanda;
+    const custoManualMes = totalHorasMes * custoHoraTecnica;
+    const custoManualAno = custoManualMes * 12;
+
+    // Automação & IA recuperam em média 65% das horas operacionais de triagem, cálculo e redação
+    const horasRecuperadasMes = Math.round(totalHorasMes * 0.65);
+    const horasRecuperadasAno = horasRecuperadasMes * 12;
+
+    // Economia operacional direta
+    const economiaDiretaAno = horasRecuperadasAno * custoHoraTecnica;
+
+    // Estimativa de contingência prevenida (redução de erro material / impugnação / glosa)
+    // Premissa: 10% dos casos manuais sofrem retrabalho ou impugnação onerosa
+    const contingenciaPrevenidaAno = demandas * 12 * 0.10 * 8000;
+
+    return {
+      horasRecuperadasMes,
+      horasRecuperadasAno,
+      custoManualAno,
+      economiaDiretaAno,
+      contingenciaPrevenidaAno
+    };
+  }, [demandas, horasPorDemanda, custoHoraTecnica]);
 
   return (
-    <section id="simulador" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface)' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+    <section id="simulador" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface)', scrollMarginTop: '80px' }}>
+      <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 className="display-lg">Simulador de <span style={{ color: 'var(--secondary)' }}>Lucro Oculto</span></h2>
-          <p className="body-md" style={{ opacity: 0.8, maxWidth: '600px', margin: '1rem auto' }}>
-            Descubra quanto dinheiro sua empresa está deixando na mesa por causa de processos manuais e demora no atendimento.
+          <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
+            Simulador Corporativo
+          </span>
+          <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
+            Diagnóstico de <span style={{ color: 'var(--secondary)' }}>Eficiência & Risco Atuarial</span>
+          </h2>
+          <p className="body-md" style={{ opacity: 0.85, maxWidth: '720px', margin: '1rem auto' }}>
+            Estime o impacto de processos manuais de auditoria, liquidação de sentença e relatórios regulatórios na sua operação jurídica ou previdenciária.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem', alignItems: 'start' }}>
-          {/* Inputs */}
-          <div className="card-base ghost-border" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'start' }}>
+          {/* Sliders Input Panel */}
+          <div className="card-base ghost-border" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '2.5rem' }}>
             <div>
-              <label className="label-md" style={{ display: 'block', marginBottom: '1rem' }}>Leads Mensais: <span style={{ color: 'var(--secondary)' }}>{leads}</span></label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <label className="label-md">Demandas / Cálculos Mensais:</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{demandas} casos/mês</span>
+              </div>
               <input 
                 type="range" 
-                min="10" 
-                max="2000" 
-                step="10" 
-                value={leads} 
-                onChange={(e) => setLeads(Number(e.target.value))} 
-                style={{ width: '100%' }}
+                min="5" 
+                max="150" 
+                step="5" 
+                value={demandas} 
+                onChange={(e) => setDemandas(Number(e.target.value))} 
+                style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
+              <span className="body-xs" style={{ opacity: 0.6 }}>Processos judiciais, auditorias de balanço ou pareceres.</span>
             </div>
             
             <div>
-              <label className="label-md" style={{ display: 'block', marginBottom: '1rem' }}>Ticket Médio (R$): <span style={{ color: 'var(--secondary)' }}>{ticket.toLocaleString()}</span></label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <label className="label-md">Horas Técnicas por Demanda:</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{horasPorDemanda}h / caso</span>
+              </div>
               <input 
                 type="range" 
-                min="100" 
-                max="50000" 
-                step="100" 
-                value={ticket} 
-                onChange={(e) => setTicket(Number(e.target.value))} 
-                style={{ width: '100%' }}
+                min="2" 
+                max="40" 
+                step="1" 
+                value={horasPorDemanda} 
+                onChange={(e) => setHorasPorDemanda(Number(e.target.value))} 
+                style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
+              <span className="body-xs" style={{ opacity: 0.6 }}>Tempo gasto em triagem, planilhas, conciliação e confecção do laudo.</span>
             </div>
 
             <div>
-              <label className="label-md" style={{ display: 'block', marginBottom: '1rem' }}>Conversão Atual (%): <span style={{ color: 'var(--secondary)' }}>{conversao}%</span></label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <label className="label-md">Custo da Hora Especializada:</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>R$ {custoHoraTecnica}/h</span>
+              </div>
               <input 
                 type="range" 
-                min="0.5" 
-                max="20" 
-                step="0.5" 
-                value={conversao} 
-                onChange={(e) => setConversao(Number(e.target.value))} 
-                style={{ width: '100%' }}
+                min="100" 
+                max="600" 
+                step="25" 
+                value={custoHoraTecnica} 
+                onChange={(e) => setCustoHoraTecnica(Number(e.target.value))} 
+                style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
+              <span className="body-xs" style={{ opacity: 0.6 }}>Remuneração média de advogados sêniores, atuários ou peritos.</span>
             </div>
           </div>
 
-          {/* Results */}
+          {/* Results Display Panel */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div className="card-base glass-panel" style={{ borderLeft: '8px solid var(--error)', backgroundColor: 'rgba(255, 0, 0, 0.08)', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '5rem', opacity: 0.05, transform: 'rotate(15deg)' }}>📉</div>
-              <p className="label-sm" style={{ opacity: 0.7, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>Custo da Inação (Anual)</p>
-              <h3 className="display-sm" style={{ color: 'var(--error)', margin: '0.5rem 0' }}>- R$ {perdaAnual.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
-              <p className="body-sm" style={{ opacity: 0.8, fontWeight: 500 }}>Este é o valor que sua empresa está queimando mensalmente por demora e falta de follow-up.</p>
+            {/* Card 1: Horas Especializadas Recuperadas */}
+            <div className="card-base glass-panel" style={{ borderLeft: '6px solid var(--secondary)', padding: '1.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <p className="label-sm" style={{ opacity: 0.75, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
+                  Horas Especializadas Recuperadas
+                </p>
+                <span style={{ fontSize: '1.5rem' }}>⏱️</span>
+              </div>
+              <h3 className="display-sm" style={{ color: 'var(--secondary)', margin: '0.5rem 0', fontSize: '2.2rem', fontWeight: 700 }}>
+                +{stats.horasRecuperadasMes}h <span style={{ fontSize: '1.1rem', fontWeight: 400, opacity: 0.8 }}>/ mês</span>
+              </h3>
+              <p className="body-sm" style={{ opacity: 0.85 }}>
+                Equivalente a <strong>+{stats.horasRecuperadasAno} horas anuais</strong> liberadas para foco estratégico em teses jurídicas, negociações e governança de risco.
+              </p>
             </div>
 
-            <div className="card-base glass-panel" style={{ borderLeft: '8px solid var(--secondary)', backgroundColor: 'rgba(0, 255, 0, 0.08)', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: '-10px', right: '-10px', fontSize: '5rem', opacity: 0.05, transform: 'rotate(15deg)' }}>📈</div>
-              <p className="label-sm" style={{ opacity: 0.7, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>Potencial de Recuperação (Anual)</p>
-              <h3 className="display-sm" style={{ color: 'var(--secondary)', margin: '0.5rem 0' }}>+ R$ {ganhoPotencial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
-              <p className="body-sm" style={{ opacity: 0.8, fontWeight: 500 }}>Faturamento extra gerado por atendimento 24/7 e cadência automática de vendas.</p>
+            {/* Card 2: Mitigação de Risco e Prejuízo Operacional */}
+            <div className="card-base glass-panel" style={{ borderLeft: '6px solid #60a5fa', padding: '1.75rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <p className="label-sm" style={{ opacity: 0.75, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
+                  Redução de Risco de Glosa / Erro Material
+                </p>
+                <span style={{ fontSize: '1.5rem' }}>🛡️</span>
+              </div>
+              <h3 className="display-sm" style={{ color: '#93c5fd', margin: '0.5rem 0', fontSize: '2rem', fontWeight: 700 }}>
+                R$ {stats.contingenciaPrevenidaAno.toLocaleString('pt-BR', { minimumFractionDigits: 0 })}
+                <span style={{ fontSize: '1rem', fontWeight: 400, opacity: 0.8 }}> / ano (estimado)</span>
+              </h3>
+              <p className="body-sm" style={{ opacity: 0.85 }}>
+                Prevenção de contingências com laudos inconsistentes, retrabalho em liquidações judiciais ou glosas em auditorias contábeis.
+              </p>
             </div>
 
-            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-              <a href="#orcamento" className="btn-primary" style={{ width: '100%', display: 'block', padding: '1.25rem' }}>
-                Recuperar esse Faturamento Agora
+            <div style={{ marginTop: '0.5rem' }}>
+              <a href="#orcamento" className="btn-primary" style={{ width: '100%', display: 'block', textAlign: 'center', padding: '1.1rem', fontSize: '1rem', fontWeight: 600 }}>
+                Solicitar Diagnóstico Institucional Personalizado
               </a>
-              <p className="body-xs" style={{ marginTop: '1rem', opacity: 0.5 }}>
-                *Cálculo baseado em médias de mercado para conversão assistida por IA.
+              <p className="body-xs" style={{ marginTop: '0.75rem', opacity: 0.6, textAlign: 'center' }}>
+                *Simulação referencial baseada em benchmarks de automação analítica com Python, n8n e cálculo atuarial.
               </p>
             </div>
           </div>
