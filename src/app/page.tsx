@@ -23,8 +23,8 @@ export default function Home() {
       <SocialProof />
       <Pillars />
       <QuemSomos />
-      <ROISimulator />
       <Portfolio />
+      <ROISimulator />
       <AIAssistantHighlight />
       <VideoGallery />
       <BudgetModule />

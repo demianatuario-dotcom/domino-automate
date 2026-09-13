@@ -10,12 +10,26 @@ export default function AIAssistantHighlight() {
     <section id="assistente-virtual" style={{ padding: '6rem 2rem', position: 'relative', backgroundColor: 'var(--surface-container)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '2rem' }}>
         
-        <div style={{ fontSize: '3.5rem', animation: 'pulse 3s infinite', marginBottom: '-0.5rem' }}>🤖</div>
+        <div style={{ marginBottom: '-0.5rem', display: 'flex', justifyContent: 'center' }}>
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none" style={{ filter: 'drop-shadow(0 0 16px rgba(233,193,118,0.35))' }}>
+            <circle cx="28" cy="28" r="27" stroke="rgba(233,193,118,0.3)" strokeWidth="1.5"/>
+            <circle cx="28" cy="28" r="20" stroke="rgba(233,193,118,0.15)" strokeWidth="1"/>
+            <circle cx="28" cy="28" r="6" fill="rgba(233,193,118,0.2)" stroke="var(--secondary)" strokeWidth="1.5"/>
+            <line x1="28" y1="8" x2="28" y2="22" stroke="var(--secondary)" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="28" y1="34" x2="28" y2="48" stroke="var(--secondary)" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="8" y1="28" x2="22" y2="28" stroke="var(--secondary)" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="34" y1="28" x2="48" y2="28" stroke="var(--secondary)" strokeWidth="1.5" strokeLinecap="round"/>
+            <circle cx="28" cy="8" r="2.5" fill="var(--secondary)"/>
+            <circle cx="28" cy="48" r="2.5" fill="var(--secondary)"/>
+            <circle cx="8" cy="28" r="2.5" fill="var(--secondary)"/>
+            <circle cx="48" cy="28" r="2.5" fill="var(--secondary)"/>
+          </svg>
+        </div>
         <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
           Atendimento Técnico Inteligente
         </span>
         <h2 className="display-lg" style={{ fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
-          Fale com Nosso <span style={{ color: 'var(--secondary)' }}>Assistente Virtual Especializado</span>
+          Diagnóstico Preliminar com <span style={{ color: 'var(--secondary)' }}>Assistente Técnico de IA</span>
         </h2>
         
         <p className="body-md" style={{ maxWidth: '820px', opacity: 0.9, fontSize: '1.125rem', lineHeight: 1.8 }}>

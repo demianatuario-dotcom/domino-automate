@@ -122,10 +122,10 @@ export default function BudgetModule() {
       <div style={{ maxWidth: '850px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
-            Atendimento Consultivo
+            Primeira Reunião Técnica
           </span>
           <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 2.75rem)' }}>
-            Projete Sua Solução / Proposta Analítica
+            Solicite Seu Diagnóstico Estratégico
           </h2>
           <p className="body-md" style={{ opacity: 0.85, maxWidth: '680px', margin: '0 auto' }}>
             Apresente sua demanda para análise técnica atuarial ou de engenharia de automação. Entraremos em contato com um diagnóstico fundamentado e sigilo absoluto.

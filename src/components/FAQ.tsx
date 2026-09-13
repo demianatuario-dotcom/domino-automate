@@ -30,7 +30,12 @@ export default function FAQ() {
   return (
     <section id="faq" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface-container-highest)' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h2 className="display-sm" style={{ textAlign: 'center', marginBottom: '4rem' }}>Perguntas Frequentes sobre <span style={{ color: 'var(--secondary)' }}>Nossos Serviços</span></h2>
+        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+          <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
+            Transparência Técnica & Clareza
+          </span>
+          <h2 className="display-sm" style={{ textAlign: 'center', marginTop: '0.5rem', marginBottom: 0 }}>Perguntas Frequentes sobre <span style={{ color: 'var(--secondary)' }}>Nossos Serviços</span></h2>
+        </div>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {faqs.map((f, i) => (
@@ -44,6 +49,17 @@ export default function FAQ() {
               )}
             </div>
           ))}
+        </div>
+
+        {/* CTA final */}
+        <div style={{ marginTop: '3rem', textAlign: 'center', padding: '2rem', borderRadius: '12px', background: 'var(--surface-container)', border: '1px solid var(--outline-variant)' }}>
+          <p className="body-md" style={{ opacity: 0.85, marginBottom: '1.25rem' }}>
+            Não encontrou a resposta para sua situação específica?
+          </p>
+          <a href="#orcamento" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.85rem 1.75rem', fontSize: '0.95rem', fontWeight: 600 }}>
+            <span>Agendar Reunião Técnica</span>
+            <span>→</span>
+          </a>
         </div>
       </div>
     </section>

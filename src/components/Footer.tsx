@@ -14,7 +14,7 @@ export default function Footer() {
               <strong style={{ color: 'var(--on-surface)' }}>DOMINO AUTOMATE DESENVOLVIMENTO DE SERVICOS DE AUTOMACAO LTDA</strong>
               <span>CNPJ: 66.699.218/0001-94</span>
               <span>Brasília - DF</span>
-              <span>demian.pereira@gmail.com | (61) 98117-1564</span>
+              <span>demian.atuario@gmail.com | (61) 98117-1564</span>
             </div>
             
             {/* Social & Contact Links */}

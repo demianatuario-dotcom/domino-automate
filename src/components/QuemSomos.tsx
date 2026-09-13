@@ -25,8 +25,11 @@ export default function QuemSomos() {
           {/* Column 1: Profile & Credentials Card */}
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', borderRight: '1px solid var(--outline-variant)', paddingRight: '2rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--secondary), var(--primary-container))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.75rem', fontWeight: 800, color: '#0a0e14', boxShadow: '0 4px 20px rgba(233, 193, 118, 0.25)' }}>
-                DP
+              <div style={{ position: 'relative', width: '72px', height: '72px', flexShrink: 0 }}>
+                <div style={{ position: 'absolute', inset: '-3px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--secondary), var(--tertiary), var(--primary-container))', animation: 'shimmerBadge 2.5s infinite' }} />
+                <div style={{ position: 'relative', width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg, #1b212b, #0d2344)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.65rem', fontWeight: 800, color: 'var(--secondary)', border: '2px solid var(--surface-container)', fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '-0.02em' }}>
+                  DP
+                </div>
               </div>
               <div>
                 <h3 className="headline-sm" style={{ fontSize: '1.4rem', color: 'var(--on-surface)', marginBottom: '0.2rem' }}>
@@ -90,10 +93,10 @@ export default function QuemSomos() {
               <h5 className="label-md" style={{ color: 'var(--on-surface)', marginBottom: '0.35rem' }}>
                 Entregas Chave de Autoridade:
               </h5>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.4rem', padding: 0, fontSize: '0.875rem', opacity: 0.85 }}>
-                <li>• <strong>10 Perícias Judiciais Concluídas</strong>: Atuação no TRT10 e TJDFT com laudos e quesitos que resistiram a impugnações complexas.</li>
-                <li>• <strong>Modelagem FUNCEF</strong>: Desenvolvimento de motor de cálculo atuarial para o 3º maior fundo de pensão do Brasil.</li>
-                <li>• <strong>Auditoria de Passivos</strong>: Geração de valor em pareceres preventivos e corretivos de equacionamento de déficit para conselhos corporativos.</li>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', padding: 0, fontSize: '0.875rem', opacity: 0.9 }}>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>⚖️</span><span><strong>10 Perícias Judiciais Concluídas</strong>: Laudos e quesitos que resistiram a impugnações complexas no TRT10 e TJDFT.</span></li>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>🐍</span><span><strong>Modelagem FUNCEF</strong>: Motor de cálculo atuarial em Python para o 3º maior fundo de pensão do Brasil.</span></li>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>📊</span><span><strong>Auditoria de Passivos CPC 33 / IAS 19</strong>: Pareceres preventivos e corretivos de equacionamento de déficit para conselhos corporativos.</span></li>
               </ul>
             </div>
 

@@ -61,9 +61,9 @@ export default function SocialProof() {
       description: "Geração de valor em governança de riscos para previdência complementar e balanços de patrocinadoras." 
     },
     { 
-      label: "Mitigação de Passivos Atuariais", 
-      value: "Milhões Auditados", 
-      description: "Mitigação de riscos e auditoria independente de passivos atuariais em conformidade com CPC 33 / IAS 19." 
+      label: "Maior Plano Previdenciário do País", 
+      value: "Top 3 EFPC", 
+      description: "Auditoria em reserva matemática e gestão de ativos de um dos maiores planos previdenciários do Brasil — FUNCEF." 
     },
     { 
       label: "Auditoria Judicial Precisa", 
