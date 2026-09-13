@@ -41,7 +41,7 @@ export default function ROISimulator() {
             Simulador Corporativo
           </span>
           <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
-            Diagnóstico de <span style={{ color: 'var(--secondary)' }}>Eficiência & Risco Atuarial</span>
+            Diagnóstico de <span style={{ color: 'var(--secondary)' }}>Geração de Valor & Mitigação de Risco Atuarial</span>
           </h2>
           <p className="body-md" style={{ opacity: 0.85, maxWidth: '720px', margin: '1rem auto' }}>
             Estime o impacto de processos manuais de auditoria, liquidação de sentença e relatórios regulatórios na sua operação jurídica ou previdenciária.
@@ -125,7 +125,7 @@ export default function ROISimulator() {
             <div className="card-base glass-panel" style={{ borderLeft: '6px solid #60a5fa', padding: '1.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p className="label-sm" style={{ opacity: 0.75, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
-                  Redução de Risco de Glosa / Erro Material
+                  Mitigação de Risco de Glosa / Erro Material
                 </p>
                 <span style={{ fontSize: '1.5rem' }}>🛡️</span>
               </div>
@@ -134,7 +134,7 @@ export default function ROISimulator() {
                 <span style={{ fontSize: '1rem', fontWeight: 400, opacity: 0.8 }}> / ano (estimado)</span>
               </h3>
               <p className="body-sm" style={{ opacity: 0.85 }}>
-                Prevenção de contingências com laudos inconsistentes, retrabalho em liquidações judiciais ou glosas em auditorias contábeis.
+                Mitigação de riscos de contingências com laudos inconsistentes, retrabalho em liquidações judiciais ou glosas em auditorias contábeis.
               </p>
             </div>
 

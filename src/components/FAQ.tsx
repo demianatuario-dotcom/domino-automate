@@ -30,7 +30,7 @@ export default function FAQ() {
   return (
     <section id="faq" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface-container-highest)' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h2 className="display-sm" style={{ textAlign: 'center', marginBottom: '4rem' }}>Dúvidas <span style={{ color: 'var(--secondary)' }}>Comuns</span></h2>
+        <h2 className="display-sm" style={{ textAlign: 'center', marginBottom: '4rem' }}>Perguntas Frequentes sobre <span style={{ color: 'var(--secondary)' }}>Nossos Serviços</span></h2>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {faqs.map((f, i) => (

@@ -5,7 +5,7 @@ import React from 'react';
 
 export const metadata: Metadata = {
   title: 'Domino Automate | Inteligência Atuarial, Governança de Riscos e Engenharia de IA',
-  description: 'Boutique de Engenharia Digital, Inteligência Atuarial (MIBA 1807), Mitigação de Passivos (CPC 33 / IAS 19), Perícias Judiciais e Automação de Riscos com IA para o mercado jurídico e corporativo.',
+  description: 'Boutique de Engenharia Digital, Inteligência Atuarial (MIBA 1807), Mitigação de Passivos Atuariais (CPC 33 / IAS 19), Auxílio em Conflitos Judiciais com Cálculo Atuarial, Geração de Valor para Consultorias e Automação de Riscos com IA para o mercado jurídico e corporativo.',
 };
 
 export default function RootLayout({

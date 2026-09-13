@@ -272,8 +272,11 @@ export default function BudgetModule() {
                     <span style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid rgba(10,14,20,0.3)', borderTopColor: 'var(--on-secondary)', borderRadius: '50%', animation: 'spin 0.6s linear infinite' }} />
                     Processando com Segurança...
                   </>
-                ) : 'Solicitar Contato Consultivo com Atuário Especialista'}
+                ) : 'Solicitar Diagnóstico Estratégico'}
               </button>
+              <p className="body-xs" style={{ opacity: 0.7, marginTop: '0.5rem' }}>
+                Análise técnica conduzida por atuário registrado (MIBA 1807).
+              </p>
               <p className="body-xs" style={{ opacity: 0.6 }}>
                 🔒 Dados protegidos sob sigilo atuarial e em conformidade estrita com a Lei Geral de Proteção de Dados (LGPD).
               </p>

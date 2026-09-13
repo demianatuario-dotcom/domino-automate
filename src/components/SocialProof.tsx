@@ -56,19 +56,19 @@ function useCountUp(target: string, duration: number = 1500) {
 export default function SocialProof() {
   const stats = [
     { 
-      label: "Governança & Previdência", 
+      label: "Governança de Riscos & Previdência", 
       value: "+15 Anos", 
-      description: "Experiência em governança de previdência complementar e balanços patrocinadores." 
+      description: "Geração de valor em governança de riscos para previdência complementar e balanços de patrocinadoras." 
     },
     { 
-      label: "Passivos Atuariais", 
+      label: "Mitigação de Passivos Atuariais", 
       value: "Milhões Auditados", 
-      description: "Mitigação e auditoria independente em passivos atuariais (CPC 33 / IAS 19)." 
+      description: "Mitigação de riscos e auditoria independente de passivos atuariais em conformidade com CPC 33 / IAS 19." 
     },
     { 
       label: "Auditoria Judicial Precisa", 
       value: "10 Perícias", 
-      description: "Histórico consolidado em perícias atuariais e financeiras no TRT10 e TJDFT." 
+      description: "Auxílio técnico em conflitos judiciais envolvendo cálculo atuarial no TRT10 e TJDFT." 
     },
     { 
       label: "Automação Segura & LGPD", 

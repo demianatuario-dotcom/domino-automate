@@ -138,7 +138,7 @@ export default function CommentsSection() {
             </button>
           </div>
         )}
-        <h2 className="display-sm" style={{ marginBottom: '2rem', textAlign: 'center' }}>Conte-nos a sua Experiência</h2>
+        <h2 className="display-sm" style={{ marginBottom: '2rem', textAlign: 'center' }}>Depoimentos & Experiências de Clientes</h2>
         
         {/* Comment Input Area */}
         <div className="card-base ghost-border" style={{ marginBottom: '3rem' }}>

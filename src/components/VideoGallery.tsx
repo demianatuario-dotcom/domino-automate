@@ -33,14 +33,29 @@ export default async function VideoGallery() {
   const playlistParam = ytIds.length > 1 ? ytIds.slice(1).join(',') : firstVideo;
 
   return (
-    <section style={{ width: '100vw', height: '100vh', backgroundColor: '#000', margin: '4rem 0' }}>
-      <iframe 
-        style={{ width: '100%', height: '100%', border: 'none' }}
-        src={`https://www.youtube.com/embed/${firstVideo}?autoplay=1&mute=0&loop=1&playlist=${playlistParam}&controls=1`} 
-        title="Galeria Automática"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-        allowFullScreen
-      />
+    <section style={{ padding: '6rem 2rem 0', backgroundColor: 'var(--surface)' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
+            Produção Audiovisual & IA
+          </span>
+          <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
+            Conteúdo <span style={{ color: 'var(--secondary)' }}>Técnico em Vídeo</span>
+          </h2>
+          <p className="body-md" style={{ opacity: 0.85, maxWidth: '680px', margin: '0 auto' }}>
+            Produção contínua de conteúdo especializado sobre inteligência atuarial, mitigação de riscos e engenharia de automação com IA.
+          </p>
+        </div>
+      </div>
+      <div style={{ width: '100vw', height: '80vh', backgroundColor: '#000', borderRadius: '0', overflow: 'hidden' }}>
+        <iframe 
+          style={{ width: '100%', height: '100%', border: 'none' }}
+          src={`https://www.youtube.com/embed/${firstVideo}?autoplay=1&mute=0&loop=1&playlist=${playlistParam}&controls=1`} 
+          title="Galeria Automática"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowFullScreen
+        />
+      </div>
     </section>
   );
 }

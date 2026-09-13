@@ -7,13 +7,13 @@ export default function QuemSomos() {
         
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
-            Liderança & Governança
+            Liderança & Governança de Riscos
           </span>
           <h2 className="display-lg" style={{ color: 'var(--secondary)', marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
             Rigor Técnico, Experiência Corporativa e Inovação Aplicada
           </h2>
           <p className="body-md" style={{ maxWidth: '750px', margin: '0 auto', opacity: 0.85 }}>
-            A ponte definitiva entre a alta precisão matemático-atuarial e a capacidade prática de engenharia de sistemas e agentes autônomos de IA.
+            A ponte definitiva entre a alta precisão matemático-atuarial e a capacidade de gerar valor prático com engenharia de sistemas e agentes autônomos de IA.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export default function QuemSomos() {
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.4rem', padding: 0, fontSize: '0.875rem', opacity: 0.85 }}>
                 <li>• <strong>10 Perícias Judiciais Concluídas</strong>: Atuação no TRT10 e TJDFT com laudos e quesitos que resistiram a impugnações complexas.</li>
                 <li>• <strong>Modelagem FUNCEF</strong>: Desenvolvimento de motor de cálculo atuarial para o 3º maior fundo de pensão do Brasil.</li>
-                <li>• <strong>Auditoria de Passivos</strong>: Pareceres preventivos e corretivos de equacionamento de déficit para conselhos corporativos.</li>
+                <li>• <strong>Auditoria de Passivos</strong>: Geração de valor em pareceres preventivos e corretivos de equacionamento de déficit para conselhos corporativos.</li>
               </ul>
             </div>
 

@@ -12,7 +12,7 @@ export default function Hero() {
           <span style={{ color: 'var(--secondary)' }}>Engenharia de Automação com IA.</span>
         </h1>
         <p className="body-md" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '820px', margin: '0 auto 2.5rem', fontSize: '1.2rem', lineHeight: '1.7' }}>
-          Unimos a precisão regulatória do cálculo atuarial (MIBA) à escalabilidade dos sistemas autônomos de IA e n8n. Mitigação de passivos, perícias complexas e hiperautomação para o mercado jurídico e corporativo.
+          Unimos a precisão regulatória do cálculo atuarial (MIBA) à escalabilidade dos sistemas autônomos de IA. Geramos valor concreto por meio da mitigação de riscos atuariais em balanços corporativos, assistência técnica em litígios judiciais complexos e hiperautomação para consultorias e operações jurídicas.
         </p>
         <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3.5rem' }}>
           <a href="#orcamento" className="btn-primary" style={{ padding: '1rem 2.25rem', fontSize: '1.05rem', fontWeight: 600, letterSpacing: '0.01em' }}>
@@ -31,7 +31,7 @@ export default function Hero() {
           </div>
           <div className="card-base ghost-border" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.25rem', borderRadius: '30px', background: 'rgba(27, 33, 43, 0.5)' }}>
             <span style={{ color: 'var(--secondary)', fontSize: '1.1rem' }}>🏛️</span> 
-            <span className="label-md" style={{ fontSize: '0.875rem' }}>+15 Anos em EFPC e Setor Bancário</span>
+            <span className="label-md" style={{ fontSize: '0.875rem' }}>+15 Anos de Geração de Valor em EFPCs e Setor Bancário</span>
           </div>
           <div className="card-base ghost-border" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', padding: '0.6rem 1.25rem', borderRadius: '30px', background: 'rgba(27, 33, 43, 0.5)' }}>
             <span style={{ color: 'var(--secondary)', fontSize: '1.1rem' }}>🔒</span> 

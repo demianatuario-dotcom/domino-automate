@@ -36,7 +36,7 @@ const corporateCases = [
     id: 'consultoria-cpc33-previc',
     title: 'Consultoria Regulatória PREVIC & CPC 33 (R1) / IAS 19',
     category: 'Auditoria de Balanços e Solvência',
-    badge: 'Conformidade e Mitigação de Déficits',
+    badge: 'Conformidade Regulatória e Mitigação de Déficits Atuariais',
     icon: '📊',
     description: 'Auditoria independente de passivos atuariais, validação de tábuas biométricas e hipóteses financeiras, testes de sensibilidade e pareceres técnicos fundamentados para patrocinadoras e conselhos deliberativos.',
     tags: ['CPC 33 (R1)', 'IAS 19', 'PREVIC', 'Auditoria Independente']
@@ -119,7 +119,7 @@ export default function Portfolio() {
             Obras de Engenharia Digital & Atuária Aplicada
           </h2>
           <p className="body-md" style={{ opacity: 0.85, maxWidth: '750px', margin: '0 auto' }}>
-            Histórico comprovado em grandes instituições de previdência, laudos periciais homologados em tribunais superiores e ecossistemas de automação corporativa.
+            Geração comprovada de valor em grandes instituições de previdência, laudos periciais homologados em tribunais superiores e ecossistemas de automação corporativa.
           </p>
         </div>
         

@@ -4,22 +4,22 @@ export default function Pillars() {
   const pillars = [
     {
       id: "atuaria-riscos",
-      badge: "Pilar 01 • Regulação & Solvência",
-      title: "Inteligência Atuarial & Governança",
-      subtitle: "Para EFPCs, Fundos de Pensão e Patrocinadoras",
+      badge: "Pilar 01 • Regulação & Solvência Atuarial",
+      title: "Inteligência Atuarial & Governança de Riscos",
+      subtitle: "Geração de Valor para Fundos de Pensão, EFPCs e Patrocinadoras",
       icon: "🏛️",
       points: [
         "Auditoria e validação independente de CPC 33 (R1) e IAS 19 para balanços corporativos.",
         "Avaliação aprofundada de premissas demográficas, tábuas biométricas e solvência atuarial.",
         "Gestão de risco de equacionamento de déficit técnico e pareceres estratégicos para Conselhos Deliberativos e Fiscais."
       ],
-      result: "Conformidade PREVIC e Mitigação de Riscos em Balanço"
+      result: "Conformidade PREVIC e Mitigação de Riscos Atuariais em Balanço"
     },
     {
       id: "pericia-judicial",
       badge: "Pilar 02 • Segurança Jurídica",
       title: "Perícia Atuarial & Assistência Técnica Judicial",
-      subtitle: "Para Escritórios de Advocacia e Departamentos Jurídicos",
+      subtitle: "Auxílio em Conflitos Judiciais com Cálculo Atuarial",
       icon: "⚖️",
       points: [
         "Cálculos de liquidação de sentença e apuração rigorosa de reservas matemáticas em litígios complexos.",
@@ -32,14 +32,14 @@ export default function Pillars() {
       id: "automacao-ia",
       badge: "Pilar 03 • Engenharia Aplicada",
       title: "Engenharia de Automação & IA Corporativa",
-      subtitle: "Para Operações Jurídicas e Financeiras de Alto Volume",
+      subtitle: "Geração de Valor para Consultorias e Operações de Alto Volume",
       icon: "⚡",
       points: [
         "Agentes autônomos de IA treinados em normativos PREVIC e jurisprudência para redação e análise documental técnica.",
         "Orquestração de pipelines em n8n e scripts Python/R integrando bancos legados a relatórios automáticos.",
         "Triagem jurídica e financeira automatizada via WhatsApp/Web com segurança de dados e conformidade total à LGPD."
       ],
-      result: "Autonomia Operacional e Eliminação de Erros Manuais"
+      result: "Autonomia Operacional e Eliminação de Riscos Manuais"
     }
   ];
 
@@ -54,7 +54,7 @@ export default function Pillars() {
             Os 3 Pilares de Atuação Estratégica
           </h2>
           <p className="body-md" style={{ opacity: 0.8, maxWidth: '750px', margin: '0 auto' }}>
-            A união entre a chancela regulatória atuarial (MIBA) e a vanguarda da engenharia de software e inteligência artificial para proteger seu balanço e otimizar processos judiciais.
+            A união entre a chancela regulatória atuarial (MIBA) e a vanguarda da engenharia de software e inteligência artificial para gerar valor na proteção de balanços, mitigação de riscos atuariais e resolução de conflitos judiciais.
           </p>
         </div>
         
