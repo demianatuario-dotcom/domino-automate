@@ -10,20 +10,21 @@ export function middleware(request: NextRequest) {
     decoded = rawPathname;
   }
 
-  const lower = decoded.toLowerCase().replace(/\/+$/, '');
+  const trimmed = decoded.replace(/\/+$/, '');
+  const lower = trimmed.toLowerCase();
 
-  // Handle /Atuária, /atuária, /Atu%C3%A1ria, /atuaria -> rewrite internally to /Atuaria
-  if (lower === '/atuária' || lower === '/atuaria') {
+  // Redirect accented or lowercase /Atuária, /atuária, /atuaria to canonical /Atuaria
+  if (lower === '/atuária' || (lower === '/atuaria' && trimmed !== '/Atuaria')) {
     const url = request.nextUrl.clone();
     url.pathname = '/Atuaria';
-    return NextResponse.rewrite(url);
+    return NextResponse.redirect(url, 308);
   }
 
-  // Handle /Estúdios, /estúdios, /Est%C3%BAdios, /estudios -> rewrite internally to /Estudios
-  if (lower === '/estúdios' || lower === '/estudios') {
+  // Redirect accented or lowercase /Estúdios, /estúdios, /estudios to canonical /Estudios
+  if (lower === '/estúdios' || (lower === '/estudios' && trimmed !== '/Estudios')) {
     const url = request.nextUrl.clone();
     url.pathname = '/Estudios';
-    return NextResponse.rewrite(url);
+    return NextResponse.redirect(url, 308);
   }
 
   return NextResponse.next();
@@ -34,4 +35,3 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico|Book_Lana|logo.png).*)',
   ],
 };
-

@@ -132,8 +132,8 @@ export default function EstudiosLanding() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vertical: '/Estúdios',
-          origem: '/Estúdios',
+          vertical: '/Estudios',
+          origem: '/Estudios',
           nome: nome.trim(),
           empresa: nomeEstudio.trim(),
           email: email.trim(),
@@ -160,7 +160,7 @@ export default function EstudiosLanding() {
   };
 
   const whatsappDirectUrl = `https://wa.me/5561981171564?text=${encodeURIComponent(
-    `Olá! Vim pela página /Estúdios da Domino Automate. Gostaria de saber como funciona a Recepcionista de IA 24/7 e a Automação Anti No-Show para o meu estúdio${nomeEstudio ? ` (${nomeEstudio})` : ''}!`
+    `Olá! Vim pela página /Estudios da Domino Automate. Gostaria de saber como funciona a Recepcionista de IA 24/7 e a Automação Anti No-Show para o meu estúdio${nomeEstudio ? ` (${nomeEstudio})` : ''}!`
   )}`;
 
   const faqs = [
@@ -701,7 +701,7 @@ export default function EstudiosLanding() {
               </p>
               <a
                 href={`https://wa.me/5561981171564?text=${encodeURIComponent(
-                  `Olá! Acabei de preencher o diagnóstico na página /Estúdios da Domino Automate.\n\n• Nome: ${nome}\n• Estúdio: ${nomeEstudio || 'Não informado'}\n• Segmento: ${segmento}\n• Prioridades: ${selectedDores.join(', ')}\n\nGostaria de conversar sobre a implementação!`
+                  `Olá! Acabei de preencher o diagnóstico na página /Estudios da Domino Automate.\n\n• Nome: ${nome}\n• Estúdio: ${nomeEstudio || 'Não informado'}\n• Segmento: ${segmento}\n• Prioridades: ${selectedDores.join(', ')}\n\nGostaria de conversar sobre a implementação!`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

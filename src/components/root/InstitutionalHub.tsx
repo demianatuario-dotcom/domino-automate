@@ -40,10 +40,10 @@ export default function InstitutionalHub() {
           <a href="#apresentacao" className="label-md desktop-only" style={{ opacity: 0.85 }}>A Domino</a>
           <a href="#habilidades" className="label-md desktop-only" style={{ opacity: 0.85 }}>Competências</a>
           <a href="#verticais" className="label-md desktop-only" style={{ opacity: 0.85 }}>Unidades de Negócio</a>
-          <Link href="/Atuária" className="label-md desktop-only" style={{ color: 'var(--secondary)' }}>
+          <Link href="/Atuaria" className="label-md desktop-only" style={{ color: 'var(--secondary)' }}>
             Atuária ↗
           </Link>
-          <Link href="/Estúdios" className="label-md desktop-only" style={{ color: '#E5C07B' }}>
+          <Link href="/Estudios" className="label-md desktop-only" style={{ color: '#E5C07B' }}>
             Estúdios ↗
           </Link>
           <a href="#verticais" className="btn-primary header-btn desktop-only" style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem' }}>
@@ -64,10 +64,10 @@ export default function InstitutionalHub() {
         <a href="#apresentacao" onClick={() => setMenuOpen(false)}>A Domino Automate</a>
         <a href="#habilidades" onClick={() => setMenuOpen(false)}>Habilidades & Engenharia</a>
         <a href="#verticais" onClick={() => setMenuOpen(false)}>Unidades de Negócio</a>
-        <Link href="/Atuária" onClick={() => setMenuOpen(false)} style={{ color: 'var(--secondary)' }}>
+        <Link href="/Atuaria" onClick={() => setMenuOpen(false)} style={{ color: 'var(--secondary)' }}>
           Vertical: Atuária & Riscos ↗
         </Link>
-        <Link href="/Estúdios" onClick={() => setMenuOpen(false)} style={{ color: 'var(--secondary)' }}>
+        <Link href="/Estudios" onClick={() => setMenuOpen(false)} style={{ color: 'var(--secondary)' }}>
           Vertical: Estúdios de Beleza ↗
         </Link>
       </nav>
@@ -239,12 +239,12 @@ export default function InstitutionalHub() {
 
               <div style={{ borderTop: '1px solid var(--outline-variant)', paddingTop: '1.5rem' }}>
                 <Link
-                  href="/Atuária"
+                  href="/Atuaria"
                   className="btn-primary"
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '1.1rem 1.5rem', fontSize: '1rem', fontWeight: 700 }}
                 >
                   <span>Explorar Vertical de Atuária</span>
-                  <span>/Atuária →</span>
+                  <span>/Atuaria →</span>
                 </Link>
               </div>
             </div>
@@ -298,7 +298,7 @@ export default function InstitutionalHub() {
 
               <div style={{ borderTop: '1px solid rgba(229, 192, 123, 0.2)', paddingTop: '1.5rem' }}>
                 <Link
-                  href="/Estúdios"
+                  href="/Estudios"
                   className="btn-primary"
                   style={{
                     display: 'flex',
@@ -313,7 +313,7 @@ export default function InstitutionalHub() {
                   }}
                 >
                   <span>Explorar Vertical de Estúdios</span>
-                  <span>/Estúdios →</span>
+                  <span>/Estudios →</span>
                 </Link>
               </div>
             </div>
@@ -334,8 +334,8 @@ export default function InstitutionalHub() {
           </div>
 
           <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <Link href="/Atuária" className="label-sm" style={{ color: 'var(--secondary)' }}>/Atuária</Link>
-            <Link href="/Estúdios" className="label-sm" style={{ color: 'var(--secondary)' }}>/Estúdios</Link>
+            <Link href="/Atuaria" className="label-sm" style={{ color: 'var(--secondary)' }}>/Atuaria</Link>
+            <Link href="/Estudios" className="label-sm" style={{ color: 'var(--secondary)' }}>/Estudios</Link>
             <a href="https://domino-automate.com.br/curriculo/" target="_blank" rel="noopener noreferrer" className="label-sm" style={{ opacity: 0.8 }}>
               Portal Curricular ↗
             </a>

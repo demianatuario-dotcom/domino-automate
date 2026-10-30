@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     const payloadToN8N = {
       ...data,
-      origem: data.origem || data.vertical || '/Atuária',
+      origem: data.origem || data.vertical || '/Atuaria',
       descricao: formattedDescricao.trim(),
       created_at: new Date().toISOString()
     };
