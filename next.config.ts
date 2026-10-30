@@ -1,35 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/Atuaria",
-        destination: "/Atu%C3%A1ria",
-      },
-      {
-        source: "/atuaria",
-        destination: "/Atu%C3%A1ria",
-      },
-      {
-        source: "/atu%C3%A1ria",
-        destination: "/Atu%C3%A1ria",
-      },
-      {
-        source: "/Estudios",
-        destination: "/Est%C3%BAdios",
-      },
-      {
-        source: "/estudios",
-        destination: "/Est%C3%BAdios",
-      },
-      {
-        source: "/est%C3%BAdios",
-        destination: "/Est%C3%BAdios",
-      },
-    ];
-  },
+  /* Routing handled by src/middleware.ts for full UTF-8 / percent-encoded support */
 };
 
 export default nextConfig;
-
