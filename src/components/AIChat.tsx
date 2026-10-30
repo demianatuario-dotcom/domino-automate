@@ -1,10 +1,20 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 
-export default function AIChat() {
+interface AIChatProps {
+  niche?: 'atuaria' | 'estudios';
+}
+
+export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
+  const isEstudios = niche === 'estudios';
+
+  const initialMessage = isEstudios
+    ? 'Olá! ✨ Sou a consultora de IA da Domino Automate para Estúdios de Beleza e Clínicas de Estética. Ajudo você a lotar sua agenda pelo WhatsApp 24/7, reduzir faltas (No-Show) e ter uma página de alta conversão. Qual é o foco do seu estúdio hoje?'
+    : 'Olá! Sou o assistente técnico da vertical de Atuária da Domino Automate. Presto consultoria preliminar sobre cálculos atuariais (MIBA 1807), perícias judiciais (TRT10/TJDFT), conformidade CPC 33 / PREVIC e automação analítica de riscos. Como posso orientar sua demanda hoje?';
+
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{role: 'user' | 'assistant', content: string}[]>([
-    { role: 'assistant', content: 'Olá! Sou o assistente técnico da Domino Automate. Presto consultoria preliminar sobre inteligência atuarial, perícias judiciais (TRT10/TJDFT), conformidade CPC 33 / PREVIC e engenharia de automação corporativa. Como posso orientar sua demanda hoje?' }
+  const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
+    { role: 'assistant', content: initialMessage }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -13,7 +23,9 @@ export default function AIChat() {
   const recognitionRef = useRef<any>(null);
   const messagesRef = useRef(messages);
 
-  // Sync ref with state
+  const accentColor = isEstudios ? '#D4AF37' : 'var(--secondary)';
+  const headerBg = isEstudios ? '#1A1416' : 'var(--primary-container)';
+
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
@@ -23,7 +35,7 @@ export default function AIChat() {
   };
 
   useEffect(() => {
-    if(isOpen) scrollToBottom();
+    if (isOpen) scrollToBottom();
   }, [messages, isOpen]);
 
   useEffect(() => {
@@ -45,8 +57,7 @@ export default function AIChat() {
           const transcript = event.results[0][0].transcript;
           setInput(transcript);
           setIsListening(false);
-          
-          // Envio automático após transcrição com um pequeno delay visual
+
           setTimeout(() => {
             handleSendInternal(transcript);
           }, 500);
@@ -102,7 +113,6 @@ export default function AIChat() {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
 
-    // Lógica de captura de leads no frontend
     if (leadStage !== 'neutral') {
       processLeadCapture(userMessage);
       return;
@@ -114,14 +124,18 @@ export default function AIChat() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ history: messagesRef.current.slice(1), message: userMessage })
+        body: JSON.stringify({
+          history: messagesRef.current.slice(1),
+          message: userMessage,
+          niche
+        })
       });
       const data = await res.json();
-      
+
       if (res.ok && data.reply) {
         let cleanReply = data.reply;
         const automateMatch = cleanReply.match(/\[\[AUTOMATE: (.*?)\]\]/);
-        
+
         if (automateMatch) {
           try {
             const automateData = JSON.parse(automateMatch[1]);
@@ -133,17 +147,12 @@ export default function AIChat() {
         }
 
         setMessages(prev => [...prev, { role: 'assistant', content: cleanReply }]);
-
-        // Detectar se a IA perguntou sobre o orçamento
-        if (cleanReply.toLowerCase().includes('posso fazer seu pedido de orçamento')) {
-          // O fluxo de confirmação será tratado na próxima resposta do usuário
-        }
       } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: 'Desculpe, meu sistema está passando por uma manutenção no momento.' }]);
+        setMessages(prev => [...prev, { role: 'assistant', content: 'Desculpe, meu sistema está passando por uma atualização rápida. Você também pode falar diretamente conosco pelo botão de WhatsApp da página!' }]);
       }
-    } catch(err) {
+    } catch (err) {
       console.error(err);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Ops! Ocorreu um erro de rede.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Ops! Ocorreu um erro de rede. Tente novamente em instantes.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -154,46 +163,59 @@ export default function AIChat() {
 
     if (leadStage === 'collect_name') {
       setLeadData(prev => ({ ...prev, nome: text }));
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Perfeito! Qual o melhor e-mail para enviarmos a proposta?' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Perfeito! Qual o melhor e-mail para enviarmos a proposta e o diagnóstico?' }]);
       setLeadStage('collect_email');
     } else if (leadStage === 'collect_email') {
       setLeadData(prev => ({ ...prev, email: text }));
-      setMessages(prev => [...prev, { role: 'assistant', content: 'E por último, qual o seu WhatsApp? (Se preferir não informar, basta digitar "não")' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'E por último, qual o seu WhatsApp com DDD? (Se preferir não informar, basta digitar "não")' }]);
       setLeadStage('collect_phone');
     } else if (leadStage === 'collect_phone') {
       const phone = text.toLowerCase().includes('não') ? '' : text;
       const finalData = { ...leadData, telefone: phone };
       setLeadData(finalData);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Tudo pronto! O formulário será analisado pela Domino Automate e entraremos em contato após a análise.' }]);
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: isEstudios
+            ? 'Tudo pronto! ✨ Já registrei seu pedido na nossa automação N8N e nossa equipe vai entrar em contato com o plano personalizado para o seu estúdio!'
+            : 'Tudo pronto! O diagnóstico foi registrado via N8N e será analisado pelo atuário Demian Lisboa Pereira (MIBA 1807).'
+        }
+      ]);
       setLeadStage('neutral');
-      
-      // Disparar Automação Silenciosa
+
       window.dispatchEvent(new CustomEvent('automate-budget', { detail: finalData }));
     }
   };
 
-  // Interceptar respostas de confirmação do orçamento
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
     if (lastMessage?.role === 'user' && leadStage === 'neutral') {
       const lastAssistant = messages[messages.length - 2];
       if (lastAssistant?.content.toLowerCase().includes('posso fazer seu pedido de orçamento')) {
         const text = lastMessage.content.toLowerCase();
-        if (text.includes('sim') || text.includes('pode') || text.includes('claro') || text.includes('com certeza')) {
+        if (text.includes('sim') || text.includes('pode') || text.includes('claro') || text.includes('com certeza') || text.includes('quero')) {
           setLeadStage('collect_name');
-          setMessages(prev => [...prev, { role: 'assistant', content: 'Ótimo! Para começar, qual o nome da sua empresa ou o seu nome de contato?' }]);
+          setMessages(prev => [
+            ...prev,
+            {
+              role: 'assistant',
+              content: isEstudios
+                ? 'Maravilha! ✨ Para começar, qual é o seu nome e o nome do seu Estúdio/Clínica?'
+                : 'Ótimo! Para começar, qual o nome da sua empresa/escritório ou o seu nome de contato?'
+            }
+          ]);
         }
       }
     }
-  }, [messages, leadStage]);
+  }, [messages, leadStage, isEstudios]);
 
   const formatMessage = (text: string) => {
-    // Remove tags de automação da exibição
     const cleanText = text.replace(/\[\[AUTOMATE: .*?\]\]/g, '').trim();
     const parts = cleanText.split(/(\*\*.*?\*\*)/g);
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={index} style={{ color: 'var(--secondary)' }}>{part.slice(2, -2)}</strong>;
+        return <strong key={index} style={{ color: accentColor }}>{part.slice(2, -2)}</strong>;
       }
       return <span key={index}>{part}</span>;
     });
@@ -201,76 +223,118 @@ export default function AIChat() {
 
   return (
     <>
-      {/* Floating Button Container */}
-      <div 
+      <div
         style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000, display: isOpen ? 'none' : 'flex', alignItems: 'flex-end', gap: '1rem' }}
       >
-        {/* Welcome Message Bubble */}
-        <div 
+        <div
           className="glass-panel chat-welcome-bubble"
-          style={{ padding: '0.75rem 1.25rem', borderRadius: '1rem 1rem 0 1rem', backgroundColor: 'var(--surface-container-highest)', border: '1px solid var(--secondary)', boxShadow: '0 4px 15px rgba(0,0,0,0.2)', cursor: 'pointer', position: 'relative', top: '-10px' }}
+          style={{
+            padding: '0.75rem 1.25rem',
+            borderRadius: '1rem 1rem 0 1rem',
+            backgroundColor: isEstudios ? '#1A1416' : 'var(--surface-container-highest)',
+            border: `1px solid ${accentColor}`,
+            boxShadow: '0 4px 15px rgba(0,0,0,0.35)',
+            cursor: 'pointer',
+            position: 'relative',
+            top: '-10px'
+          }}
           onClick={() => setIsOpen(true)}
         >
-          <p className="body-sm" style={{ margin: 0, fontWeight: 500, color: 'var(--on-surface)', textAlign: 'center' }}>Fale com nosso<br/><span style={{color: 'var(--secondary)'}}>assistente virtual!</span></p>
+          <p className="body-sm" style={{ margin: 0, fontWeight: 500, color: 'var(--on-surface)', textAlign: 'center' }}>
+            {isEstudios ? (
+              <>Consultora IA<br /><span style={{ color: accentColor }}>para Estúdios ✨</span></>
+            ) : (
+              <>Consultor IA<br /><span style={{ color: accentColor }}>Atuária & Riscos 🏛️</span></>
+            )}
+          </p>
         </div>
 
-        {/* Floating Button */}
-        <div 
+        <div
           className="floating-shadow glass-panel"
-          style={{ width: '60px', height: '60px', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--primary-container)', border: '2px solid var(--secondary)', animation: 'pulse 2s infinite' }}
+          style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: headerBg,
+            border: `2px solid ${accentColor}`,
+            animation: 'pulse 2s infinite'
+          }}
           onClick={() => setIsOpen(true)}
         >
-          <span style={{ fontSize: '1.75rem' }}>💬</span>
+          <span style={{ fontSize: '1.75rem' }}>{isEstudios ? '✨' : '💬'}</span>
         </div>
       </div>
 
-      {/* Chat Window */}
       {isOpen && (
-        <div 
-          className="card-base floating-shadow ghost-border chat-window-mobile" 
-          style={{ position: 'fixed', bottom: '2rem', right: '2rem', width: '350px', height: '500px', zIndex: 1000, display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}
+        <div
+          className="card-base floating-shadow ghost-border chat-window-mobile"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            right: '2rem',
+            width: '370px',
+            height: '520px',
+            zIndex: 1000,
+            display: 'flex',
+            flexDirection: 'column',
+            padding: 0,
+            overflow: 'hidden',
+            border: `1px solid ${accentColor}`
+          }}
         >
-          {/* Header */}
-          <div style={{ backgroundColor: 'var(--primary-container)', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--outline-variant)' }}>
-            <span className="label-md" style={{ color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span>🏛️</span> Consultor Atuarial & IA
+          <div style={{ backgroundColor: headerBg, padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--outline-variant)' }}>
+            <span className="label-md" style={{ color: accentColor, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span>{isEstudios ? '✨' : '🏛️'}</span>
+              {isEstudios ? 'Consultora IA • Estúdios de Beleza' : 'Consultor Técnico • Atuária & IA'}
             </span>
             <button onClick={() => setIsOpen(false)} style={{ background: 'transparent', color: 'var(--on-surface)', cursor: 'pointer', fontSize: '1.5rem', lineHeight: 1 }}>×</button>
           </div>
 
-          {/* Messages */}
-          <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', backgroundColor: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', backgroundColor: isEstudios ? '#110D0F' : 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {messages.map((m, i) => (
-              <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%', backgroundColor: m.role === 'user' ? 'var(--primary-container)' : 'var(--surface-container)', padding: '0.75rem 1rem', borderRadius: '8px', border: m.role === 'user' ? '1px solid var(--secondary)' : '1px solid var(--outline-variant)' }}>
+              <div
+                key={i}
+                style={{
+                  alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
+                  maxWidth: '85%',
+                  backgroundColor: m.role === 'user' ? headerBg : (isEstudios ? '#1D1619' : 'var(--surface-container)'),
+                  padding: '0.75rem 1rem',
+                  borderRadius: '8px',
+                  border: m.role === 'user' ? `1px solid ${accentColor}` : '1px solid var(--outline-variant)'
+                }}
+              >
                 <p className="body-sm">{formatMessage(m.content)}</p>
               </div>
             ))}
             {isLoading && (
-              <div style={{ alignSelf: 'flex-start', backgroundColor: 'var(--surface-container)', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}>
+              <div style={{ alignSelf: 'flex-start', backgroundColor: isEstudios ? '#1D1619' : 'var(--surface-container)', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}>
                 <p className="body-sm" style={{ opacity: 0.6 }}>Digitando...</p>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <form onSubmit={handleSend} style={{ padding: '1rem', backgroundColor: 'var(--surface-container-highest)', borderTop: '1px solid var(--outline-variant)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <input 
-              type="text" 
-              className="input-field" 
-              style={{ flex: 1, minHeight: '40px', padding: '0.5rem 1rem' }} 
+          <form onSubmit={handleSend} style={{ padding: '1rem', backgroundColor: isEstudios ? '#1A1416' : 'var(--surface-container-highest)', borderTop: '1px solid var(--outline-variant)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <input
+              type="text"
+              className="input-field"
+              style={{ flex: 1, minHeight: '40px', padding: '0.5rem 1rem', backgroundColor: isEstudios ? '#110D0F' : undefined }}
               placeholder={isListening ? "Ouvindo..." : "Digite sua dúvida..."}
               value={input}
               onChange={e => setInput(e.target.value)}
               disabled={isLoading}
             />
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={toggleListen}
-              style={{ 
-                padding: '0.5rem', 
-                borderRadius: '8px', 
-                background: 'transparent', 
+              style={{
+                padding: '0.5rem',
+                borderRadius: '8px',
+                background: 'transparent',
                 border: isListening ? '1px solid var(--error)' : '1px solid var(--outline-variant)',
                 cursor: 'pointer',
                 display: 'flex',
@@ -282,7 +346,7 @@ export default function AIChat() {
               }}
               title={isListening ? "Parar gravação" : "Falar"}
             >
-              <span style={{ fontSize: '1.2rem', color: isListening ? 'var(--error)' : 'var(--secondary)' }}>
+              <span style={{ fontSize: '1.2rem', color: isListening ? 'var(--error)' : accentColor }}>
                 {isListening ? '🛑' : '🎤'}
               </span>
             </button>

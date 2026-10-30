@@ -136,9 +136,19 @@ export default function BudgetModule() {
           <div className="card-base ghost-border" style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px solid var(--secondary)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🏛️</div>
             <h3 className="headline-sm" style={{ color: 'var(--secondary)', marginBottom: '0.5rem' }}>Demanda Registrada com Sucesso!</h3>
-            <p className="body-md" style={{ maxWidth: '500px', margin: '0 auto', opacity: 0.9 }}>
+            <p className="body-md" style={{ maxWidth: '500px', margin: '0 auto 1.75rem', opacity: 0.9 }}>
               Seu cenário será analisado pelo atuário responsável <strong>Demian Lisboa Pereira (MIBA 1807)</strong>. Entraremos em contato em até 24 horas úteis.
             </p>
+            <a
+              href={`https://wa.me/5561981171564?text=${encodeURIComponent(`Olá, Demian! Acabei de registrar a solicitação de diagnóstico técnico na vertical de Atuária (${demanda}) em nome de ${nome || 'minha organização'}.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.9rem 1.75rem', fontSize: '0.95rem', fontWeight: 700 }}
+            >
+              <span>Adiantar Atendimento no WhatsApp</span>
+              <span>↗</span>
+            </a>
           </div>
         ) : (
           <form className="card-base ghost-border floating-shadow" onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2.25rem', padding: '3rem' }}>

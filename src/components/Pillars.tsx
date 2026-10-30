@@ -4,66 +4,66 @@ export default function Pillars() {
   const pillars = [
     {
       id: "atuaria-riscos",
-      badge: "Pilar 01 • Regulação & Solvência Atuarial",
-      title: "Inteligência Atuarial & Governança de Riscos",
-      subtitle: "Geração de Valor para Fundos de Pensão, EFPCs e Patrocinadoras",
+      badge: "Frente 01 • Regulação & Solvência",
+      title: "Auditoria CPC 33 / IAS 19 & Governança EFPC",
+      subtitle: "Validação Independente para Patrocinadoras e Fundos de Pensão",
       icon: "🏛️",
       points: [
-        "Auditoria e validação independente de CPC 33 (R1) e IAS 19 para balanços corporativos.",
-        "Avaliação aprofundada de premissas demográficas, tábuas biométricas e solvência atuarial.",
-        "Gestão de risco de equacionamento de déficit técnico e pareceres estratégicos para Conselhos Deliberativos e Fiscais."
+        "Revisão independente de laudos atuariais, notas explicativas e conciliação de passivos em balanços corporativos.",
+        "Testes de aderência de tábuas biométricas, hipóteses econômico-financeiras e apuração do Valor Presente Atuarial (VPA).",
+        "Modelagem de planos de equacionamento de déficit técnico e suporte a Conselhos Deliberativos e Fiscais perante a PREVIC."
       ],
-      result: "Conformidade PREVIC e Mitigação de Riscos Atuariais em Balanço"
+      result: "Segurança Contábil e Mitigação de Riscos em Balanço"
     },
     {
       id: "pericia-judicial",
-      badge: "Pilar 02 • Segurança Jurídica",
+      badge: "Frente 02 • Contencioso Estratégico",
       title: "Perícia Atuarial & Assistência Técnica Judicial",
-      subtitle: "Auxílio em Conflitos Judiciais com Cálculo Atuarial",
+      subtitle: "Defesa Técnica e Liquidação em Litígios Complexos",
       icon: "⚖️",
       points: [
-        "Cálculos de liquidação de sentença e apuração rigorosa de reservas matemáticas em litígios complexos.",
-        "Formulação de quesitos estratégicos e impugnação técnica fundamentada de laudos periciais divergentes.",
-        "Pareceres prévios de viabilidade atuarial para instrução probatória em teses cíveis, trabalhistas e previdenciárias."
+        "Cálculos de liquidação de sentença, recomposição de reserva matemática e benefícios previdenciários/trabalhistas.",
+        "Elaboração de quesitos estratégicos e impugnação técnica fundamentada contra laudos periciais inconsistentes.",
+        "Pareceres prévios de risco e viabilidade matemática para instrução probatória em bancas de advocacia empresarial."
       ],
       result: "Histórico de 10 Perícias Homologadas no TRT10 e TJDFT"
     },
     {
       id: "automacao-ia",
-      badge: "Pilar 03 • Engenharia Aplicada",
-      title: "Engenharia de Automação & IA Corporativa",
-      subtitle: "Geração de Valor para Consultorias e Operações de Alto Volume",
-      icon: "⚡",
+      badge: "Frente 03 • Engenharia Atuarial",
+      title: "Motores de Cálculo em Python & Automação de Riscos",
+      subtitle: "Escala Analítica para Consultorias e Departamentos Jurídicos",
+      icon: "🐍",
       points: [
-        "Agentes autônomos de IA treinados em normativos PREVIC e jurisprudência para redação e análise documental técnica.",
-        "Orquestração de pipelines em n8n e scripts Python/R integrando bancos legados a relatórios automáticos.",
-        "Triagem jurídica e financeira automatizada via WhatsApp/Web com segurança de dados e conformidade total à LGPD."
+        "Algoritmos propietarios em Python e R para processamento massivo de bases cadastrais e projeções estocásticas.",
+        "Agentes de IA treinados em normativos PREVIC e jurisprudência para auditoria documental e redação de pareceres.",
+        "Esteiras automatizadas em n8n para auditoria contínua de folha, benefícios e contingências sob estrito sigilo LGPD."
       ],
-      result: "Autonomia Operacional e Eliminação de Riscos Manuais"
+      result: "Eliminação de Erro Material e Ganho de Escala Técnica"
     }
   ];
 
   return (
-    <section id="pilares" style={{ padding: '6rem 2rem', position: 'relative' }}>
+    <section id="escopo-atuarial" style={{ padding: '6rem 2rem', position: 'relative', scrollMarginTop: '80px' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
-            Estrutura de Soluções
+            Escopo Técnico Especializado
           </span>
           <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
-            Os 3 Pilares de Atuação Estratégica
+            Frentes de Atuação em Ciências Atuariais
           </h2>
           <p className="body-md" style={{ opacity: 0.8, maxWidth: '750px', margin: '0 auto' }}>
-            A união entre a chancela regulatória atuarial (MIBA) e a vanguarda da engenharia de software e inteligência artificial para gerar valor na proteção de balanços, mitigação de riscos atuariais e resolução de conflitos judiciais.
+            Metodologia rigorosa fundamentada nas normas do Instituto Brasileiro de Atuária (IBA), pronunciamentos contábeis internacionais e engenharia computacional aplicada ao risco.
           </p>
         </div>
-        
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
           {pillars.map((pillar, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               id={pillar.id}
-              className="card-base floating-shadow glass-panel" 
+              className="card-base floating-shadow glass-panel"
               style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', borderTop: '4px solid var(--secondary)', position: 'relative', scrollMarginTop: '100px' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

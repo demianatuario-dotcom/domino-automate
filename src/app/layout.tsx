@@ -4,8 +4,8 @@ import './globals.css';
 import React from 'react';
 
 export const metadata: Metadata = {
-  title: 'Domino Automate | Inteligência Atuarial, Governança de Riscos e Engenharia de IA',
-  description: 'Boutique de Engenharia Digital, Inteligência Atuarial (MIBA 1807), Mitigação de Passivos Atuariais (CPC 33 / IAS 19), Auxílio em Conflitos Judiciais com Cálculo Atuarial, Geração de Valor para Consultorias e Automação de Riscos com IA para o mercado jurídico e corporativo.',
+  title: 'Domino Automate | Engenharia de Sistemas, Inteligência Analítica e Automações com IA',
+  description: 'Software house e consultoria de engenharia aplicada em Brasília-DF. Desenvolvemos ecossistemas digitais, motores analíticos em Python/n8n e agentes de IA privada para as verticais de Atuária e Estúdios de Beleza.',
 };
 
 export default function RootLayout({
