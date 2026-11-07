@@ -87,6 +87,12 @@ A versão **V2.2** consolidou o ecossistema digital da **Domino Automate** como 
 - **Metadados de OpenGraph:**
   - Declaração de dimensões reais de `1024 x 538` para o asset binário `/logo.png` em todas as rotas canônicas e no `RootLayout`.
 
+### FRENTE 8 — Hardening de Build e Deploy Nixpacks/Coolify
+- **`next.config.ts`:**
+  - Adicionado `serverExternalPackages: ['firebase-admin', 'pg']` para preservar módulos nativos do Node no runtime de servidor.
+- **`src/app/api/comments/route.ts`:**
+  - Migração de `firebase-admin/app` e `firebase-admin/auth` para `import type` estático e carregamento dinâmico assíncrono via `await import(...)` em runtime, eliminando o conflito `ERR_REQUIRE_ESM` do empacotador Webpack durante a coleta de páginas estáticas.
+
 ---
 
 ## 3. SUITE DE TESTES E VALIDAÇÃO DE BUILD
@@ -94,3 +100,4 @@ A versão **V2.2** consolidou o ecossistema digital da **Domino Automate** como 
 - **Suite Automatizada (`src/__tests__/domino-v2.test.ts`):** 19 testes em 7 suites executados com `node --test` nativo (100% aprovados, 0 falhas).
 - **TypeScript Strict Mode (`npx tsc --noEmit`):** 0 erros de compilação ou tipagem.
 - **Build de Produção Next.js 16 (`npm run build`):** 19 rotas compiladas e geradas com sucesso (14 rotas estáticas pré-renderizadas e 5 rotas dinâmicas de API).
+

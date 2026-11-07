@@ -308,6 +308,7 @@ Abaixo encontra-se o código-fonte integral e atualizado de todos os **54 arquiv
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['firebase-admin', 'pg'],
   /* Routing handled by src/middleware.ts for full UTF-8 / percent-encoded support */
 };
 
@@ -5499,8 +5500,8 @@ export async function POST(req: Request) {
 #### Arquivo: `src/app/api/comments/route.ts`
 
 ```ts
-import { getApps, initializeApp, cert, applicationDefault, type App } from 'firebase-admin/app';
-import { getAuth, type Auth, type DecodedIdToken } from 'firebase-admin/auth';
+import type { App } from 'firebase-admin/app';
+import type { Auth, DecodedIdToken } from 'firebase-admin/auth';
 import {
   getComments,
   insertComment,
@@ -5552,6 +5553,8 @@ function parseServiceAccountKey(rawKey: string): {
 
 /**
  * Initializes and returns the singleton Firebase Admin Auth instance.
+ * Dynamically imports firebase-admin at runtime to avoid bundling issues
+ * during static page data collection in Next.js/Webpack/Nixpacks.
  * Supports:
  * 1. FIREBASE_SERVICE_ACCOUNT_KEY (JSON or Base64 JSON)
  * 2. FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY
@@ -5559,7 +5562,10 @@ function parseServiceAccountKey(rawKey: string): {
  *
  * Never treats projectId alone as a valid credential in production.
  */
-function getFirebaseAdminAuth(): Auth {
+async function getFirebaseAdminAuth(): Promise<Auth> {
+  const { getApps, initializeApp, cert, applicationDefault } = await import('firebase-admin/app');
+  const { getAuth } = await import('firebase-admin/auth');
+
   const existingApps = getApps();
   if (existingApps.length > 0) {
     return getAuth(existingApps[0]);
@@ -5684,7 +5690,8 @@ export async function POST(request: Request) {
     const checkRevoked = process.env.FIREBASE_CHECK_REVOKED !== 'false';
     let decodedToken: DecodedIdToken;
     try {
-      decodedToken = await getFirebaseAdminAuth().verifyIdToken(idToken, checkRevoked);
+      const adminAuth = await getFirebaseAdminAuth();
+      decodedToken = await adminAuth.verifyIdToken(idToken, checkRevoked);
     } catch {
       return Response.json(
         { error: 'Não autorizado. Falha ao validar o token.' },
