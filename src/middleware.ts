@@ -1,6 +1,39 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+const CANONICAL_ROUTES: Record<string, string> = {
+  '/atuaria': '/Atuaria',
+  '/atuária': '/Atuaria',
+  '/estudios': '/Estudios',
+  '/estúdios': '/Estudios',
+  '/saloes': '/Saloes',
+  '/salões': '/Saloes',
+  '/salao': '/Saloes',
+  '/salão': '/Saloes',
+  '/barbearias': '/Barbearias',
+  '/barbearia': '/Barbearias',
+  '/advocacia': '/Advocacia',
+  '/advogados': '/Advocacia',
+  '/contabilidade': '/Contabilidade',
+  '/contabil': '/Contabilidade',
+  '/contábil': '/Contabilidade',
+  '/farmacias': '/Farmacias',
+  '/farmácias': '/Farmacias',
+  '/farmacia': '/Farmacias',
+  '/farmácia': '/Farmacias',
+  '/oticas': '/Oticas',
+  '/óticas': '/Oticas',
+  '/otica': '/Oticas',
+  '/ótica': '/Oticas',
+  '/odontologia': '/Odontologia',
+  '/odonto': '/Odontologia',
+  '/dentistas': '/Odontologia',
+  '/varejo': '/Varejo',
+  '/lojas': '/Varejo',
+  '/comercio': '/Varejo',
+  '/comércio': '/Varejo',
+};
+
 export function middleware(request: NextRequest) {
   const rawPathname = request.nextUrl.pathname;
   let decoded = rawPathname;
@@ -11,19 +44,16 @@ export function middleware(request: NextRequest) {
   }
 
   const trimmed = decoded.replace(/\/+$/, '');
-  const lower = trimmed.toLowerCase();
-
-  // Redirect accented or lowercase /Atuária, /atuária, /atuaria to canonical /Atuaria
-  if (lower === '/atuária' || (lower === '/atuaria' && trimmed !== '/Atuaria')) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/Atuaria';
-    return NextResponse.redirect(url, 308);
+  if (!trimmed || trimmed === '') {
+    return NextResponse.next();
   }
 
-  // Redirect accented or lowercase /Estúdios, /estúdios, /estudios to canonical /Estudios
-  if (lower === '/estúdios' || (lower === '/estudios' && trimmed !== '/Estudios')) {
+  const lower = trimmed.toLowerCase();
+  const targetCanonical = CANONICAL_ROUTES[lower];
+
+  if (targetCanonical && trimmed !== targetCanonical) {
     const url = request.nextUrl.clone();
-    url.pathname = '/Estudios';
+    url.pathname = targetCanonical;
     return NextResponse.redirect(url, 308);
   }
 

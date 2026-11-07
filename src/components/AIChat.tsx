@@ -1,16 +1,21 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import { SEGMENTS_CONFIG, SegmentNicheKey } from '@/config/segmentsConfig';
 
 interface AIChatProps {
-  niche?: 'atuaria' | 'estudios';
+  niche?: SegmentNicheKey;
 }
 
 export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
+  const isAtuaria = niche === 'atuaria';
   const isEstudios = niche === 'estudios';
+  const customSegment = (!isAtuaria && !isEstudios) ? SEGMENTS_CONFIG[niche] : null;
 
-  const initialMessage = isEstudios
-    ? 'Olá! ✨ Sou a consultora de IA da Domino Automate para Estúdios de Beleza e Clínicas de Estética. Ajudo você a lotar sua agenda pelo WhatsApp 24/7, reduzir faltas (No-Show) e ter uma página de alta conversão. Qual é o foco do seu estúdio hoje?'
-    : 'Olá! Sou o assistente técnico da vertical de Atuária da Domino Automate. Presto consultoria preliminar sobre cálculos atuariais (MIBA 1807), perícias judiciais (TRT10/TJDFT), conformidade CPC 33 / PREVIC e automação analítica de riscos. Como posso orientar sua demanda hoje?';
+  const initialMessage = customSegment
+    ? customSegment.chatConfig.initialMessage
+    : isEstudios
+      ? 'Olá! ✨ Sou a consultora de IA da Domino Automate para Estúdios de Beleza e Clínicas de Estética. Ajudo você a lotar sua agenda pelo WhatsApp 24/7, reduzir faltas (No-Show) e ter uma página de alta conversão. Qual é o foco do seu estúdio hoje?'
+      : 'Olá! Sou o assistente técnico da vertical de Atuária da Domino Automate. Presto consultoria preliminar sobre cálculos atuariais (MIBA 1807), perícias judiciais (TRT10/TJDFT), conformidade CPC 33 / PREVIC e automação analítica de riscos. Como posso orientar sua demanda hoje?';
 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
@@ -23,8 +28,41 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
   const recognitionRef = useRef<any>(null);
   const messagesRef = useRef(messages);
 
-  const accentColor = isEstudios ? '#D4AF37' : 'var(--secondary)';
-  const headerBg = isEstudios ? '#1A1416' : 'var(--primary-container)';
+  const accentColor = customSegment
+    ? customSegment.theme.accentPrimary
+    : isEstudios
+      ? '#D4AF37'
+      : 'var(--secondary)';
+
+  const headerBg = customSegment
+    ? customSegment.theme.cardBg
+    : isEstudios
+      ? '#1A1416'
+      : 'var(--primary-container)';
+
+  const chatBodyBg = customSegment
+    ? customSegment.theme.bgPrimary
+    : isEstudios
+      ? '#110D0F'
+      : 'var(--surface)';
+
+  const assistantMsgBg = customSegment
+    ? customSegment.theme.bgSecondary
+    : isEstudios
+      ? '#1D1619'
+      : 'var(--surface-container)';
+
+  const iconSymbol = customSegment
+    ? customSegment.icon
+    : isEstudios
+      ? '✨'
+      : '🏛️';
+
+  const headerTitle = customSegment
+    ? customSegment.chatConfig.headerTitle
+    : isEstudios
+      ? 'Consultora IA • Estúdios de Beleza'
+      : 'Consultor Técnico • Atuária & IA';
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -177,9 +215,11 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
         ...prev,
         {
           role: 'assistant',
-          content: isEstudios
-            ? 'Tudo pronto! ✨ Já registrei seu pedido na nossa automação N8N e nossa equipe vai entrar em contato com o plano personalizado para o seu estúdio!'
-            : 'Tudo pronto! O diagnóstico foi registrado via N8N e será analisado pelo atuário Demian Lisboa Pereira (MIBA 1807).'
+          content: customSegment
+            ? customSegment.chatConfig.successMessage
+            : isEstudios
+              ? 'Tudo pronto! ✨ Já registrei seu pedido na nossa automação N8N e nossa equipe vai entrar em contato com o plano personalizado para o seu estúdio!'
+              : 'Tudo pronto! O diagnóstico foi registrado via N8N e será analisado pelo atuário Demian Lisboa Pereira (MIBA 1807).'
         }
       ]);
       setLeadStage('neutral');
@@ -200,15 +240,17 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
             ...prev,
             {
               role: 'assistant',
-              content: isEstudios
-                ? 'Maravilha! ✨ Para começar, qual é o seu nome e o nome do seu Estúdio/Clínica?'
-                : 'Ótimo! Para começar, qual o nome da sua empresa/escritório ou o seu nome de contato?'
+              content: customSegment
+                ? customSegment.chatConfig.collectNamePrompt
+                : isEstudios
+                  ? 'Maravilha! ✨ Para começar, qual é o seu nome e o nome do seu Estúdio/Clínica?'
+                  : 'Ótimo! Para começar, qual o nome da sua empresa/escritório ou o seu nome de contato?'
             }
           ]);
         }
       }
     }
-  }, [messages, leadStage, isEstudios]);
+  }, [messages, leadStage, isEstudios, customSegment]);
 
   const formatMessage = (text: string) => {
     const cleanText = text.replace(/\[\[AUTOMATE: .*?\]\]/g, '').trim();
@@ -231,7 +273,7 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
           style={{
             padding: '0.75rem 1.25rem',
             borderRadius: '1rem 1rem 0 1rem',
-            backgroundColor: isEstudios ? '#1A1416' : 'var(--surface-container-highest)',
+            backgroundColor: headerBg,
             border: `1px solid ${accentColor}`,
             boxShadow: '0 4px 15px rgba(0,0,0,0.35)',
             cursor: 'pointer',
@@ -241,7 +283,12 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
           onClick={() => setIsOpen(true)}
         >
           <p className="body-sm" style={{ margin: 0, fontWeight: 500, color: 'var(--on-surface)', textAlign: 'center' }}>
-            {isEstudios ? (
+            {customSegment ? (
+              <>
+                {customSegment.chatConfig.welcomeBubbleTitle}<br />
+                <span style={{ color: accentColor }}>{customSegment.chatConfig.welcomeBubbleHighlight}</span>
+              </>
+            ) : isEstudios ? (
               <>Consultora IA<br /><span style={{ color: accentColor }}>para Estúdios ✨</span></>
             ) : (
               <>Consultor IA<br /><span style={{ color: accentColor }}>Atuária & Riscos 🏛️</span></>
@@ -265,7 +312,7 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
           }}
           onClick={() => setIsOpen(true)}
         >
-          <span style={{ fontSize: '1.75rem' }}>{isEstudios ? '✨' : '💬'}</span>
+          <span style={{ fontSize: '1.75rem' }}>{iconSymbol}</span>
         </div>
       </div>
 
@@ -288,20 +335,20 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
         >
           <div style={{ backgroundColor: headerBg, padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--outline-variant)' }}>
             <span className="label-md" style={{ color: accentColor, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <span>{isEstudios ? '✨' : '🏛️'}</span>
-              {isEstudios ? 'Consultora IA • Estúdios de Beleza' : 'Consultor Técnico • Atuária & IA'}
+              <span>{iconSymbol}</span>
+              {headerTitle}
             </span>
             <button onClick={() => setIsOpen(false)} style={{ background: 'transparent', color: 'var(--on-surface)', cursor: 'pointer', fontSize: '1.5rem', lineHeight: 1 }}>×</button>
           </div>
 
-          <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', backgroundColor: isEstudios ? '#110D0F' : 'var(--surface)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', backgroundColor: chatBodyBg, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {messages.map((m, i) => (
               <div
                 key={i}
                 style={{
                   alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
                   maxWidth: '85%',
-                  backgroundColor: m.role === 'user' ? headerBg : (isEstudios ? '#1D1619' : 'var(--surface-container)'),
+                  backgroundColor: m.role === 'user' ? headerBg : assistantMsgBg,
                   padding: '0.75rem 1rem',
                   borderRadius: '8px',
                   border: m.role === 'user' ? `1px solid ${accentColor}` : '1px solid var(--outline-variant)'
@@ -311,18 +358,18 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
               </div>
             ))}
             {isLoading && (
-              <div style={{ alignSelf: 'flex-start', backgroundColor: isEstudios ? '#1D1619' : 'var(--surface-container)', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}>
+              <div style={{ alignSelf: 'flex-start', backgroundColor: assistantMsgBg, padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid var(--outline-variant)' }}>
                 <p className="body-sm" style={{ opacity: 0.6 }}>Digitando...</p>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={handleSend} style={{ padding: '1rem', backgroundColor: isEstudios ? '#1A1416' : 'var(--surface-container-highest)', borderTop: '1px solid var(--outline-variant)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <form onSubmit={handleSend} style={{ padding: '1rem', backgroundColor: headerBg, borderTop: '1px solid var(--outline-variant)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <input
               type="text"
               className="input-field"
-              style={{ flex: 1, minHeight: '40px', padding: '0.5rem 1rem', backgroundColor: isEstudios ? '#110D0F' : undefined }}
+              style={{ flex: 1, minHeight: '40px', padding: '0.5rem 1rem', backgroundColor: chatBodyBg }}
               placeholder={isListening ? "Ouvindo..." : "Digite sua dúvida..."}
               value={input}
               onChange={e => setInput(e.target.value)}
