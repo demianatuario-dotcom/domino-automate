@@ -13,7 +13,17 @@ export const metadata: Metadata = {
     description:
       'Desenvolvemos ecossistemas digitais, motores analíticos em Python/n8n e agentes de IA no WhatsApp para operações corporativas e verticais especializadas.',
     url: 'https://domino-automate.com.br',
+    siteName: 'Domino Automate',
+    locale: 'pt_BR',
     type: 'website',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1024,
+        height: 538,
+        alt: 'Domino Automate | Engenharia de Sistemas e Automação IA',
+      },
+    ],
   },
 };
 

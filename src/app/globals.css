@@ -37,6 +37,11 @@
   margin: 0;
 }
 
+html {
+  scroll-padding-top: 5rem;
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--surface);
   color: var(--on-surface);
@@ -91,7 +96,16 @@ a {
 button, input, textarea {
   font-family: inherit;
   border: none;
-  outline: none;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--segment-accent, var(--secondary));
+  outline-offset: 2px;
 }
 
 .card-base {
@@ -241,6 +255,7 @@ button, input, textarea {
   .chat-window-mobile {
     width: 100vw !important;
     height: 100vh !important;
+    height: 100dvh !important;
     bottom: 0 !important;
     right: 0 !important;
     border-radius: 0 !important;
@@ -261,6 +276,8 @@ button, input, textarea {
   justify-content: center;
   width: 44px;
   height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   background: transparent;
   border: 1px solid var(--outline-variant);
   border-radius: 8px;

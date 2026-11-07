@@ -14,8 +14,6 @@ import FAQ from '@/components/FAQ';
 import Footer from '@/components/Footer';
 import AIChat from '@/components/AIChat';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Vertical Atuária, Perícia Judicial & Governança CPC 33 (MIBA 1807)',
   description:
@@ -28,7 +26,17 @@ export const metadata: Metadata = {
     description:
       'Auditoria independente CPC 33 (R1) / IAS 19, conformidade PREVIC, perícia atuarial judicial e automação analítica em Python.',
     url: 'https://domino-automate.com.br/Atuaria',
+    siteName: 'Domino Automate',
+    locale: 'pt_BR',
     type: 'website',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1024,
+        height: 538,
+        alt: 'Domino Automate | Vertical Atuária & Previdência Complementar',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',

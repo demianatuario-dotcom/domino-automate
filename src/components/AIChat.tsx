@@ -52,6 +52,8 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
   const [isListening, setIsListening] = useState(false);
   const [pendingOfferDiagnostic, setPendingOfferDiagnostic] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const messagesRef = useRef(messages);
 
@@ -106,6 +108,25 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
   }, []);
 
   useEffect(() => {
+    if (!isOpen) return;
+    const focusTimer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+        setTimeout(() => openButtonRef.current?.focus(), 20);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(focusTimer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const win = window as unknown as {
         SpeechRecognition?: new () => SpeechRecognitionInstance;
@@ -156,7 +177,7 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
   };
 
   const [leadStage, setLeadStage] = useState<
-    'neutral' | 'collect_name' | 'collect_email' | 'collect_phone'
+    'neutral' | 'collect_name' | 'collect_email' | 'collect_phone' | 'collect_consent'
   >('neutral');
   const [leadData, setLeadData] = useState({
     nome: '',
@@ -184,7 +205,7 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
 
     if (leadStage !== 'neutral') {
-      processLeadCapture(userMessage);
+      await processLeadCapture(userMessage);
       return;
     }
 
@@ -221,7 +242,7 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          history: messagesRef.current.slice(1),
+          history: messagesRef.current.slice(1).slice(-10),
           message: userMessage,
           niche,
         }),
@@ -268,18 +289,39 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
     }
   };
 
-  const processLeadCapture = (text: string) => {
+  const processLeadCapture = async (text: string) => {
     if (leadStage === 'neutral') return;
 
+    const trimmed = text.trim();
+
     if (leadStage === 'collect_name') {
-      setLeadData((prev) => ({ ...prev, nome: text }));
+      if (trimmed.length < 2) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: 'Por favor, informe um nome válido (mínimo 2 caracteres).' },
+        ]);
+        return;
+      }
+      setLeadData((prev) => ({ ...prev, nome: trimmed }));
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: 'Perfeito! Qual o melhor e-mail para enviarmos o diagnóstico?' },
       ]);
       setLeadStage('collect_email');
     } else if (leadStage === 'collect_email') {
-      setLeadData((prev) => ({ ...prev, email: text }));
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(trimmed)) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              'O e-mail informado parece inválido. Por favor, informe um e-mail válido (ex: contato@suaempresa.com.br):',
+          },
+        ]);
+        return;
+      }
+      setLeadData((prev) => ({ ...prev, email: trimmed }));
       setMessages((prev) => [
         ...prev,
         {
@@ -290,23 +332,147 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
       ]);
       setLeadStage('collect_phone');
     } else if (leadStage === 'collect_phone') {
-      const phone = text.toLowerCase().includes('não') ? '' : text;
-      const finalData = { ...leadData, telefone: phone };
-      setLeadData(finalData);
+      const lower = trimmed.toLowerCase();
+      const skippedPhone = lower === 'não' || lower === 'nao' || lower === 'n';
+      const phoneRegex = /^[0-9+\-()\s]{8,22}$/;
+      const digitsOnly = trimmed.replace(/\D/g, '');
+
+      if (!skippedPhone && (!phoneRegex.test(trimmed) || digitsOnly.length < 8 || digitsOnly.length > 15)) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              'O telefone informado parece inválido. Informe um número com DDD (ex: 61 99999-9999) ou digite "não" para continuar:',
+          },
+        ]);
+        return;
+      }
+
+      const phone = skippedPhone ? '' : trimmed;
+      setLeadData((prev) => ({ ...prev, telefone: phone }));
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: customSegment
-            ? customSegment.chatConfig.successMessage
-            : isEstudios
-              ? 'Tudo pronto! ✨ Já registrei seu pedido na nossa automação N8N e nossa equipe vai entrar em contato!'
-              : 'Tudo pronto! O diagnóstico foi registrado via N8N e será analisado pelo atuário Demian Lisboa Pereira (MIBA 1807).',
+          content:
+            'Para concluir em conformidade com a LGPD (Lei nº 13.709/2018): você autoriza o uso desses dados exclusivamente para o retorno do diagnóstico comercial pela Domino Automate? Responda **"sim"** para confirmar o envio.',
         },
       ]);
-      setLeadStage('neutral');
+      setLeadStage('collect_consent');
+    } else if (leadStage === 'collect_consent') {
+      const lower = trimmed.toLowerCase();
+      const isNo = lower === 'não' || lower === 'nao' || lower.includes('cancelar') || lower === 'n';
+      const isYes =
+        lower === 'sim' ||
+        lower.startsWith('sim') ||
+        lower.includes('concordo') ||
+        lower.includes('autorizo') ||
+        lower.includes('aceito') ||
+        lower === 'ok' ||
+        lower === 'pode';
 
-      window.dispatchEvent(new CustomEvent('automate-budget', { detail: finalData }));
+      if (isNo) {
+        setLeadStage('neutral');
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              'Envio cancelado conforme solicitado. Nenhum dado foi salvo. Caso deseje atendimento direto, utilize o botão de WhatsApp da página.',
+          },
+        ]);
+        return;
+      }
+
+      if (!isYes) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              'Por favor, responda **"sim"** para confirmar o consentimento LGPD e enviar o diagnóstico, ou **"não"** para cancelar.',
+          },
+        ]);
+        return;
+      }
+
+      setLeadStage('neutral');
+      setIsLoading(true);
+
+      const verticalSlug = customSegment
+        ? customSegment.slug
+        : isEstudios
+          ? '/Estudios'
+          : '/Atuaria';
+      const demandaLabel = customSegment
+        ? customSegment.form.demandLabel
+        : isEstudios
+          ? 'Automação IA + N8N para Estúdio de Beleza'
+          : 'Diagnóstico Estratégico';
+
+      try {
+        const res = await fetch('/api/quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            vertical: verticalSlug,
+            origem: `${verticalSlug} (Chat IA)`,
+            nome: leadData.nome,
+            email: leadData.email,
+            telefone: leadData.telefone,
+            demanda: demandaLabel,
+            dores: leadData.dores.join(', '),
+            doresArray: leadData.dores,
+            descricao: leadData.detalhes || `Solicitado via Consultor IA na vertical ${verticalSlug}`,
+            lgpdConsent: true,
+          }),
+        });
+
+        if (res.ok) {
+          const resData = (await res.json().catch(() => ({}))) as {
+            deliveryStatus?: string;
+            n8nDelivered?: boolean;
+          };
+          const statusMsg =
+            resData.deliveryStatus === 'queued_outbox'
+              ? 'Tudo pronto! Seu diagnóstico foi salvo com segurança em nossa fila prioritária e nossa equipe entrará em contato em breve.'
+              : customSegment
+                ? customSegment.chatConfig.successMessage
+                : isEstudios
+                  ? 'Tudo pronto! ✨ Já registrei seu pedido na nossa automação N8N e nossa equipe vai entrar em contato!'
+                  : 'Tudo pronto! O diagnóstico foi registrado e será analisado pelo atuário Demian Lisboa Pereira (MIBA 1807).';
+
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content: statusMsg,
+            },
+          ]);
+          window.dispatchEvent(new CustomEvent('automate-budget', { detail: leadData }));
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: 'assistant',
+              content:
+                'Não foi possível registrar seu pedido agora. Por favor, acione nossa equipe diretamente pelo botão de WhatsApp da página.',
+            },
+          ]);
+        }
+      } catch {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content:
+              'Não foi possível concluir o envio por oscilação de conexão. Você pode falar conosco diretamente no WhatsApp da página.',
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -372,8 +538,11 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
         </div>
 
         <button
+          ref={openButtonRef}
           type="button"
           aria-label="Abrir Consultor de IA"
+          aria-expanded={isOpen}
+          aria-controls="domino-ai-chat-dialog"
           className="floating-shadow glass-panel"
           style={{
             width: '56px',
@@ -391,12 +560,16 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
             trackDominoEvent('chat_open', { vertical: niche, section: 'floating_button' });
           }}
         >
-          <span style={{ fontSize: '1.6rem' }}>{iconSymbol}</span>
+          <span style={{ fontSize: '1.6rem' }} aria-hidden="true">{iconSymbol}</span>
         </button>
       </div>
 
       {isOpen && (
         <div
+          id="domino-ai-chat-dialog"
+          role="dialog"
+          aria-modal="false"
+          aria-label={headerTitle}
           className="card-base floating-shadow ghost-border chat-window-mobile"
           style={{
             position: 'fixed',
@@ -426,21 +599,24 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
               className="label-md"
               style={{ color: accentColor, display: 'flex', alignItems: 'center', gap: '0.4rem' }}
             >
-              <span>{iconSymbol}</span>
+              <span aria-hidden="true">{iconSymbol}</span>
               {headerTitle}
             </span>
             <button
               type="button"
               aria-label="Fechar chat"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                setTimeout(() => openButtonRef.current?.focus(), 20);
+              }}
               style={{
                 background: 'transparent',
                 color: '#F8FAFC',
                 cursor: 'pointer',
                 fontSize: '1.5rem',
                 lineHeight: 1,
-                minWidth: '36px',
-                minHeight: '36px',
+                minWidth: '44px',
+                minHeight: '44px',
               }}
             >
               ×
@@ -448,6 +624,9 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
           </div>
 
           <div
+            role="log"
+            aria-live="polite"
+            aria-busy={isLoading}
             style={{
               flex: 1,
               padding: '1rem',
@@ -507,11 +686,14 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
             }}
           >
             <input
+              ref={inputRef}
+              id="domino-ai-chat-input"
+              aria-label="Mensagem para o consultor de IA"
               type="text"
               className="input-field"
               style={{
                 flex: 1,
-                minHeight: '42px',
+                minHeight: '44px',
                 padding: '0.5rem 0.9rem',
                 backgroundColor: chatBodyBg,
                 color: '#F8FAFC',
@@ -524,6 +706,7 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
             <button
               type="button"
               onClick={toggleListen}
+              aria-label={isListening ? 'Parar gravação de voz' : 'Falar por voz'}
               style={{
                 padding: '0.5rem',
                 borderRadius: '8px',
@@ -533,24 +716,25 @@ export default function AIChat({ niche = 'atuaria' }: AIChatProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                minWidth: '42px',
-                minHeight: '42px',
+                minWidth: '44px',
+                minHeight: '44px',
               }}
               title={isListening ? 'Parar gravação' : 'Falar por voz'}
             >
-              <span style={{ fontSize: '1.15rem', color: isListening ? 'var(--error)' : accentColor }}>
+              <span style={{ fontSize: '1.15rem', color: isListening ? 'var(--error)' : accentColor }} aria-hidden="true">
                 {isListening ? '🛑' : '🎤'}
               </span>
             </button>
             <button
               type="submit"
               disabled={isLoading}
+              aria-label="Enviar mensagem"
               className="btn-primary"
               style={{
                 padding: '0.5rem 0.95rem',
                 borderRadius: '8px',
-                minWidth: '42px',
-                minHeight: '42px',
+                minWidth: '44px',
+                minHeight: '44px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

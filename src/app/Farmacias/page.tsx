@@ -12,7 +12,17 @@ export const metadata: Metadata = {
     title: cfg.metaTitle,
     description: cfg.metaDescription,
     url: `https://domino-automate.com.br${cfg.slug}`,
+    siteName: 'Domino Automate',
+    locale: 'pt_BR',
     type: 'website',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1024,
+        height: 538,
+        alt: cfg.metaTitle,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',

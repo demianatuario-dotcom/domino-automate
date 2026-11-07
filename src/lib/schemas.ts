@@ -15,10 +15,19 @@ export const VALID_NICHES = [
 
 export type ValidNiche = (typeof VALID_NICHES)[number];
 
+export const MAX_CHAT_HISTORY_TURNS = 10;
+export const MAX_CHAT_TURN_CHARS = 1500;
+export const MAX_CHAT_HISTORY_TOTAL_CHARS = 6000;
+
+/**
+ * Controlled conversation history turn.
+ * Only 'user' and 'assistant' conversational turns are permitted;
+ * 'system', 'developer', 'tool', 'function' or privileged roles are strictly rejected.
+ */
 export const ChatHistoryItemSchema = z
   .object({
-    role: z.enum(['user', 'assistant', 'model']),
-    content: z.string().trim().min(1).max(2000),
+    role: z.enum(['user', 'assistant']),
+    content: z.string().trim().min(1).max(MAX_CHAT_TURN_CHARS),
   })
   .strict();
 
@@ -28,8 +37,20 @@ export const ChatRequestSchema = z
       .string()
       .trim()
       .min(1, 'A mensagem não pode estar vazia.')
-      .max(1500, 'A mensagem excede o limite de 1500 caracteres.'),
-    history: z.array(ChatHistoryItemSchema).max(12).optional().default([]),
+      .max(MAX_CHAT_TURN_CHARS, 'A mensagem excede o limite de 1500 caracteres.'),
+    history: z
+      .array(ChatHistoryItemSchema)
+      .max(MAX_CHAT_HISTORY_TURNS)
+      .optional()
+      .default([])
+      .refine(
+        (items) =>
+          items.reduce((sum, item) => sum + item.content.length, 0) <=
+          MAX_CHAT_HISTORY_TOTAL_CHARS,
+        {
+          message: `O histórico excede o limite total de ${MAX_CHAT_HISTORY_TOTAL_CHARS} caracteres.`,
+        }
+      ),
     niche: z
       .string()
       .trim()
@@ -62,6 +83,17 @@ export const StructuredAIResponseSchema = z
 
 const cleanPhoneRegex = /^[0-9+\-()\s]{8,22}$/;
 
+export const QuoteSimulatorSchema = z
+  .object({
+    val1: z.number(),
+    val2: z.number(),
+    val3: z.number(),
+    scenario: z.enum(['conservador', 'referencia', 'otimista']),
+    customMarginPct: z.number().optional(),
+    impactoMensal: z.number(),
+  })
+  .strict();
+
 export const QuoteRequestSchema = z
   .object({
     vertical: z.string().trim().max(60).optional().default('/Atuaria'),
@@ -87,7 +119,8 @@ export const QuoteRequestSchema = z
     doresArray: z.array(z.string().trim().max(160)).max(15).optional().default([]),
     descricao: z.string().trim().max(3000).optional().default(''),
     perguntas_respostas: z.record(z.string().max(200), z.string().max(1000)).optional().default({}),
-    lgpdConsent: z.boolean().optional().default(true),
+    lgpdConsent: z.literal(true),
+    simulador: QuoteSimulatorSchema.optional(),
     sessionId: z.string().trim().max(80).optional(),
     b_website_check: z.string().max(120).optional().default(''),
   })
@@ -102,11 +135,6 @@ export const CommentRequestSchema = z
       .trim()
       .min(2, 'O comentário não pode ser vazio.')
       .max(1000, 'Comentário muito longo.'),
-    userName: z.string().trim().min(2, 'Nome obrigatório.').max(80),
-    userEmail: z.union([z.string().trim().email().max(160), z.null(), z.literal('')]).optional(),
-    userImage: z.union([z.string().trim().url().max(400), z.null(), z.literal('')]).optional(),
-    provider: z.string().trim().max(40).optional().default('firebase'),
     parentId: z.union([z.number().int().positive(), z.null()]).optional().default(null),
   })
   .strict();
-

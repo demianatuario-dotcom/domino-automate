@@ -13,7 +13,17 @@ export const metadata: Metadata = {
     description:
       'Recepcionista de IA 24/7 no WhatsApp, blindagem anti no-show via n8n e Landing Pages de alto padrão para estúdios de beleza e estética.',
     url: 'https://domino-automate.com.br/Estudios',
+    siteName: 'Domino Automate',
+    locale: 'pt_BR',
     type: 'website',
+    images: [
+      {
+        url: '/logo.png',
+        width: 1024,
+        height: 538,
+        alt: 'Domino Automate | Estúdios de Beleza & Estética',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',

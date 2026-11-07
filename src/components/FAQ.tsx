@@ -36,19 +36,43 @@ export default function FAQ() {
           </span>
           <h2 className="display-sm" style={{ textAlign: 'center', marginTop: '0.5rem', marginBottom: 0 }}>Perguntas Frequentes sobre <span style={{ color: 'var(--secondary)' }}>Nossos Serviços</span></h2>
         </div>
-        
+
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {faqs.map((f, i) => (
-            <div key={i} className="card-base ghost-border" style={{ padding: '1.5rem', cursor: 'pointer' }} onClick={() => setOpenIndex(openIndex === i ? null : i)}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h4 className="label-md" style={{ fontWeight: 'bold' }}>{f.q}</h4>
-                <span style={{ fontSize: '1.5rem', transform: openIndex === i ? 'rotate(45deg)' : 'none', transition: '0.3s' }}>+</span>
+          {faqs.map((f, i) => {
+            const isOpen = openIndex === i;
+            const panelId = `atuaria-faq-panel-${i}`;
+            return (
+              <div key={i} className="card-base ghost-border" style={{ padding: 0, overflow: 'hidden' }}>
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() => setOpenIndex(isOpen ? null : i)}
+                  style={{
+                    width: '100%',
+                    padding: '1.35rem 1.5rem',
+                    minHeight: '48px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    background: 'transparent',
+                    color: 'var(--on-surface)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span className="label-md" style={{ fontWeight: 'bold' }}>{f.q}</span>
+                  <span aria-hidden="true" style={{ fontSize: '1.5rem', transform: isOpen ? 'rotate(45deg)' : 'none', transition: '0.3s' }}>+</span>
+                </button>
+                {isOpen && (
+                  <div id={panelId} style={{ padding: '0 1.5rem 1.35rem' }}>
+                    <p className="body-md" style={{ opacity: 0.85, borderTop: '1px solid var(--outline-variant)', paddingTop: '1rem' }}>{f.a}</p>
+                  </div>
+                )}
               </div>
-              {openIndex === i && (
-                <p className="body-md" style={{ marginTop: '1rem', opacity: 0.8, borderTop: '1px solid var(--outline-variant)', paddingTop: '1rem' }}>{f.a}</p>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* CTA final */}
@@ -58,7 +82,7 @@ export default function FAQ() {
           </p>
           <a href="#orcamento" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.85rem 1.75rem', fontSize: '0.95rem', fontWeight: 600 }}>
             <span>Agendar Reunião Técnica</span>
-            <span>→</span>
+            <span aria-hidden="true">→</span>
           </a>
         </div>
       </div>

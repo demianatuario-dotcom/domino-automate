@@ -1,7 +1,7 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { trackDominoEvent } from '@/lib/analytics';
-import type { ROIScenarioKey } from '@/lib/roiEngine';
+import { DEFAULT_ROI_CONFIG, type ROIScenarioKey } from '@/lib/roiEngine';
 
 const SCENARIO_CONFIG: Record<ROIScenarioKey, { label: string; recupRatio: number; erroRatio: number }> = {
   conservador: { label: 'Conservador', recupRatio: 0.45, erroRatio: 0.05 },
@@ -13,6 +13,9 @@ export default function ROISimulator() {
   const [demandas, setDemandas] = useState(25);
   const [horasPorDemanda, setHorasPorDemanda] = useState(12);
   const [custoHoraTecnica, setCustoHoraTecnica] = useState(250);
+  const [custoMedioContingencia, setCustoMedioContingencia] = useState<number>(
+    DEFAULT_ROI_CONFIG.defaultAtuariaContingencyUnitCost
+  );
   const [scenario, setScenario] = useState<ROIScenarioKey>('referencia');
   const [showMemory, setShowMemory] = useState(false);
   const [simStarted, setSimStarted] = useState(false);
@@ -36,14 +39,16 @@ export default function ROISimulator() {
     const economiaDiretaMes = horasRecuperadasMes * custoHoraTecnica;
     const economiaDiretaAno = horasRecuperadasAno * custoHoraTecnica;
 
-    const contingenciaPrevenidaAno = Math.round(demandas * 12 * cfg.erroRatio * 8000);
+    const contingenciaPrevenidaAno = Math.round(
+      demandas * 12 * cfg.erroRatio * custoMedioContingencia
+    );
 
     const memoriaDeCalculo = [
       `Cenário ${cfg.label}: recuperação de ${Math.round(cfg.recupRatio * 100)}% das horas operacionais de triagem, conciliação de bases e cálculo.`,
       `Carga técnica mensal atual: ${demandas} demandas × ${horasPorDemanda}h = ${totalHorasMes}h/mês (Custo base: R$ ${custoManualMes.toLocaleString('pt-BR')}/mês).`,
-      `Horas técnicas recuperadas: ${totalHorasMes}h × ${Math.round(cfg.recupRatio * 100)}% = ${horasRecuperadasMes}h/mês (${horasRecuperadasAno}h/ano).`,
+      `Capacidade produtiva liberada: ${totalHorasMes}h × ${Math.round(cfg.recupRatio * 100)}% = ${horasRecuperadasMes}h/mês (${horasRecuperadasAno}h/ano).`,
       `Economia operacional direta: ${horasRecuperadasMes}h × R$ ${custoHoraTecnica}/h = R$ ${economiaDiretaMes.toLocaleString('pt-BR')}/mês (R$ ${economiaDiretaAno.toLocaleString('pt-BR')}/ano).`,
-      `Mitigação de risco material/glosa: ${demandas * 12} casos/ano × ${Math.round(cfg.erroRatio * 100)}% taxa de retrabalho × R$ 8.000 custo médio de contingência = R$ ${contingenciaPrevenidaAno.toLocaleString('pt-BR')}/ano.`,
+      `Mitigação de risco material/glosa (premissa configurável, não somada à economia mensal para evitar dupla contagem): ${demandas * 12} casos/ano × ${Math.round(cfg.erroRatio * 100)}% taxa de retrabalho × R$ ${custoMedioContingencia.toLocaleString('pt-BR')} (premissa de custo médio por contingência) = R$ ${contingenciaPrevenidaAno.toLocaleString('pt-BR')}/ano.`,
     ];
 
     return {
@@ -57,7 +62,23 @@ export default function ROISimulator() {
       contingenciaPrevenidaAno,
       memoriaDeCalculo,
     };
-  }, [demandas, horasPorDemanda, custoHoraTecnica, scenario]);
+  }, [demandas, horasPorDemanda, custoHoraTecnica, custoMedioContingencia, scenario]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('atuaria-roi-update', {
+          detail: {
+            val1: demandas,
+            val2: custoHoraTecnica,
+            val3: horasPorDemanda,
+            scenario,
+            impactoMensal: stats.economiaDiretaMes,
+          },
+        })
+      );
+    }
+  }, [demandas, custoHoraTecnica, horasPorDemanda, scenario, stats.economiaDiretaMes]);
 
   return (
     <section id="simulador" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface)', scrollMarginTop: '80px' }}>
@@ -74,13 +95,14 @@ export default function ROISimulator() {
           </p>
 
           {/* 3-Scenario Selector */}
-          <div style={{ display: 'inline-flex', gap: '0.5rem', padding: '0.35rem', borderRadius: '50px', backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-variant)', marginTop: '0.75rem' }}>
+          <div role="group" aria-label="Cenários de simulação" style={{ display: 'inline-flex', gap: '0.5rem', padding: '0.35rem', borderRadius: '50px', backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-variant)', marginTop: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
             {(['conservador', 'referencia', 'otimista'] as ROIScenarioKey[]).map((scen) => {
               const active = scenario === scen;
               return (
                 <button
                   key={scen}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => {
                     notifySimStart();
                     setScenario(scen);
@@ -91,7 +113,8 @@ export default function ROISimulator() {
                     });
                   }}
                   style={{
-                    padding: '0.5rem 1.15rem',
+                    padding: '0.55rem 1.15rem',
+                    minHeight: '44px',
                     borderRadius: '50px',
                     fontSize: '0.8rem',
                     fontWeight: 700,
@@ -107,15 +130,16 @@ export default function ROISimulator() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 310px), 1fr))', gap: '3rem', alignItems: 'start' }}>
           {/* Sliders Input Panel */}
-          <div className="card-base ghost-border" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '2.5rem' }}>
+          <div className="card-base ghost-border" style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem', padding: '2.25rem' }}>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <label className="label-md">Demandas / Cálculos Mensais:</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <label htmlFor="atuaria-slider-demandas" className="label-md">Demandas / Cálculos Mensais:</label>
                 <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{demandas} casos/mês</span>
               </div>
               <input
+                id="atuaria-slider-demandas"
                 type="range"
                 min="5"
                 max="150"
@@ -128,11 +152,12 @@ export default function ROISimulator() {
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <label className="label-md">Horas Técnicas por Demanda:</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <label htmlFor="atuaria-slider-horas" className="label-md">Horas Técnicas por Demanda:</label>
                 <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{horasPorDemanda}h / caso</span>
               </div>
               <input
+                id="atuaria-slider-horas"
                 type="range"
                 min="2"
                 max="40"
@@ -145,11 +170,12 @@ export default function ROISimulator() {
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <label className="label-md">Custo da Hora Especializada:</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
+                <label htmlFor="atuaria-slider-custo-hora" className="label-md">Custo da Hora Especializada:</label>
                 <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>R$ {custoHoraTecnica}/h</span>
               </div>
               <input
+                id="atuaria-slider-custo-hora"
                 type="range"
                 min="100"
                 max="600"
@@ -160,23 +186,47 @@ export default function ROISimulator() {
               />
               <span className="body-xs" style={{ opacity: 0.6 }}>Remuneração média de advogados sêniores, atuários ou peritos.</span>
             </div>
+
+            <div style={{ paddingTop: '0.75rem', borderTop: '1px solid var(--outline-variant)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <label htmlFor="atuaria-slider-contingencia" className="label-sm" style={{ opacity: 0.85 }}>
+                  Premissa Configurável: Custo Médio por Contingência / Retrabalho:
+                </label>
+                <span className="label-sm" style={{ color: 'var(--secondary)', fontWeight: 700 }}>
+                  R$ {custoMedioContingencia.toLocaleString('pt-BR')}
+                </span>
+              </div>
+              <input
+                id="atuaria-slider-contingencia"
+                type="range"
+                min="1000"
+                max="30000"
+                step="1000"
+                value={custoMedioContingencia}
+                onChange={(e) => { notifySimStart(); setCustoMedioContingencia(Number(e.target.value)); }}
+                style={{ width: '100%', accentColor: 'var(--secondary)' }}
+              />
+              <span className="body-xs" style={{ opacity: 0.6 }}>
+                Premissa referencial ajustável por porte do litígio/auditoria (não constitui valor universal ou garantia).
+              </span>
+            </div>
           </div>
 
           {/* Results Display Panel */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div aria-live="polite" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* Card 1: Horas Especializadas & Economia Direta */}
             <div className="card-base glass-panel" style={{ borderLeft: '6px solid var(--secondary)', padding: '1.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p className="label-sm" style={{ opacity: 0.75, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
-                  Economia Operacional Direta ({stats.cfg.label})
+                  Economia Operacional Direta ({stats.cfg.label} • Projeção do Simulador)
                 </p>
-                <span style={{ fontSize: '1.5rem' }}>⏱️</span>
+                <span style={{ fontSize: '1.5rem' }} aria-hidden="true">⏱️</span>
               </div>
               <h3 className="display-sm" style={{ color: 'var(--secondary)', margin: '0.5rem 0', fontSize: '2.1rem', fontWeight: 700 }}>
                 R$ {stats.economiaDiretaMes.toLocaleString('pt-BR')} <span style={{ fontSize: '1rem', fontWeight: 400, opacity: 0.8 }}>/ mês</span>
               </h3>
               <p className="body-sm" style={{ opacity: 0.85 }}>
-                Equivalente a <strong>+{stats.horasRecuperadasMes}h/mês (+{stats.horasRecuperadasAno}h/ano)</strong> liberadas, gerando <strong>R$ {stats.economiaDiretaAno.toLocaleString('pt-BR')}/ano</strong> em capacidade produtiva.
+                Equivalente a <strong>+{stats.horasRecuperadasMes}h/mês (+{stats.horasRecuperadasAno}h/ano)</strong> de capacidade técnica liberada, gerando <strong>R$ {stats.economiaDiretaAno.toLocaleString('pt-BR')}/ano</strong> em produtividade operacional.
               </p>
             </div>
 
@@ -184,16 +234,16 @@ export default function ROISimulator() {
             <div className="card-base glass-panel" style={{ borderLeft: '6px solid #60a5fa', padding: '1.75rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <p className="label-sm" style={{ opacity: 0.75, textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
-                  Mitigação de Risco de Glosa / Erro Material
+                  Mitigação de Risco de Glosa / Erro Material (Premissa Configurável)
                 </p>
-                <span style={{ fontSize: '1.5rem' }}>🛡️</span>
+                <span style={{ fontSize: '1.5rem' }} aria-hidden="true">🛡️</span>
               </div>
               <h3 className="display-sm" style={{ color: '#93c5fd', margin: '0.5rem 0', fontSize: '2rem', fontWeight: 700 }}>
                 R$ {stats.contingenciaPrevenidaAno.toLocaleString('pt-BR')}
-                <span style={{ fontSize: '1rem', fontWeight: 400, opacity: 0.8 }}> / ano (estimado)</span>
+                <span style={{ fontSize: '1rem', fontWeight: 400, opacity: 0.8 }}> / ano (premissa estimada)</span>
               </h3>
               <p className="body-sm" style={{ opacity: 0.85 }}>
-                Prevenção estimada de contingências por inconsistências em bases de dados, retrabalho em liquidações ou glosas em auditorias.
+                Estimativa separada (não somada à economia operacional mensal) considerando a premissa configurada de R$ {custoMedioContingencia.toLocaleString('pt-BR')} por contingência evitada.
               </p>
             </div>
 
@@ -201,9 +251,12 @@ export default function ROISimulator() {
             <div className="card-base ghost-border" style={{ padding: '1rem 1.25rem' }}>
               <button
                 type="button"
+                aria-expanded={showMemory}
+                aria-controls="atuaria-roi-memory-panel"
                 onClick={() => setShowMemory(!showMemory)}
                 style={{
                   width: '100%',
+                  minHeight: '44px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
@@ -215,10 +268,10 @@ export default function ROISimulator() {
                 }}
               >
                 <span>📐 Ver Memória de Cálculo e Premissas ({stats.cfg.label})</span>
-                <span>{showMemory ? '−' : '+'}</span>
+                <span aria-hidden="true">{showMemory ? '−' : '+'}</span>
               </button>
               {showMemory && (
-                <ul style={{ marginTop: '0.75rem', paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.78rem', opacity: 0.85 }}>
+                <ul id="atuaria-roi-memory-panel" style={{ marginTop: '0.75rem', paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.78rem', opacity: 0.85 }}>
                   {stats.memoriaDeCalculo.map((line, idx) => (
                     <li key={idx}>{line}</li>
                   ))}
@@ -234,6 +287,7 @@ export default function ROISimulator() {
                     vertical: '/Atuaria',
                     scenario,
                     section: 'roi_cta',
+                    estimatedMonthlyImpact: stats.economiaDiretaMes,
                   })
                 }
                 className="btn-primary"
@@ -242,7 +296,7 @@ export default function ROISimulator() {
                 Solicitar Diagnóstico Institucional Personalizado
               </a>
               <p className="body-xs" style={{ marginTop: '0.75rem', opacity: 0.6, textAlign: 'center' }}>
-                *Estimativa operacional parametrizável baseada em automação analítica com Python, n8n e cálculo atuarial. Não constitui garantia de resultado financeiro.
+                *Projeção do simulador baseada em premissas configuráveis pelo usuário. Não constitui garantia de resultado financeiro.
               </p>
             </div>
           </div>

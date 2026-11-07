@@ -9,6 +9,13 @@ export type DominoAnalyticsEvent =
   | 'form_start'
   | 'form_submit';
 
+export type LeadDeliveryAnalyticsStatus =
+  | 'delivered'
+  | 'delivered_webhook_only'
+  | 'queued_outbox'
+  | 'deduplicated'
+  | 'failed';
+
 export interface DominoAnalyticsParams {
   vertical: string;
   section?: string;
@@ -16,6 +23,7 @@ export interface DominoAnalyticsParams {
   themeMode?: 'dark' | 'light';
   layoutStrategy?: string;
   estimatedMonthlyImpact?: number;
+  deliveryStatus?: LeadDeliveryAnalyticsStatus;
 }
 
 declare global {
@@ -97,6 +105,7 @@ export function trackDominoEvent(
     ...(params.scenario ? { roi_scenario: params.scenario } : {}),
     ...(params.themeMode ? { theme_mode: params.themeMode } : {}),
     ...(params.layoutStrategy ? { layout_strategy: params.layoutStrategy } : {}),
+    ...(params.deliveryStatus ? { delivery_status: params.deliveryStatus } : {}),
     ...(typeof params.estimatedMonthlyImpact === 'number'
       ? { value: Math.round(params.estimatedMonthlyImpact), currency: 'BRL' }
       : {}),
@@ -113,4 +122,3 @@ export function trackDominoEvent(
     // Non-blocking analytics
   }
 }
-

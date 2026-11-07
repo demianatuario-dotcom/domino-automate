@@ -99,16 +99,16 @@ export default function CommentsSection() {
     setIsSubmitting(true);
     
     try {
+      const idToken = await user.getIdToken();
       const res = await fetch('/api/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
         body: JSON.stringify({ 
           content, 
           parentId,
-          userName: user.displayName || 'Usuário',
-          userEmail: user.email,
-          userImage: user.photoURL,
-          provider: 'firebase'
         }),
       });
       

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -208,6 +208,17 @@ export default function InstitutionalHub() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('todos');
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [menuOpen]);
+
   const capabilities = [
     {
       num: '01',
@@ -266,6 +277,9 @@ export default function InstitutionalHub() {
             className="hamburger-btn"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={menuOpen}
+            aria-controls="institutional-mobile-menu"
+            style={{ minWidth: '44px', minHeight: '44px' }}
           >
             {menuOpen ? '✕' : '☰'}
           </button>
@@ -273,7 +287,7 @@ export default function InstitutionalHub() {
       </header>
 
       <div className={`mobile-overlay ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)} />
-      <nav className={`mobile-menu ${menuOpen ? 'open' : ''}`} style={{ overflowY: 'auto', maxHeight: '85vh' }}>
+      <nav id="institutional-mobile-menu" className={`mobile-menu ${menuOpen ? 'open' : ''}`} style={{ overflowY: 'auto', maxHeight: '85vh' }}>
         <a href="#apresentacao" onClick={() => setMenuOpen(false)}>A Domino Automate</a>
         <a href="#habilidades" onClick={() => setMenuOpen(false)}>Habilidades & Engenharia</a>
         <a href="#verticais" onClick={() => setMenuOpen(false)}>Todos os 10 Segmentos</a>
@@ -414,12 +428,14 @@ export default function InstitutionalHub() {
           </div>
 
           {/* Filtros por Macro-Categoria */}
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '3rem' }}>
+          <div role="group" aria-label="Filtrar segmentos por macro-categoria" style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '3rem' }}>
             {categories.map((cat) => {
               const isActive = activeCategory === cat.key;
               return (
                 <button
+                  type="button"
                   key={cat.key}
+                  aria-pressed={isActive}
                   onClick={() => setActiveCategory(cat.key)}
                   style={{
                     padding: '0.7rem 1.25rem',
@@ -433,7 +449,8 @@ export default function InstitutionalHub() {
                     transition: 'all 0.2s ease',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5rem'
+                    gap: '0.5rem',
+                    minHeight: '44px'
                   }}
                 >
                   <span>{cat.label}</span>
@@ -453,7 +470,7 @@ export default function InstitutionalHub() {
           </div>
 
           {/* Grid dos 10 Segmentos */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: '2rem' }}>
             {filteredVerticals.map((v) => (
               <div
                 key={v.id}

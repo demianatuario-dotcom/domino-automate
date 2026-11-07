@@ -36,6 +36,7 @@ export interface SegmentTheme {
   cardBorder: string;
   accentPrimary: string;
   accentSecondary: string;
+  accentText?: string;
   accentGradient: string;
   buttonTextColor: string;
   textPrimary: string;
@@ -144,6 +145,8 @@ export interface SegmentConfig {
     defaultMarginPct: number;
     hourlyOperationalValue: number;
     weeklyHoursSavedBase: number;
+    baselineRevenueMultiplier: number;
+    estimatedInvestment?: number;
     metric1Suffix: string;
     metric3Suffix: string;
   };
@@ -202,7 +205,8 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       cardBorder: 'rgba(180, 101, 67, 0.22)',
       accentPrimary: '#B4532A',
       accentSecondary: '#D48862',
-      accentGradient: 'linear-gradient(45deg, #B4532A, #D48862)',
+      accentText: '#9A4524',
+      accentGradient: 'linear-gradient(45deg, #9A4524, #B4532A)',
       buttonTextColor: '#FFFFFF',
       textPrimary: '#1F1614',
       textSecondary: '#4A3833',
@@ -335,6 +339,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       defaultMarginPct: 60,
       hourlyOperationalValue: 40,
       weeklyHoursSavedBase: 8,
+      baselineRevenueMultiplier: 1.5,
       metric1Suffix: 'novos agendamentos/mês via resposta imediata',
       metric3Suffix: 'horários ociosos recuperados/mês',
     },
@@ -422,7 +427,8 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       cardBorder: 'rgba(180, 83, 9, 0.25)',
       accentPrimary: '#B45309',
       accentSecondary: '#D97706',
-      accentGradient: 'linear-gradient(45deg, #B45309, #D97706)',
+      accentText: '#9A4507',
+      accentGradient: 'linear-gradient(45deg, #9A4507, #B45309)',
       buttonTextColor: '#FFFFFF',
       textPrimary: '#171411',
       textSecondary: '#4B443B',
@@ -555,6 +561,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       defaultMarginPct: 70,
       hourlyOperationalValue: 35,
       weeklyHoursSavedBase: 7,
+      baselineRevenueMultiplier: 1.5,
       metric1Suffix: 'cortes/combos extras agendados no mês',
       metric3Suffix: 'furos de bancada recuperados no mês',
     },
@@ -642,7 +649,8 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       cardBorder: 'rgba(148, 113, 44, 0.25)',
       accentPrimary: '#8E6A24',
       accentSecondary: '#B38B40',
-      accentGradient: 'linear-gradient(45deg, #8E6A24, #B38B40)',
+      accentText: '#7A5A1C',
+      accentGradient: 'linear-gradient(45deg, #7A5A1C, #8E6A24)',
       buttonTextColor: '#FFFFFF',
       textPrimary: '#0F172A',
       textSecondary: '#334155',
@@ -775,6 +783,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       defaultMarginPct: 75,
       hourlyOperationalValue: 180,
       weeklyHoursSavedBase: 10,
+      baselineRevenueMultiplier: 1.5,
       metric1Suffix: 'novos contratos qualificados/mês',
       metric3Suffix: 'oportunidades jurídicas recuperadas/mês',
     },
@@ -862,7 +871,8 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       cardBorder: 'rgba(5, 150, 105, 0.24)',
       accentPrimary: '#059669',
       accentSecondary: '#10B981',
-      accentGradient: 'linear-gradient(45deg, #047857, #10B981)',
+      accentText: '#047857',
+      accentGradient: 'linear-gradient(45deg, #047857, #059669)',
       buttonTextColor: '#FFFFFF',
       textPrimary: '#0F172A',
       textSecondary: '#334155',
@@ -994,6 +1004,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       defaultMarginPct: 65,
       hourlyOperationalValue: 65,
       weeklyHoursSavedBase: 16,
+      baselineRevenueMultiplier: 2.2,
       metric1Suffix: 'novos contratos contábeis/BPO por mês',
       metric3Suffix: 'horas técnicas da equipe liberadas/mês',
     },
@@ -1081,7 +1092,8 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       cardBorder: 'rgba(8, 145, 178, 0.24)',
       accentPrimary: '#0891B2',
       accentSecondary: '#0D9488',
-      accentGradient: 'linear-gradient(45deg, #0891B2, #0D9488)',
+      accentText: '#0E7490',
+      accentGradient: 'linear-gradient(45deg, #0E7490, #0891B2)',
       buttonTextColor: '#FFFFFF',
       textPrimary: '#082026',
       textSecondary: '#2D4F57',
@@ -1214,6 +1226,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       defaultMarginPct: 40,
       hourlyOperationalValue: 35,
       weeklyHoursSavedBase: 10,
+      baselineRevenueMultiplier: 1.5,
       metric1Suffix: 'pedidos extras convertidos por velocidade/mês',
       metric3Suffix: 'recompras e orçamentos recuperados/mês',
     },
@@ -1300,7 +1313,8 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       cardBorder: 'rgba(180, 83, 9, 0.25)',
       accentPrimary: '#B45309',
       accentSecondary: '#D97706',
-      accentGradient: 'linear-gradient(45deg, #B45309, #D97706)',
+      accentText: '#9A4507',
+      accentGradient: 'linear-gradient(45deg, #9A4507, #B45309)',
       buttonTextColor: '#FFFFFF',
       textPrimary: '#181613',
       textSecondary: '#4A453D',
@@ -1433,6 +1447,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       defaultMarginPct: 50,
       hourlyOperationalValue: 40,
       weeklyHoursSavedBase: 8,
+      baselineRevenueMultiplier: 1.5,
       metric1Suffix: 'óculos extras convertidos via WhatsApp/mês',
       metric3Suffix: 'orçamentos e renovações anuais fechadas/mês',
     },
@@ -1519,6 +1534,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       cardBorder: 'rgba(2, 132, 199, 0.22)',
       accentPrimary: '#0284C7',
       accentSecondary: '#0369A1',
+      accentText: '#0369A1',
       accentGradient: 'linear-gradient(45deg, #0369A1, #0284C7)',
       buttonTextColor: '#FFFFFF',
       textPrimary: '#0F172A',
@@ -1652,6 +1668,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       defaultMarginPct: 60,
       hourlyOperationalValue: 90,
       weeklyHoursSavedBase: 8,
+      baselineRevenueMultiplier: 1.5,
       metric1Suffix: 'tratamentos extras iniciados/mês',
       metric3Suffix: 'faltas evitadas e orçamentos resgatados/mês',
     },
@@ -1739,7 +1756,8 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       cardBorder: 'rgba(234, 88, 12, 0.24)',
       accentPrimary: '#EA580C',
       accentSecondary: '#F97316',
-      accentGradient: 'linear-gradient(45deg, #C2410C, #F97316)',
+      accentText: '#C2410C',
+      accentGradient: 'linear-gradient(45deg, #C2410C, #EA580C)',
       buttonTextColor: '#FFFFFF',
       textPrimary: '#0F172A',
       textSecondary: '#334155',
@@ -1872,6 +1890,7 @@ export const SEGMENTS_CONFIG: Record<Exclude<SegmentNicheKey, 'atuaria' | 'estud
       defaultMarginPct: 45,
       hourlyOperationalValue: 35,
       weeklyHoursSavedBase: 8,
+      baselineRevenueMultiplier: 1.5,
       metric1Suffix: 'vendas extras pelo WhatsApp/mês',
       metric3Suffix: 'clientes reativados voltando a comprar/mês',
     },

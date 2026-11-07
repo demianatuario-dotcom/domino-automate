@@ -1,22 +1,42 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import { NextResponse } from 'next/server';
-import { getServicos } from '@/lib/db';
-import { SEGMENTS_CONFIG, type SegmentConfig } from '@/config/segmentsConfig';
+import { getServicos, sanitizeDbErrorMessage } from '../../../lib/db.ts';
+import { SEGMENTS_CONFIG, type SegmentConfig } from '../../../config/segmentsConfig.ts';
 import {
   ChatRequestSchema,
   StructuredAIResponseSchema,
   type ValidNiche,
-} from '@/lib/schemas';
+} from '../../../lib/schemas.ts';
 import {
   checkRateLimit,
   extractClientIdentifier,
   buildRateLimitHeaders,
   withCircuitBreaker,
-} from '@/lib/rateLimit';
+} from '../../../lib/rateLimit.ts';
+import { readJsonBodyWithLimit } from '../../../lib/bodyReader.ts';
+import {
+  INJECTION_PATTERNS,
+  sanitizeIncomingPII,
+  buildControlledConversationContents,
+} from '../../../lib/chatControl.ts';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 const MAX_CHAT_PAYLOAD_BYTES = 24_576; // 24 KB
+const SERVICOS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+let servicosCache: {
+  data: Awaited<ReturnType<typeof getServicos>>;
+  expiresAt: number;
+} | null = null;
+
+async function getCachedServicos() {
+  const now = Date.now();
+  if (servicosCache && now < servicosCache.expiresAt) {
+    return servicosCache.data;
+  }
+  const data = await getServicos();
+  servicosCache = { data, expiresAt: now + SERVICOS_CACHE_TTL_MS };
+  return data;
+}
 
 const ATUARIA_SYSTEM_INSTRUCTION = `Você é o "Consultor Técnico de Inteligência Atuarial & Engenharia de IA" da vertical de ATUÁRIA da DOMINO AUTOMATE (CNPJ: 66.699.218/0001-94), liderada pelo atuário Demian Lisboa Pereira (MIBA 1807).
 
@@ -105,32 +125,6 @@ Responda sempre em JSON válido segundo o schema:
 - "qualification": objeto com "shouldOfferDiagnostic" (boolean), "gargalos" (array com até 3 gargalos dentre os mapeados) e "detalhes" (resumo executivo da demanda do visitante).`;
 }
 
-const INJECTION_PATTERNS: RegExp[] = [
-  /api[_\s-]?key/i,
-  /gemini[_\s-]?api/i,
-  /system[_\s-]?prompt/i,
-  /ignore (all )?(previous|above|prior) instructions/i,
-  /disregard (all )?(previous|above|prior) instructions/i,
-  /esqueça (todas )?(as )?instruções/i,
-  /ignore (todas )?(as )?regras/i,
-  /mostre (o )?(seu )?prompt/i,
-  /reveal (the )?(system )?prompt/i,
-  /qual (é )?(a )?sua chave/i,
-  /vari[aá]ve(l|is) de ambiente/i,
-  /process\.env/i,
-  /database_url/i,
-  /n8n_webhook/i,
-  /jailbreak/i,
-  /developer mode/i,
-];
-
-function sanitizeIncomingPII(text: string): { sanitized: string; hadSensitivePII: boolean } {
-  const cpfRegex = /\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g;
-  const hadSensitivePII = cpfRegex.test(text);
-  const sanitized = text.replace(cpfRegex, '[CPF_OMITIDO_POR_LGPD]');
-  return { sanitized, hadSensitivePII };
-}
-
 function getSafeRejectionReply(niche: ValidNiche): string {
   if (niche === 'estudios') {
     return 'Como consultora da vertical de Estúdios da Domino Automate, ajudo você a automatizar seu atendimento e agenda com IA. Informações internas de infraestrutura e credenciais são restritas.';
@@ -143,44 +137,35 @@ function getSafeRejectionReply(niche: ValidNiche): string {
 }
 
 export async function POST(req: Request) {
-  const contentLength = Number(req.headers.get('content-length') ?? 0);
-  if (contentLength > MAX_CHAT_PAYLOAD_BYTES) {
-    return NextResponse.json(
-      { error: 'Payload excede o limite permitido.' },
-      { status: 413 }
-    );
+  const bodyRead = await readJsonBodyWithLimit(req, MAX_CHAT_PAYLOAD_BYTES);
+  if (!bodyRead.ok) {
+    return Response.json({ error: bodyRead.error }, { status: bodyRead.status });
   }
 
-  let rawBody: unknown;
-  try {
-    rawBody = await req.json();
-  } catch {
-    return NextResponse.json({ error: 'JSON inválido.' }, { status: 400 });
-  }
-
-  const parsed = ChatRequestSchema.safeParse(rawBody);
+  const parsed = ChatRequestSchema.safeParse(bodyRead.data);
   if (!parsed.success) {
-    return NextResponse.json(
+    return Response.json(
       { error: 'Dados de entrada inválidos.', details: parsed.error.flatten().fieldErrors },
       { status: 400 }
     );
   }
 
-  const { message, history, niche, sessionId } = parsed.data;
-  const clientId = extractClientIdentifier(req, sessionId);
+  const { message, history, niche } = parsed.data;
+  const clientId = extractClientIdentifier(req);
 
   const { result: rlResult, releaseConcurrency } = await checkRateLimit(clientId, {
     namespace: 'chat',
     windowMs: 60_000,
     maxRequests: 15,
     maxConcurrent: 3,
+    vertical: niche,
   });
 
   const rlHeaders = buildRateLimitHeaders(rlResult);
 
   if (!rlResult.allowed) {
     releaseConcurrency();
-    return NextResponse.json(
+    return Response.json(
       {
         error: 'Muitas mensagens enviadas em sequência. Aguarde alguns segundos antes de continuar.',
       },
@@ -189,9 +174,11 @@ export async function POST(req: Request) {
   }
 
   try {
-    const isSuspicious = INJECTION_PATTERNS.some((regex) => regex.test(message));
+    const isSuspicious =
+      INJECTION_PATTERNS.some((regex) => regex.test(message)) ||
+      history.some((item) => INJECTION_PATTERNS.some((regex) => regex.test(item.content)));
     if (isSuspicious) {
-      return NextResponse.json(
+      return Response.json(
         {
           reply: getSafeRejectionReply(niche),
           qualification: { shouldOfferDiagnostic: false, gargalos: [], detalhes: '' },
@@ -212,7 +199,7 @@ export async function POST(req: Request) {
       let servicosText =
         'Serviços especializados em Atuária, Perícia Judicial e Automação de Riscos com IA.';
       try {
-        const servicos = await getServicos();
+        const servicos = await getCachedServicos();
         if (servicos && servicos.length > 0) {
           servicosText = servicos
             .map(
@@ -222,7 +209,7 @@ export async function POST(req: Request) {
             .join('\n\n');
         }
       } catch (dbErr) {
-        console.warn('Could not load dynamic services from DB:', (dbErr as Error).message);
+        console.warn('Could not load dynamic services from DB:', sanitizeDbErrorMessage(dbErr));
       }
       fullSystemInstruction = ATUARIA_SYSTEM_INSTRUCTION.replace(
         '{SERVICOS_PLACEHOLDER}',
@@ -230,23 +217,19 @@ export async function POST(req: Request) {
       );
     }
 
-    const formattedHistory = history.slice(-10).map((msg) => ({
-      role: msg.role === 'user' ? ('user' as const) : ('model' as const),
-      parts: [{ text: sanitizeIncomingPII(msg.content).sanitized }],
-    }));
+    const controlledContents = buildControlledConversationContents(history, cleanMessage);
 
     const aiRawText = await withCircuitBreaker(
       'gemini-chat',
       async () => {
         const response = await ai.models.generateContent({
           model: 'gemini-2.5-flash',
-          contents: [
-            ...formattedHistory,
-            { role: 'user', parts: [{ text: cleanMessage }] },
-          ],
+          contents: controlledContents,
           config: {
             systemInstruction: fullSystemInstruction,
             temperature: 0.45,
+            maxOutputTokens: 700,
+            thinkingConfig: { thinkingBudget: 0 },
             responseMimeType: 'application/json',
             responseSchema: {
               type: Type.OBJECT,
@@ -285,6 +268,13 @@ export async function POST(req: Request) {
       { failureThreshold: 4, cooldownMs: 25_000 }
     );
 
+    if (!aiRawText || !aiRawText.trim()) {
+      return Response.json(
+        { error: 'O assistente não retornou resposta no momento. Tente novamente.' },
+        { status: 502, headers: rlHeaders }
+      );
+    }
+
     let replyText = '';
     let qualificationData = {
       shouldOfferDiagnostic: false,
@@ -293,27 +283,44 @@ export async function POST(req: Request) {
     };
 
     try {
-      const parsedJson = JSON.parse(aiRawText);
+      const parsedJson = JSON.parse(aiRawText) as unknown;
       const validated = StructuredAIResponseSchema.safeParse(parsedJson);
       if (validated.success) {
         replyText = validated.data.reply;
         if (validated.data.qualification) {
-          qualificationData = validated.data.qualification;
+          qualificationData = {
+            shouldOfferDiagnostic: Boolean(validated.data.qualification.shouldOfferDiagnostic),
+            gargalos: validated.data.qualification.gargalos
+              .map((g) => g.replace(/<[^>]*>?/gm, '').trim().slice(0, 140))
+              .filter(Boolean)
+              .slice(0, 3),
+            detalhes: validated.data.qualification.detalhes
+              .replace(/<[^>]*>?/gm, '')
+              .trim()
+              .slice(0, 500),
+          };
         }
+      } else if (
+        typeof parsedJson === 'object' &&
+        parsedJson !== null &&
+        'reply' in parsedJson &&
+        typeof (parsedJson as { reply?: unknown }).reply === 'string'
+      ) {
+        replyText = String((parsedJson as { reply: string }).reply).slice(0, 2500);
       } else {
-        replyText = String(parsedJson?.reply ?? aiRawText);
+        replyText = aiRawText.slice(0, 2500);
       }
     } catch {
-      // Fallback if model returned plain text
-      replyText = aiRawText.replace(/\[\[AUTOMATE: .*?\]\]/g, '').trim();
+      replyText = aiRawText.replace(/\[\[AUTOMATE: .*?\]\]/g, '').trim().slice(0, 2500);
     }
 
-    // Strip any accidental legacy tag and redact sensitive patterns
+    // Strip any accidental legacy tag and redact sensitive patterns or URLs not from domino-automate
     replyText = replyText.replace(/\[\[AUTOMATE: .*?\]\]/g, '').trim();
     const sensitivePatterns = [
       /AIzaSy[A-Za-z0-9_-]{33}/g,
-      /postgres:\/\/[^\s]+/g,
-      /webhook\/[a-zA-Z0-9_-]+/g,
+      /postgres(?:ql)?:\/\/[^\s]+/gi,
+      /webhook\/[a-zA-Z0-9_-]+/gi,
+      /PRIVATE_KEY/gi,
     ];
     for (const pattern of sensitivePatterns) {
       replyText = replyText.replace(pattern, '[REDACTED_BY_SECURITY]');
@@ -321,10 +328,10 @@ export async function POST(req: Request) {
 
     if (hadSensitivePII) {
       replyText +=
-        '\n\n*(Nota de Privacidade LGPD: Para sua segurança, dados de documentos como CPF são omitidos automaticamente neste chat comercial preliminar).*';
+        '\n\n*(Nota de Privacidade LGPD: Para sua segurança, dados sensíveis como CPF ou cartões são omitidos automaticamente neste chat comercial preliminar).*';
     }
 
-    return NextResponse.json(
+    return Response.json(
       {
         reply: replyText,
         qualification: qualificationData,
@@ -332,8 +339,8 @@ export async function POST(req: Request) {
       { headers: rlHeaders }
     );
   } catch (error) {
-    console.error('Gemini API Error:', (error as Error).message);
-    return NextResponse.json(
+    console.error('Gemini API Error:', sanitizeDbErrorMessage(error));
+    return Response.json(
       { error: 'Falha temporária na comunicação com o assistente.' },
       { status: 500, headers: rlHeaders }
     );

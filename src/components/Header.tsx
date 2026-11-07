@@ -12,7 +12,16 @@ export default function Header() {
     } else {
       document.body.style.overflow = '';
     }
-    return () => { document.body.style.overflow = ''; };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
@@ -42,6 +51,9 @@ export default function Header() {
             className="hamburger-btn"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={menuOpen}
+            aria-controls="atuaria-mobile-menu"
+            style={{ minWidth: '44px', minHeight: '44px' }}
           >
             {menuOpen ? '✕' : '☰'}
           </button>
@@ -50,7 +62,7 @@ export default function Header() {
 
       <div className={`mobile-overlay ${menuOpen ? 'open' : ''}`} onClick={closeMenu} />
 
-      <nav className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
+      <nav id="atuaria-mobile-menu" className={`mobile-menu ${menuOpen ? 'open' : ''}`}>
         <Link href="/" onClick={closeMenu} style={{ opacity: 0.8 }}>← Voltar ao Portal Domino</Link>
         <a href="#escopo-atuarial" onClick={closeMenu}>Escopo Técnico Atuarial</a>
         <a href="#lideranca-atuarial" onClick={closeMenu}>Liderança MIBA 1807</a>

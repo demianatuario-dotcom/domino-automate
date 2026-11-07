@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { SegmentConfig, SectionBlockKey, ThemeMode } from '@/config/segmentsConfig';
 import { calculateSegmentROI, ROIScenarioKey } from '@/lib/roiEngine';
-import { trackDominoEvent } from '@/lib/analytics';
+import { trackDominoEvent, type LeadDeliveryAnalyticsStatus } from '@/lib/analytics';
 import AIChat from '@/components/AIChat';
 
 interface SegmentLandingTemplateProps {
@@ -15,8 +15,17 @@ interface SegmentLandingTemplateProps {
 export default function SegmentLandingTemplate({ config }: SegmentLandingTemplateProps) {
   const { hero, pas, pillars, technicalProof, simulator, form, faqs } = config;
 
-  const [themeMode, setThemeMode] = useState<ThemeMode>(config.defaultThemeMode);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    if (typeof document !== 'undefined') {
+      const attr = document.documentElement.getAttribute('data-theme');
+      if (attr === 'light' || attr === 'dark') {
+        return attr;
+      }
+    }
+    return config.defaultThemeMode;
+  });
   const [menuOpen, setMenuOpen] = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
 
   // Simulator states
   const [val1, setVal1] = useState(simulator.slider1.defaultValue);
@@ -35,36 +44,68 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
   const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
   const [detalhes, setDetalhes] = useState('');
-  const [lgpdConsent, setLgpdConsent] = useState(true);
+  const [lgpdConsent, setLgpdConsent] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [deliveryStatus, setDeliveryStatus] = useState<LeadDeliveryAnalyticsStatus>('delivered');
   const [formError, setFormError] = useState('');
   const formStartedRef = useRef(false);
 
   // FAQ state
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        hamburgerRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [menuOpen]);
+
   // Read ?theme=light|dark for A/B campaigns and fire page_view_vertical event
   useEffect(() => {
-    let activeTheme = config.defaultThemeMode;
+    let resolvedTheme = config.defaultThemeMode;
     if (typeof window !== 'undefined') {
+      const attr = document.documentElement.getAttribute('data-theme');
       const params = new URLSearchParams(window.location.search);
       const qTheme = params.get('theme');
       if (qTheme === 'light' || qTheme === 'dark') {
-        activeTheme = qTheme;
+        resolvedTheme = qTheme;
         setThemeMode(qTheme);
+      } else if (attr === 'light' || attr === 'dark') {
+        resolvedTheme = attr;
+        setThemeMode(attr);
       }
+      document.documentElement.setAttribute('data-theme', resolvedTheme);
     }
 
     trackDominoEvent('page_view_vertical', {
       vertical: config.slug,
-      themeMode: activeTheme,
+      themeMode: resolvedTheme,
       layoutStrategy: config.layoutStrategy,
     });
   }, [config.defaultThemeMode, config.slug, config.layoutStrategy]);
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', themeMode);
+    }
+  }, [themeMode]);
+
   const activeTheme = themeMode === 'light' ? config.lightTheme : config.theme;
+  const effectiveAccent =
+    themeMode === 'light'
+      ? activeTheme.accentText || activeTheme.accentPrimary
+      : activeTheme.accentPrimary;
+  const primaryButtonBackground =
+    themeMode === 'light'
+      ? { backgroundColor: effectiveAccent, backgroundImage: 'none' }
+      : { backgroundImage: activeTheme.accentGradient };
 
   const roiOutput = useMemo(() => {
     return calculateSegmentROI({
@@ -78,6 +119,8 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
       customMarginPct,
       hourlyOperationalValue: simulator.hourlyOperationalValue,
       weeklyHoursSavedBase: simulator.weeklyHoursSavedBase,
+      baselineRevenueMultiplier: simulator.baselineRevenueMultiplier,
+      estimatedInvestment: simulator.estimatedInvestment,
     });
   }, [val1, val2, val3, scenario, customMarginPct, simulator]);
 
@@ -114,29 +157,13 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
         setEmail(data.email || '');
         setWhatsapp(data.telefone || '');
         setDetalhes(data.detalhes || '');
+        setLgpdConsent(true);
+        setSubmitted(true);
 
         trackDominoEvent('chat_lead_captured', {
           vertical: config.slug,
           themeMode,
         });
-
-        fetch('/api/quote', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            vertical: config.slug,
-            origem: config.slug,
-            nome: data.nome || 'Visitante Chat IA',
-            email: data.email || '',
-            telefone: data.telefone || '',
-            tipo_organizacao: subType,
-            demanda: form.demandLabel,
-            dores: (data.dores || selectedPains).join(', '),
-            doresArray: data.dores || selectedPains,
-            descricao: data.detalhes || `Solicitado via Consultor IA na vertical ${config.slug}`,
-            lgpdConsent: true,
-          }),
-        }).catch((err) => console.error(err));
       }
     };
 
@@ -182,7 +209,15 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
           dores: selectedPains.join(', '),
           doresArray: selectedPains,
           descricao: detalhes.trim(),
-          lgpdConsent,
+          lgpdConsent: true,
+          simulador: {
+            val1,
+            val2,
+            val3,
+            scenario,
+            customMarginPct,
+            impactoMensal: roiOutput.impactoEconomicoTotalMensal,
+          },
           b_website_check: honeypot,
         }),
       });
@@ -191,13 +226,22 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
         const errData = (await res.json().catch(() => ({}))) as { error?: string };
         setFormError(errData.error || 'Não foi possível enviar agora. Tente pelo WhatsApp.');
       } else {
+        const resData = (await res.json().catch(() => ({}))) as {
+          deduplicated?: boolean;
+          deliveryStatus?: string;
+        };
+        const status = (resData.deliveryStatus || 'delivered') as LeadDeliveryAnalyticsStatus;
+        setDeliveryStatus(status);
         setSubmitted(true);
-        trackDominoEvent('form_submit', {
-          vertical: config.slug,
-          scenario,
-          themeMode,
-          estimatedMonthlyImpact: roiOutput.impactoEconomicoTotalMensal,
-        });
+        if (!resData.deduplicated) {
+          trackDominoEvent('form_submit', {
+            vertical: config.slug,
+            scenario,
+            themeMode,
+            estimatedMonthlyImpact: roiOutput.impactoEconomicoTotalMensal,
+            deliveryStatus: status,
+          });
+        }
       }
     } catch {
       setFormError('Erro de conexão. Tente novamente ou chame no WhatsApp.');
@@ -224,7 +268,8 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
     '--segment-bg-secondary': activeTheme.bgSecondary,
     '--segment-surface': activeTheme.cardBg,
     '--segment-border': activeTheme.cardBorder,
-    '--segment-accent': activeTheme.accentPrimary,
+    '--segment-accent': effectiveAccent,
+    '--segment-accent-text': effectiveAccent,
     '--segment-accent-secondary': activeTheme.accentSecondary,
     '--segment-text': activeTheme.textPrimary,
     '--segment-text-muted': activeTheme.textSecondary,
@@ -233,7 +278,6 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
     minHeight: '100vh',
     backgroundColor: 'var(--segment-bg)',
     color: 'var(--segment-text)',
-    transition: 'background-color 0.25s ease, color 0.25s ease',
   } as React.CSSProperties;
 
   // JSON-LD Structured Data (Service + BreadcrumbList + FAQPage)
@@ -834,6 +878,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               <button
                 key={sc.key}
                 type="button"
+                aria-pressed={active}
                 onClick={() => {
                   setScenario(sc.key);
                   trackDominoEvent('simulator_start', {
@@ -851,7 +896,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                   backgroundColor: active ? 'var(--segment-accent)' : 'var(--segment-surface)',
                   color: active ? activeTheme.buttonTextColor : 'var(--segment-text)',
                   border: '1px solid var(--segment-border)',
-                  minHeight: '42px',
+                  minHeight: '44px',
                 }}
               >
                 {sc.label}
@@ -882,7 +927,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
           >
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.45rem', gap: '0.5rem' }}>
-                <label className="label-md" style={{ fontSize: '0.88rem', color: 'var(--segment-text)' }}>
+                <label htmlFor="sim-slider-1" className="label-md" style={{ fontSize: '0.88rem', color: 'var(--segment-text)' }}>
                   {simulator.slider1.label}:
                 </label>
                 <span style={{ color: 'var(--segment-accent)', fontWeight: 700, whiteSpace: 'nowrap' }}>
@@ -890,6 +935,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                 </span>
               </div>
               <input
+                id="sim-slider-1"
                 type="range"
                 min={simulator.slider1.min}
                 max={simulator.slider1.max}
@@ -902,7 +948,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.45rem', gap: '0.5rem' }}>
-                <label className="label-md" style={{ fontSize: '0.88rem', color: 'var(--segment-text)' }}>
+                <label htmlFor="sim-slider-2" className="label-md" style={{ fontSize: '0.88rem', color: 'var(--segment-text)' }}>
                   {simulator.slider2.label}:
                 </label>
                 <span style={{ color: 'var(--segment-accent)', fontWeight: 700, whiteSpace: 'nowrap' }}>
@@ -912,6 +958,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                 </span>
               </div>
               <input
+                id="sim-slider-2"
                 type="range"
                 min={simulator.slider2.min}
                 max={simulator.slider2.max}
@@ -924,7 +971,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.45rem', gap: '0.5rem' }}>
-                <label className="label-md" style={{ fontSize: '0.88rem', color: 'var(--segment-text)' }}>
+                <label htmlFor="sim-slider-3" className="label-md" style={{ fontSize: '0.88rem', color: 'var(--segment-text)' }}>
                   {simulator.slider3.label}:
                 </label>
                 <span style={{ color: 'var(--segment-accent)', fontWeight: 700, whiteSpace: 'nowrap' }}>
@@ -932,6 +979,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                 </span>
               </div>
               <input
+                id="sim-slider-3"
                 type="range"
                 min={simulator.slider3.min}
                 max={simulator.slider3.max}
@@ -945,7 +993,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
             {/* Premissa editável de Margem */}
             <div style={{ paddingTop: '0.85rem', borderTop: '1px solid var(--segment-border)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                <label className="label-sm" style={{ color: 'var(--segment-text-muted)' }}>
+                <label htmlFor="sim-slider-margin" className="label-sm" style={{ color: 'var(--segment-text-muted)' }}>
                   Premissa: Margem de Contribuição Estimada (%):
                 </label>
                 <span style={{ color: 'var(--segment-accent)', fontWeight: 700, fontSize: '0.85rem' }}>
@@ -953,6 +1001,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                 </span>
               </div>
               <input
+                id="sim-slider-margin"
                 type="range"
                 min={20}
                 max={90}
@@ -967,6 +1016,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
           {/* Resultados Econômicos Distintos + Memória de Cálculo */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
             <div
+              aria-live="polite"
               style={{
                 padding: '1.85rem',
                 borderRadius: 'var(--segment-card-radius)',
@@ -1008,7 +1058,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               >
                 <div>
                   <span style={{ fontSize: '0.72rem', color: 'var(--segment-text-muted)', display: 'block' }}>
-                    Lucro Incremental ({roiOutput.marginPct}%)
+                    Margem de Contribuição ({roiOutput.marginPct}%)
                   </span>
                   <strong style={{ fontSize: '1.05rem', color: 'var(--segment-accent)' }}>
                     + R$ {roiOutput.lucroIncrementalMensal.toLocaleString('pt-BR')}/mês
@@ -1042,6 +1092,8 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                 <button
                   type="button"
                   onClick={() => setShowMemory(!showMemory)}
+                  aria-expanded={showMemory}
+                  aria-controls="sim-memory-panel"
                   style={{
                     background: 'transparent',
                     color: 'var(--segment-accent)',
@@ -1056,6 +1108,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
 
                 {showMemory && (
                   <div
+                    id="sim-memory-panel"
                     style={{
                       marginTop: '0.75rem',
                       padding: '0.9rem 1rem',
@@ -1093,7 +1146,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               style={{
                 padding: '1rem 1.5rem',
                 borderRadius: 'var(--segment-button-radius)',
-                backgroundImage: activeTheme.accentGradient,
+                ...primaryButtonBackground,
                 color: activeTheme.buttonTextColor,
                 fontWeight: 700,
                 textAlign: 'center',
@@ -1153,6 +1206,8 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
 
         {submitted ? (
           <div
+            role="status"
+            aria-live="polite"
             style={{
               padding: '3.25rem 2rem',
               borderRadius: 'var(--segment-card-radius)',
@@ -1161,7 +1216,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               textAlign: 'center',
             }}
           >
-            <div style={{ fontSize: '2.75rem', marginBottom: '0.85rem' }}>{config.icon}</div>
+            <div style={{ fontSize: '2.75rem', marginBottom: '0.85rem' }} aria-hidden="true">{config.icon}</div>
             <h3
               className="headline-sm"
               style={{ color: 'var(--segment-accent)', marginBottom: '0.75rem', fontSize: '1.55rem' }}
@@ -1172,8 +1227,16 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               className="body-md"
               style={{ maxWidth: '520px', margin: '0 auto 1.85rem', color: 'var(--segment-text-muted)' }}
             >
-              Nossa esteira no <strong>n8n</strong> já processou as informações de{' '}
-              <strong>{empresa || nome}</strong>. Caso deseje atendimento imediato, clique abaixo para abrir o WhatsApp:
+              {deliveryStatus === 'queued_outbox' ? (
+                <>
+                  As informações de <strong>{empresa || nome}</strong> foram gravadas com segurança na fila transacional da Domino Automate. Caso deseje atendimento imediato, clique abaixo para abrir o WhatsApp:
+                </>
+              ) : (
+                <>
+                  Nossa esteira no <strong>n8n</strong> já recebeu as informações de{' '}
+                  <strong>{empresa || nome}</strong>. Caso deseje atendimento imediato, clique abaixo para abrir o WhatsApp:
+                </>
+              )}
             </p>
             <a
               href={`https://wa.me/5561981171564?text=${encodeURIComponent(
@@ -1194,20 +1257,21 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                 gap: '0.75rem',
                 padding: '1rem 2rem',
                 borderRadius: 'var(--segment-button-radius)',
-                backgroundImage: activeTheme.accentGradient,
+                ...primaryButtonBackground,
                 color: activeTheme.buttonTextColor,
                 fontWeight: 700,
                 fontSize: '1rem',
               }}
             >
               <span>Adiantar Conversa no WhatsApp</span>
-              <span>💬</span>
+              <span aria-hidden="true">💬</span>
             </a>
           </div>
         ) : (
           <form
             onSubmit={handleFormSubmit}
             onFocus={handleFormFocus}
+            aria-busy={loading}
             style={{
               backgroundColor: 'var(--segment-surface)',
               padding: '2.25rem',
@@ -1226,20 +1290,22 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               style={{ display: 'none' }}
               tabIndex={-1}
               autoComplete="off"
+              aria-hidden="true"
             />
 
             <div>
-              <label
+              <span
                 className="label-md"
                 style={{ display: 'block', marginBottom: '0.65rem', color: 'var(--segment-accent)' }}
               >
                 1. Qual é o perfil da sua operação?
-              </label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.55rem' }}>
+              </span>
+              <div role="group" aria-label="Perfil da operação" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.55rem' }}>
                 {form.subTypes.map((item) => (
                   <button
                     type="button"
                     key={item}
+                    aria-pressed={subType === item}
                     onClick={() => setSubType(item)}
                     style={{
                       padding: '0.55rem 0.95rem',
@@ -1247,7 +1313,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                       fontSize: '0.82rem',
                       fontWeight: 600,
                       cursor: 'pointer',
-                      minHeight: '40px',
+                      minHeight: '44px',
                       backgroundColor: subType === item ? 'var(--segment-accent)' : 'var(--segment-bg)',
                       color: subType === item ? activeTheme.buttonTextColor : 'var(--segment-text)',
                       border: '1px solid var(--segment-border)',
@@ -1260,19 +1326,20 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
             </div>
 
             <div>
-              <label
+              <span
                 className="label-md"
                 style={{ display: 'block', marginBottom: '0.65rem', color: 'var(--segment-accent)' }}
               >
                 2. Quais gargalos deseja resolver primeiro?
-              </label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.55rem' }}>
+              </span>
+              <div role="group" aria-label="Gargalos prioritários" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.55rem' }}>
                 {form.painsList.map((pain) => {
                   const active = selectedPains.includes(pain);
                   return (
                     <button
                       type="button"
                       key={pain}
+                      aria-pressed={active}
                       onClick={() => togglePain(pain)}
                       style={{
                         padding: '0.6rem 0.95rem',
@@ -1280,7 +1347,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                         fontSize: '0.82rem',
                         textAlign: 'left',
                         cursor: 'pointer',
-                        minHeight: '40px',
+                        minHeight: '44px',
                         backgroundColor: active ? `${activeTheme.accentPrimary}22` : 'var(--segment-bg)',
                         color: active ? 'var(--segment-accent)' : 'var(--segment-text-muted)',
                         border: active
@@ -1304,10 +1371,11 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               }}
             >
               <div>
-                <label className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--segment-text-muted)' }}>
+                <label htmlFor="segment-input-nome" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--segment-text-muted)' }}>
                   Seu Nome *
                 </label>
                 <input
+                  id="segment-input-nome"
                   required
                   type="text"
                   placeholder="Ex: Ana Carolina"
@@ -1326,10 +1394,11 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               </div>
 
               <div>
-                <label className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--segment-text-muted)' }}>
+                <label htmlFor="segment-input-org" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--segment-text-muted)' }}>
                   {form.orgLabel}
                 </label>
                 <input
+                  id="segment-input-org"
                   type="text"
                   placeholder={form.orgPlaceholder}
                   value={empresa}
@@ -1347,10 +1416,11 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               </div>
 
               <div>
-                <label className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--segment-text-muted)' }}>
+                <label htmlFor="segment-input-whatsapp" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--segment-text-muted)' }}>
                   WhatsApp com DDD *
                 </label>
                 <input
+                  id="segment-input-whatsapp"
                   required
                   type="tel"
                   placeholder="(61) 99999-9999"
@@ -1369,10 +1439,11 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               </div>
 
               <div>
-                <label className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--segment-text-muted)' }}>
+                <label htmlFor="segment-input-email" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: 'var(--segment-text-muted)' }}>
                   E-mail Corporativo (Opcional)
                 </label>
                 <input
+                  id="segment-input-email"
                   type="email"
                   placeholder="contato@suaempresa.com.br"
                   value={email}
@@ -1391,6 +1462,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
             </div>
 
             <label
+              htmlFor="segment-input-lgpd"
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
@@ -1401,6 +1473,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               }}
             >
               <input
+                id="segment-input-lgpd"
                 type="checkbox"
                 checked={lgpdConsent}
                 onChange={(e) => setLgpdConsent(e.target.checked)}
@@ -1412,7 +1485,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
             </label>
 
             {formError && (
-              <p style={{ color: activeTheme.painBorderColor, fontSize: '0.85rem', fontWeight: 600 }}>
+              <p role="alert" aria-live="assertive" style={{ color: activeTheme.painBorderColor, fontSize: '0.85rem', fontWeight: 600 }}>
                 ⚠️ {formError}
               </p>
             )}
@@ -1424,7 +1497,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                 width: '100%',
                 padding: '1.05rem',
                 borderRadius: 'var(--segment-button-radius)',
-                backgroundImage: activeTheme.accentGradient,
+                ...primaryButtonBackground,
                 color: activeTheme.buttonTextColor,
                 fontWeight: 700,
                 fontSize: '1rem',
@@ -1486,6 +1559,9 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               >
                 <button
                   type="button"
+                  id={`segment-faq-btn-${idx}`}
+                  aria-expanded={isOpen}
+                  aria-controls={`segment-faq-panel-${idx}`}
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
                   style={{
                     width: '100%',
@@ -1503,12 +1579,15 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                   }}
                 >
                   <span>{faq.q}</span>
-                  <span style={{ color: 'var(--segment-accent)', fontSize: '1.25rem' }}>
+                  <span style={{ color: 'var(--segment-accent)', fontSize: '1.25rem' }} aria-hidden="true">
                     {isOpen ? '−' : '+'}
                   </span>
                 </button>
                 {isOpen && (
                   <div
+                    id={`segment-faq-panel-${idx}`}
+                    role="region"
+                    aria-labelledby={`segment-faq-btn-${idx}`}
                     style={{
                       padding: '0 1.5rem 1.35rem',
                       color: 'var(--segment-text-muted)',
@@ -1617,7 +1696,8 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               fontSize: '0.76rem',
               fontWeight: 600,
               cursor: 'pointer',
-              minHeight: '36px',
+              minHeight: '44px',
+              minWidth: '44px',
             }}
           >
             {themeMode === 'dark' ? '☀️ Claro' : '🌙 Escuro'}
@@ -1638,17 +1718,24 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
               fontSize: '0.84rem',
               fontWeight: 700,
               borderRadius: 'var(--segment-button-radius)',
-              backgroundImage: activeTheme.accentGradient,
+              ...primaryButtonBackground,
               color: activeTheme.buttonTextColor,
+              minHeight: '44px',
+              display: 'inline-flex',
+              alignItems: 'center',
             }}
           >
             Solicitar Diagnóstico
           </a>
           <button
+            ref={hamburgerRef}
+            type="button"
             className="hamburger-btn"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-            style={{ borderColor: activeTheme.cardBorder, color: activeTheme.textPrimary }}
+            aria-expanded={menuOpen}
+            aria-controls="segment-mobile-menu"
+            style={{ borderColor: activeTheme.cardBorder, color: activeTheme.textPrimary, minWidth: '44px', minHeight: '44px' }}
           >
             {menuOpen ? '✕' : '☰'}
           </button>
@@ -1656,7 +1743,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
       </header>
 
       <div className={`mobile-overlay ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)} />
-      <nav className={`mobile-menu ${menuOpen ? 'open' : ''}`} style={{ backgroundColor: activeTheme.bgSecondary }}>
+      <nav id="segment-mobile-menu" className={`mobile-menu ${menuOpen ? 'open' : ''}`} style={{ backgroundColor: activeTheme.bgSecondary }}>
         <Link href="/" onClick={() => setMenuOpen(false)}>
           ← Voltar ao Portal Domino
         </Link>
@@ -1675,7 +1762,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
         <a
           href="#diagnostico"
           onClick={() => setMenuOpen(false)}
-          style={{ color: activeTheme.accentPrimary, fontWeight: 700 }}
+          style={{ color: 'var(--segment-accent)', fontWeight: 700 }}
         >
           Solicitar Diagnóstico Agora
         </a>
@@ -1766,7 +1853,7 @@ export default function SegmentLandingTemplate({ config }: SegmentLandingTemplat
                   fontSize: '0.98rem',
                   fontWeight: 700,
                   borderRadius: 'var(--segment-button-radius)',
-                  backgroundImage: activeTheme.accentGradient,
+                  ...primaryButtonBackground,
                   color: activeTheme.buttonTextColor,
                   boxShadow: `0 6px 22px ${activeTheme.accentPrimary}33`,
                   minHeight: '48px',

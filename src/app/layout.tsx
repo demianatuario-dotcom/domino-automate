@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: '/logo.png',
-        width: 512,
-        height: 512,
+        width: 1024,
+        height: 538,
         alt: 'Domino Automate Logo',
       },
     ],
@@ -88,22 +88,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pt-BR" className={`${manrope.variable} ${spaceGrotesk.variable}`}>
-      <Script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=G-NMQX5ZBVXX"
-        strategy="afterInteractive"
-      />
-      <Script id="google-analytics" strategy="afterInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'G-NMQX5ZBVXX', { anonymize_ip: true });
-        `}
-      </Script>
+    <html lang="pt-BR" className={`${manrope.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=new URLSearchParams(window.location.search).get('theme');if(p==='light'||p==='dark'){document.documentElement.setAttribute('data-theme',p);}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-NMQX5ZBVXX"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-NMQX5ZBVXX', { anonymize_ip: true });
+          `}
+        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}

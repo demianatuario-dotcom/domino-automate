@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import AIChat from '@/components/AIChat';
-import { trackDominoEvent } from '@/lib/analytics';
+import { trackDominoEvent, type LeadDeliveryAnalyticsStatus } from '@/lib/analytics';
 import type { ROIScenarioKey } from '@/lib/roiEngine';
 
 const BOOK_LANA_IMAGES = [
@@ -75,10 +75,12 @@ export default function EstudiosLanding() {
   const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
   const [detalhes, setDetalhes] = useState('');
-  const [lgpdConsent, setLgpdConsent] = useState(true);
+  const [lgpdConsent, setLgpdConsent] = useState(false);
   const [honeypot, setHoneypot] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [deliveryStatus, setDeliveryStatus] = useState<LeadDeliveryAnalyticsStatus>('delivered');
+  const [formError, setFormError] = useState('');
   const [formStarted, setFormStarted] = useState(false);
 
   // FAQ state
@@ -87,6 +89,18 @@ export default function EstudiosLanding() {
   useEffect(() => {
     trackDominoEvent('page_view_vertical', { vertical: '/Estudios' });
   }, []);
+
+  useEffect(() => {
+    if (!menuOpen && !lightboxOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (lightboxOpen) setLightboxOpen(false);
+        if (menuOpen) setMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [menuOpen, lightboxOpen]);
 
   const notifySimStart = () => {
     if (!simStarted) {
@@ -120,7 +134,7 @@ export default function EstudiosLanding() {
       `Cenário ${cfg.label}: taxa de recuperação de contatos no WhatsApp de ${(cfg.whatsappConvRatio * 100).toFixed(1)}% e contenção de No-Show de ${Math.round(cfg.noShowRecupRatio * 100)}%.`,
       `Demanda mensal: ${mensagensDia} contatos/dia × 26 dias = ${contatosMes} contatos/mês → +${novosAgendamentosMes} agendamentos extras × R$ ${ticketMedio} = R$ ${receitaRecuperadaWhatsApp.toLocaleString('pt-BR')}/mês.`,
       `Redução de faltas: ${faltasSemana} faltas/semana × 4 = ${faltasMes} faltas/mês → ${faltasEvitadasMes} horários preservados × R$ ${ticketMedio} = R$ ${receitaRecuperadaNoShow.toLocaleString('pt-BR')}/mês.`,
-      `Faturamento Incremental Bruto: R$ ${ganhoBrutoMensal.toLocaleString('pt-BR')}/mês | Lucro Incremental Líquido (${margemLiquidaPct}% margem): R$ ${lucroLiquidoMensal.toLocaleString('pt-BR')}/mês.`,
+      `Faturamento Incremental Bruto: R$ ${ganhoBrutoMensal.toLocaleString('pt-BR')}/mês | Margem de Contribuição Incremental (${margemLiquidaPct}%): R$ ${lucroLiquidoMensal.toLocaleString('pt-BR')}/mês.`,
     ];
 
     return {
@@ -150,31 +164,9 @@ export default function EstudiosLanding() {
         setEmail(data.email || '');
         setWhatsapp(data.telefone || '');
         setDetalhes(data.detalhes || '');
-
-        fetch('/api/quote', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            vertical: '/Estudios',
-            origem: '/Estudios (Chat IA)',
-            nome: data.nome || 'Visitante Qualificado IA',
-            email: data.email || '',
-            telefone: data.telefone || '',
-            tipo_organizacao: segmento,
-            demanda: 'Automação IA + N8N para Estúdio de Beleza',
-            dores: (data.dores || selectedDores).join(', '),
-            doresArray: data.dores || selectedDores,
-            descricao: data.detalhes || 'Solicitado via Consultora IA de Estúdios',
-            lgpdConsent: true,
-          }),
-        })
-          .then((res) => {
-            if (res.ok) {
-              setSubmitted(true);
-              trackDominoEvent('chat_lead_captured', { vertical: '/Estudios', section: 'ai_chat' });
-            }
-          })
-          .catch((err) => console.error(err));
+        setLgpdConsent(true);
+        setSubmitted(true);
+        trackDominoEvent('chat_lead_captured', { vertical: '/Estudios', section: 'ai_chat' });
       }
     };
 
@@ -184,8 +176,13 @@ export default function EstudiosLanding() {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (honeypot || !lgpdConsent) return;
+    if (honeypot) return;
+    if (!lgpdConsent) {
+      setFormError('Confirme o consentimento LGPD para prosseguir.');
+      return;
+    }
 
+    setFormError('');
     setLoading(true);
     const cleanPhone = whatsapp.replace(/\D/g, '');
 
@@ -206,16 +203,41 @@ export default function EstudiosLanding() {
           doresArray: selectedDores,
           descricao: detalhes.trim(),
           b_website_check: honeypot,
-          lgpdConsent,
+          lgpdConsent: true,
+          simulador: {
+            val1: mensagensDia,
+            val2: ticketMedio,
+            val3: faltasSemana,
+            scenario,
+            customMarginPct: margemLiquidaPct,
+            impactoMensal: simResults.lucroLiquidoMensal,
+          },
         }),
       });
 
-      if (res.ok) {
+      if (!res.ok) {
+        const errData = (await res.json().catch(() => ({}))) as { error?: string };
+        setFormError(errData.error || 'Não foi possível enviar agora. Tente pelo WhatsApp.');
+      } else {
+        const resData = (await res.json().catch(() => ({}))) as {
+          deduplicated?: boolean;
+          deliveryStatus?: string;
+        };
+        const status = (resData.deliveryStatus || 'delivered') as LeadDeliveryAnalyticsStatus;
+        setDeliveryStatus(status);
         setSubmitted(true);
-        trackDominoEvent('form_submit', { vertical: '/Estudios', section: 'lead_form' });
+        if (!resData.deduplicated) {
+          trackDominoEvent('form_submit', {
+            vertical: '/Estudios',
+            section: 'lead_form',
+            scenario,
+            estimatedMonthlyImpact: simResults.lucroLiquidoMensal,
+            deliveryStatus: status,
+          });
+        }
       }
-    } catch (error) {
-      console.error('Erro ao enviar formulário:', error);
+    } catch {
+      setFormError('Erro de conexão. Tente novamente ou chame no WhatsApp.');
     } finally {
       setLoading(false);
     }
@@ -376,7 +398,9 @@ export default function EstudiosLanding() {
             className="hamburger-btn"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
-            style={{ borderColor: 'rgba(212, 175, 55, 0.3)', color: '#FAF6F0' }}
+            aria-expanded={menuOpen}
+            aria-controls="estudios-mobile-menu"
+            style={{ borderColor: 'rgba(212, 175, 55, 0.3)', color: '#FAF6F0', minWidth: '44px', minHeight: '44px' }}
           >
             {menuOpen ? '✕' : '☰'}
           </button>
@@ -384,7 +408,7 @@ export default function EstudiosLanding() {
       </header>
 
       <div className={`mobile-overlay ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)} />
-      <nav className={`mobile-menu ${menuOpen ? 'open' : ''}`} style={{ backgroundColor: '#1A1318' }}>
+      <nav id="estudios-mobile-menu" className={`mobile-menu ${menuOpen ? 'open' : ''}`} style={{ backgroundColor: '#1A1318' }}>
         <Link href="/" onClick={() => setMenuOpen(false)}>← Voltar ao Portal Domino</Link>
         <a href="#case-lana" onClick={() => setMenuOpen(false)}>Vitrine Case Real</a>
         <a href="#solucao-estudios" onClick={() => setMenuOpen(false)}>Como Funciona</a>
@@ -723,6 +747,7 @@ export default function EstudiosLanding() {
                   <button
                     key={scen}
                     type="button"
+                    aria-pressed={active}
                     onClick={() => {
                       notifySimStart();
                       setScenario(scen);
@@ -738,6 +763,7 @@ export default function EstudiosLanding() {
                       fontSize: '0.8rem',
                       fontWeight: 700,
                       cursor: 'pointer',
+                      minHeight: '42px',
                       backgroundColor: active ? '#D4AF37' : 'transparent',
                       color: active ? '#110D10' : '#FAF6F0',
                     }}
@@ -753,10 +779,11 @@ export default function EstudiosLanding() {
             <div style={{ backgroundColor: '#1B1418', padding: '2rem', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.25)', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <label className="label-md">Interessadas por dia no WhatsApp/Direct:</label>
+                  <label htmlFor="estudios-slider-1" className="label-md">Interessadas por dia no WhatsApp/Direct:</label>
                   <span style={{ color: '#E5C07B', fontWeight: 700 }}>{mensagensDia} contatos/dia</span>
                 </div>
                 <input
+                  id="estudios-slider-1"
                   type="range"
                   min="5"
                   max="80"
@@ -768,10 +795,11 @@ export default function EstudiosLanding() {
 
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <label className="label-md">Ticket Médio do Procedimento:</label>
+                  <label htmlFor="estudios-slider-2" className="label-md">Ticket Médio do Procedimento:</label>
                   <span style={{ color: '#E5C07B', fontWeight: 700 }}>R$ {ticketMedio}</span>
                 </div>
                 <input
+                  id="estudios-slider-2"
                   type="range"
                   min="80"
                   max="1200"
@@ -783,10 +811,11 @@ export default function EstudiosLanding() {
 
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <label className="label-md">Faltas ou desmarcações por semana:</label>
+                  <label htmlFor="estudios-slider-3" className="label-md">Faltas ou desmarcações por semana:</label>
                   <span style={{ color: '#E5C07B', fontWeight: 700 }}>{faltasSemana} horários/semana</span>
                 </div>
                 <input
+                  id="estudios-slider-3"
                   type="range"
                   min="1"
                   max="20"
@@ -798,10 +827,11 @@ export default function EstudiosLanding() {
 
               <div style={{ paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <label className="label-sm" style={{ opacity: 0.85 }}>Premissa Editável: Margem Líquida (%)</label>
+                  <label htmlFor="estudios-slider-margin" className="label-sm" style={{ opacity: 0.85 }}>Premissa Editável: Margem de Contribuição Estimada (%)</label>
                   <span style={{ color: '#E5C07B', fontWeight: 700, fontSize: '0.85rem' }}>{margemLiquidaPct}%</span>
                 </div>
                 <input
+                  id="estudios-slider-margin"
                   type="range"
                   min="25"
                   max="90"
@@ -813,7 +843,7 @@ export default function EstudiosLanding() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
-              <div style={{ padding: '1.75rem', borderRadius: '12px', backgroundColor: '#1B1418', borderLeft: '5px solid #D4AF37' }}>
+              <div aria-live="polite" style={{ padding: '1.75rem', borderRadius: '12px', backgroundColor: '#1B1418', borderLeft: '5px solid #D4AF37' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <p className="label-sm" style={{ textTransform: 'uppercase', color: '#E5C07B' }}>
                     Faturamento Incremental Bruto ({simResults.cfg.label})
@@ -824,7 +854,7 @@ export default function EstudiosLanding() {
                   + R$ {simResults.ganhoBrutoMensal.toLocaleString('pt-BR')} <span style={{ fontSize: '1rem', opacity: 0.75 }}>/mês</span>
                 </p>
                 <p className="body-sm" style={{ color: '#DFD7CE', opacity: 0.85 }}>
-                  Lucro Líquido Estimado ({margemLiquidaPct}% margem): <strong>R$ {simResults.lucroLiquidoMensal.toLocaleString('pt-BR')}/mês</strong> • Recuperando <strong>+{simResults.novosAgendamentosMes} agendamentos/mês</strong> e evitando <strong>{simResults.faltasEvitadasMes} faltas/mês</strong>.
+                  Margem de Contribuição Estimada ({margemLiquidaPct}% margem): <strong>R$ {simResults.lucroLiquidoMensal.toLocaleString('pt-BR')}/mês</strong> • Recuperando <strong>+{simResults.novosAgendamentosMes} agendamentos/mês</strong> e evitando <strong>{simResults.faltasEvitadasMes} faltas/mês</strong>.
                 </p>
               </div>
 
@@ -855,6 +885,8 @@ export default function EstudiosLanding() {
               <div style={{ padding: '1rem 1.25rem', borderRadius: '10px', backgroundColor: '#1B1418', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
                 <button
                   type="button"
+                  aria-expanded={showMemory}
+                  aria-controls="estudios-memory-panel"
                   onClick={() => setShowMemory(!showMemory)}
                   style={{
                     width: '100%',
@@ -869,10 +901,10 @@ export default function EstudiosLanding() {
                   }}
                 >
                   <span>📐 Ver Memória de Cálculo ({simResults.cfg.label})</span>
-                  <span style={{ color: '#E5C07B' }}>{showMemory ? '−' : '+'}</span>
+                  <span style={{ color: '#E5C07B' }} aria-hidden="true">{showMemory ? '−' : '+'}</span>
                 </button>
                 {showMemory && (
-                  <ul style={{ marginTop: '0.75rem', paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.78rem', color: '#DFD7CE', opacity: 0.9 }}>
+                  <ul id="estudios-memory-panel" style={{ marginTop: '0.75rem', paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.78rem', color: '#DFD7CE', opacity: 0.9 }}>
                     {simResults.memoriaDeCalculo.map((line, idx) => (
                       <li key={idx}>{line}</li>
                     ))}
@@ -900,13 +932,21 @@ export default function EstudiosLanding() {
           </div>
 
           {submitted ? (
-            <div style={{ padding: '3.5rem 2rem', borderRadius: '16px', backgroundColor: '#1B1418', border: '1px solid #D4AF37', textAlign: 'center' }}>
-              <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
+            <div role="status" aria-live="polite" style={{ padding: '3.5rem 2rem', borderRadius: '16px', backgroundColor: '#1B1418', border: '1px solid #D4AF37', textAlign: 'center' }}>
+              <div style={{ fontSize: '3rem', marginBottom: '1rem' }} aria-hidden="true">✨</div>
               <h3 className="headline-sm" style={{ color: '#E5C07B', marginBottom: '0.75rem', fontSize: '1.6rem' }}>
                 Diagnóstico do Seu Estúdio Registrado!
               </h3>
               <p className="body-md" style={{ maxWidth: '520px', margin: '0 auto 2rem', color: '#DFD7CE' }}>
-                Recebemos os dados de <strong>{nomeEstudio || nome}</strong> via automação N8N. Clique no botão abaixo para abrir a conversa prioritária no nosso WhatsApp com seu resumo pronto:
+                {deliveryStatus === 'queued_outbox' ? (
+                  <>
+                    As informações de <strong>{nomeEstudio || nome}</strong> foram gravadas com segurança na fila transacional da Domino Automate. Clique no botão abaixo para abrir a conversa prioritária no nosso WhatsApp com seu resumo pronto:
+                  </>
+                ) : (
+                  <>
+                    Recebemos os dados de <strong>{nomeEstudio || nome}</strong> via automação N8N. Clique no botão abaixo para abrir a conversa prioritária no nosso WhatsApp com seu resumo pronto:
+                  </>
+                )}
               </p>
               <a
                 href={`https://wa.me/5561981171564?text=${encodeURIComponent(
@@ -928,12 +968,13 @@ export default function EstudiosLanding() {
                 }}
               >
                 <span>Continuar no WhatsApp da Especialista</span>
-                <span>💬</span>
+                <span aria-hidden="true">💬</span>
               </a>
             </div>
           ) : (
             <form
               onSubmit={handleFormSubmit}
+              aria-busy={loading}
               style={{
                 backgroundColor: '#1B1418',
                 padding: '2.5rem 2rem',
@@ -953,17 +994,19 @@ export default function EstudiosLanding() {
                 style={{ display: 'none' }}
                 tabIndex={-1}
                 autoComplete="off"
+                aria-hidden="true"
               />
 
               <div>
-                <label className="label-md" style={{ display: 'block', marginBottom: '0.75rem', color: '#E5C07B' }}>
+                <span className="label-md" style={{ display: 'block', marginBottom: '0.75rem', color: '#E5C07B' }}>
                   1. Qual é o segmento do seu espaço?
-                </label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                </span>
+                <div role="group" aria-label="Segmento do estúdio" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
                   {SEGMENTOS_ESTUDIO.map((item) => (
                     <button
                       type="button"
                       key={item}
+                      aria-pressed={segmento === item}
                       onClick={() => { notifyFormStart(); setSegmento(item); }}
                       style={{
                         padding: '0.6rem 1rem',
@@ -971,6 +1014,7 @@ export default function EstudiosLanding() {
                         fontSize: '0.82rem',
                         fontWeight: 600,
                         cursor: 'pointer',
+                        minHeight: '42px',
                         backgroundColor: segmento === item ? '#D4AF37' : '#261C22',
                         color: segmento === item ? '#110D10' : '#FAF6F0',
                         border: '1px solid rgba(212, 175, 55, 0.3)',
@@ -983,16 +1027,17 @@ export default function EstudiosLanding() {
               </div>
 
               <div>
-                <label className="label-md" style={{ display: 'block', marginBottom: '0.75rem', color: '#E5C07B' }}>
+                <span className="label-md" style={{ display: 'block', marginBottom: '0.75rem', color: '#E5C07B' }}>
                   2. Quais gargalos você quer resolver primeiro? (Pode marcar vários)
-                </label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                </span>
+                <div role="group" aria-label="Gargalos prioritários" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
                   {DORES_ESTUDIO.map((dor) => {
                     const active = selectedDores.includes(dor);
                     return (
                       <button
                         type="button"
                         key={dor}
+                        aria-pressed={active}
                         onClick={() => toggleDor(dor)}
                         style={{
                           padding: '0.6rem 1rem',
@@ -1000,6 +1045,7 @@ export default function EstudiosLanding() {
                           fontSize: '0.82rem',
                           textAlign: 'left',
                           cursor: 'pointer',
+                          minHeight: '42px',
                           backgroundColor: active ? 'rgba(212, 175, 55, 0.2)' : '#261C22',
                           color: active ? '#E5C07B' : '#DFD7CE',
                           border: active ? '1px solid #D4AF37' : '1px solid rgba(255,255,255,0.08)',
@@ -1014,55 +1060,84 @@ export default function EstudiosLanding() {
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-                <input
-                  required
-                  type="text"
-                  placeholder="Seu Nome"
-                  className="input-field"
-                  style={{ backgroundColor: '#110D10' }}
-                  value={nome}
-                  onChange={(e) => { notifyFormStart(); setNome(e.target.value); }}
-                />
-                <input
-                  type="text"
-                  placeholder="Nome do Estúdio / Clínica (@instagram)"
-                  className="input-field"
-                  style={{ backgroundColor: '#110D10' }}
-                  value={nomeEstudio}
-                  onChange={(e) => setNomeEstudio(e.target.value)}
-                />
-                <input
-                  required
-                  type="tel"
-                  placeholder="Seu WhatsApp com DDD"
-                  className="input-field"
-                  style={{ backgroundColor: '#110D10' }}
-                  value={whatsapp}
-                  onChange={(e) => setWhatsapp(e.target.value)}
-                />
-                <input
-                  required
-                  type="email"
-                  placeholder="Seu Melhor E-mail"
-                  className="input-field"
-                  style={{ backgroundColor: '#110D10' }}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <div>
+                  <label htmlFor="estudios-input-nome" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: '#DFD7CE' }}>
+                    Seu Nome *
+                  </label>
+                  <input
+                    id="estudios-input-nome"
+                    required
+                    type="text"
+                    placeholder="Seu Nome"
+                    className="input-field"
+                    style={{ backgroundColor: '#110D10', width: '100%' }}
+                    value={nome}
+                    onChange={(e) => { notifyFormStart(); setNome(e.target.value); }}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="estudios-input-estudio" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: '#DFD7CE' }}>
+                    Nome do Estúdio / Clínica
+                  </label>
+                  <input
+                    id="estudios-input-estudio"
+                    type="text"
+                    placeholder="Nome do Estúdio / Clínica (@instagram)"
+                    className="input-field"
+                    style={{ backgroundColor: '#110D10', width: '100%' }}
+                    value={nomeEstudio}
+                    onChange={(e) => setNomeEstudio(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="estudios-input-whatsapp" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: '#DFD7CE' }}>
+                    Seu WhatsApp com DDD *
+                  </label>
+                  <input
+                    id="estudios-input-whatsapp"
+                    required
+                    type="tel"
+                    placeholder="Seu WhatsApp com DDD"
+                    className="input-field"
+                    style={{ backgroundColor: '#110D10', width: '100%' }}
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="estudios-input-email" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: '#DFD7CE' }}>
+                    Seu Melhor E-mail *
+                  </label>
+                  <input
+                    id="estudios-input-email"
+                    required
+                    type="email"
+                    placeholder="Seu Melhor E-mail"
+                    className="input-field"
+                    style={{ backgroundColor: '#110D10', width: '100%' }}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
               </div>
 
               <div>
+                <label htmlFor="estudios-input-detalhes" className="label-sm" style={{ display: 'block', marginBottom: '0.35rem', color: '#DFD7CE' }}>
+                  Detalhes da Operação (Opcional)
+                </label>
                 <textarea
+                  id="estudios-input-detalhes"
                   placeholder="Conte brevemente quantas profissionais atendem hoje no espaço ou alguma necessidade específica (opcional)..."
                   className="input-field"
-                  style={{ backgroundColor: '#110D10', minHeight: '90px', resize: 'vertical' }}
+                  style={{ backgroundColor: '#110D10', minHeight: '90px', resize: 'vertical', width: '100%' }}
                   value={detalhes}
                   onChange={(e) => setDetalhes(e.target.value)}
                 />
               </div>
 
-              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.8rem', color: '#DFD7CE', cursor: 'pointer' }}>
+              <label htmlFor="estudios-input-lgpd" style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.8rem', color: '#DFD7CE', cursor: 'pointer' }}>
                 <input
+                  id="estudios-input-lgpd"
                   type="checkbox"
                   checked={lgpdConsent}
                   onChange={(e) => setLgpdConsent(e.target.checked)}
@@ -1073,6 +1148,12 @@ export default function EstudiosLanding() {
                   Concordo em receber o diagnóstico comercial da Domino Automate via WhatsApp e e-mail em conformidade com a LGPD (Lei nº 13.709/2018).
                 </span>
               </label>
+
+              {formError && (
+                <p role="alert" aria-live="assertive" style={{ color: '#E57373', fontSize: '0.85rem', fontWeight: 600 }}>
+                  ⚠️ {formError}
+                </p>
+              )}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <button
@@ -1085,7 +1166,7 @@ export default function EstudiosLanding() {
                     color: '#110D10',
                     fontWeight: 700,
                     fontSize: '1.05rem',
-                    cursor: 'pointer',
+                    cursor: loading ? 'wait' : 'pointer',
                   }}
                 >
                   {loading ? 'Enviando para nossa Automação...' : 'Receber Proposta & Diagnóstico no WhatsApp →'}
@@ -1103,29 +1184,54 @@ export default function EstudiosLanding() {
             Dúvidas Frequentes de <span style={{ color: '#E5C07B' }}>Gestoras de Estúdios</span>
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {faqs.map((f, i) => (
-              <div
-                key={i}
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                style={{
-                  padding: '1.5rem',
-                  borderRadius: '10px',
-                  backgroundColor: '#1B1418',
-                  border: '1px solid rgba(212, 175, 55, 0.2)',
-                  cursor: 'pointer',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 className="label-md" style={{ color: '#FAF6F0', fontSize: '1rem' }}>{f.q}</h4>
-                  <span style={{ color: '#E5C07B', fontSize: '1.4rem' }}>{openFaq === i ? '−' : '+'}</span>
+            {faqs.map((f, i) => {
+              const isOpen = openFaq === i;
+              return (
+                <div
+                  key={i}
+                  style={{
+                    borderRadius: '10px',
+                    backgroundColor: '#1B1418',
+                    border: '1px solid rgba(212, 175, 55, 0.2)',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <button
+                    type="button"
+                    id={`estudios-faq-btn-${i}`}
+                    aria-expanded={isOpen}
+                    aria-controls={`estudios-faq-panel-${i}`}
+                    onClick={() => setOpenFaq(isOpen ? null : i)}
+                    style={{
+                      width: '100%',
+                      padding: '1.5rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'transparent',
+                      border: 'none',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <span className="label-md" style={{ color: '#FAF6F0', fontSize: '1rem' }}>{f.q}</span>
+                    <span style={{ color: '#E5C07B', fontSize: '1.4rem' }} aria-hidden="true">{isOpen ? '−' : '+'}</span>
+                  </button>
+                  {isOpen && (
+                    <div
+                      id={`estudios-faq-panel-${i}`}
+                      role="region"
+                      aria-labelledby={`estudios-faq-btn-${i}`}
+                      style={{ padding: '0 1.5rem 1.5rem' }}
+                    >
+                      <p className="body-sm" style={{ paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', color: '#DFD7CE', lineHeight: 1.65 }}>
+                        {f.a}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                {openFaq === i && (
-                  <p className="body-sm" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)', color: '#DFD7CE', lineHeight: 1.65 }}>
-                    {f.a}
-                  </p>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1157,6 +1263,9 @@ export default function EstudiosLanding() {
       {/* Lightbox Modal for Book_Lana */}
       {lightboxOpen && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Galeria de Telas do Case Lana Wolf"
           onClick={() => setLightboxOpen(false)}
           style={{
             position: 'fixed',
