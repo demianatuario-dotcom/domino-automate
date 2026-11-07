@@ -4,6 +4,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import AIChat from '@/components/AIChat';
+import { trackDominoEvent } from '@/lib/analytics';
+import type { ROIScenarioKey } from '@/lib/roiEngine';
 
 const BOOK_LANA_IMAGES = [
   { src: '/Book_Lana/Site1.png', label: 'Hero & Posicionamento de Alto Padrão' },
@@ -20,7 +22,7 @@ const SEGMENTOS_ESTUDIO = [
   'Clínica de Estética Facial & Corporal',
   'Salão de Beleza & Hair Studio Premium',
   'Micropigmentação & Harmonização',
-  'Spa, Unhas & Espaço de Bem-Estar'
+  'Spa, Unhas & Espaço de Bem-Estar',
 ];
 
 const DORES_ESTUDIO = [
@@ -29,8 +31,22 @@ const DORES_ESTUDIO = [
   'Perda de mensagens à noite e nos finais de semana',
   'Falta de retorno automático para manutenção (30/45 dias)',
   'Site ou link na bio amador que não passa alto valor',
-  'Profissional interrompendo atendimento em maca para responder celular'
+  'Profissional interrompendo atendimento em maca para responder celular',
 ];
+
+const ESTUDIOS_SCENARIOS: Record<ROIScenarioKey, { label: string; whatsappConvRatio: number; noShowRecupRatio: number }> = {
+  conservador: { label: 'Conservador', whatsappConvRatio: 0.04, noShowRecupRatio: 0.45 },
+  referencia: { label: 'Referência', whatsappConvRatio: 0.063, noShowRecupRatio: 0.65 },
+  otimista: { label: 'Otimista', whatsappConvRatio: 0.09, noShowRecupRatio: 0.80 },
+};
+
+interface AutomateBudgetDetail {
+  nome?: string;
+  email?: string;
+  telefone?: string;
+  detalhes?: string;
+  dores?: string[];
+}
 
 export default function EstudiosLanding() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -39,6 +55,10 @@ export default function EstudiosLanding() {
   const [mensagensDia, setMensagensDia] = useState(18);
   const [ticketMedio, setTicketMedio] = useState(220);
   const [faltasSemana, setFaltasSemana] = useState(4);
+  const [margemLiquidaPct, setMargemLiquidaPct] = useState(65);
+  const [scenario, setScenario] = useState<ROIScenarioKey>('referencia');
+  const [showMemory, setShowMemory] = useState(false);
+  const [simStarted, setSimStarted] = useState(false);
 
   // Lightbox state for Book Lana
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -50,47 +70,81 @@ export default function EstudiosLanding() {
   const [segmento, setSegmento] = useState(SEGMENTOS_ESTUDIO[0]);
   const [selectedDores, setSelectedDores] = useState<string[]>([
     'Demora para responder clientes no WhatsApp / Direct',
-    'Clientes que faltam ou desmarcam em cima da hora (No-Show)'
+    'Clientes que faltam ou desmarcam em cima da hora (No-Show)',
   ]);
   const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
   const [detalhes, setDetalhes] = useState('');
+  const [lgpdConsent, setLgpdConsent] = useState(true);
   const [honeypot, setHoneypot] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [formStarted, setFormStarted] = useState(false);
 
   // FAQ state
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
+  useEffect(() => {
+    trackDominoEvent('page_view_vertical', { vertical: '/Estudios' });
+  }, []);
+
+  const notifySimStart = () => {
+    if (!simStarted) {
+      setSimStarted(true);
+      trackDominoEvent('simulator_start', { vertical: '/Estudios', section: 'roi_simulator' });
+    }
+  };
+
+  const notifyFormStart = () => {
+    if (!formStarted) {
+      setFormStarted(true);
+      trackDominoEvent('form_start', { vertical: '/Estudios', section: 'lead_form' });
+    }
+  };
+
   const simResults = useMemo(() => {
-    // Estimativa: 20% das mensagens perdidas/demoradas seriam convertidas com IA em <5 segundos (26 dias operacionais)
-    const novosAgendamentosMes = Math.round(mensagensDia * 0.18 * 26 * 0.35);
+    const cfg = ESTUDIOS_SCENARIOS[scenario];
+    const contatosMes = mensagensDia * 26;
+    const novosAgendamentosMes = Math.round(contatosMes * cfg.whatsappConvRatio);
     const receitaRecuperadaWhatsApp = novosAgendamentosMes * ticketMedio;
 
-    // Estimativa: redução de 65% nas faltas semanais com confirmação automática N8N
-    const faltasEvitadasMes = Math.round(faltasSemana * 4 * 0.65);
+    const faltasMes = faltasSemana * 4;
+    const faltasEvitadasMes = Math.round(faltasMes * cfg.noShowRecupRatio);
     const receitaRecuperadaNoShow = faltasEvitadasMes * ticketMedio;
 
-    const ganhoTotalMensal = receitaRecuperadaWhatsApp + receitaRecuperadaNoShow;
-    const ganhoAnual = ganhoTotalMensal * 12;
+    const ganhoBrutoMensal = receitaRecuperadaWhatsApp + receitaRecuperadaNoShow;
+    const lucroLiquidoMensal = Math.round(ganhoBrutoMensal * (margemLiquidaPct / 100));
+    const ganhoAnual = ganhoBrutoMensal * 12;
+
+    const memoriaDeCalculo = [
+      `Cenário ${cfg.label}: taxa de recuperação de contatos no WhatsApp de ${(cfg.whatsappConvRatio * 100).toFixed(1)}% e contenção de No-Show de ${Math.round(cfg.noShowRecupRatio * 100)}%.`,
+      `Demanda mensal: ${mensagensDia} contatos/dia × 26 dias = ${contatosMes} contatos/mês → +${novosAgendamentosMes} agendamentos extras × R$ ${ticketMedio} = R$ ${receitaRecuperadaWhatsApp.toLocaleString('pt-BR')}/mês.`,
+      `Redução de faltas: ${faltasSemana} faltas/semana × 4 = ${faltasMes} faltas/mês → ${faltasEvitadasMes} horários preservados × R$ ${ticketMedio} = R$ ${receitaRecuperadaNoShow.toLocaleString('pt-BR')}/mês.`,
+      `Faturamento Incremental Bruto: R$ ${ganhoBrutoMensal.toLocaleString('pt-BR')}/mês | Lucro Incremental Líquido (${margemLiquidaPct}% margem): R$ ${lucroLiquidoMensal.toLocaleString('pt-BR')}/mês.`,
+    ];
 
     return {
+      cfg,
       novosAgendamentosMes,
       faltasEvitadasMes,
-      ganhoTotalMensal,
-      ganhoAnual
+      ganhoBrutoMensal,
+      lucroLiquidoMensal,
+      ganhoAnual,
+      memoriaDeCalculo,
     };
-  }, [mensagensDia, ticketMedio, faltasSemana]);
+  }, [mensagensDia, ticketMedio, faltasSemana, margemLiquidaPct, scenario]);
 
   const toggleDor = (dor: string) => {
-    setSelectedDores(prev =>
-      prev.includes(dor) ? prev.filter(item => item !== dor) : [...prev, dor]
+    notifyFormStart();
+    setSelectedDores((prev) =>
+      prev.includes(dor) ? prev.filter((item) => item !== dor) : [...prev, dor]
     );
   };
 
   useEffect(() => {
-    const handleAutomate = (e: any) => {
-      const data = e.detail;
+    const handleAutomate = (e: Event) => {
+      const customEvent = e as CustomEvent<AutomateBudgetDetail>;
+      const data = customEvent.detail;
       if (data) {
         setNome(data.nome || '');
         setEmail(data.email || '');
@@ -101,18 +155,26 @@ export default function EstudiosLanding() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vertical: '/Estúdios',
-            origem: '/Estúdios',
-            nome: data.nome,
-            email: data.email,
-            telefone: data.telefone,
+            vertical: '/Estudios',
+            origem: '/Estudios (Chat IA)',
+            nome: data.nome || 'Visitante Qualificado IA',
+            email: data.email || '',
+            telefone: data.telefone || '',
             tipo_organizacao: segmento,
             demanda: 'Automação IA + N8N para Estúdio de Beleza',
             dores: (data.dores || selectedDores).join(', '),
             doresArray: data.dores || selectedDores,
-            descricao: data.detalhes || 'Solicitado via Consultora IA de Estúdios'
+            descricao: data.detalhes || 'Solicitado via Consultora IA de Estúdios',
+            lgpdConsent: true,
+          }),
+        })
+          .then((res) => {
+            if (res.ok) {
+              setSubmitted(true);
+              trackDominoEvent('chat_lead_captured', { vertical: '/Estudios', section: 'ai_chat' });
+            }
           })
-        }).catch(err => console.error(err));
+          .catch((err) => console.error(err));
       }
     };
 
@@ -122,13 +184,13 @@ export default function EstudiosLanding() {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (honeypot) return;
+    if (honeypot || !lgpdConsent) return;
 
     setLoading(true);
     const cleanPhone = whatsapp.replace(/\D/g, '');
 
     try {
-      await fetch('/api/quote', {
+      const res = await fetch('/api/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -143,11 +205,15 @@ export default function EstudiosLanding() {
           dores: selectedDores.join(', '),
           doresArray: selectedDores,
           descricao: detalhes.trim(),
-          b_website_check: honeypot
-        })
+          b_website_check: honeypot,
+          lgpdConsent,
+        }),
       });
 
-      setSubmitted(true);
+      if (res.ok) {
+        setSubmitted(true);
+        trackDominoEvent('form_submit', { vertical: '/Estudios', section: 'lead_form' });
+      }
     } catch (error) {
       console.error('Erro ao enviar formulário:', error);
     } finally {
@@ -156,6 +222,7 @@ export default function EstudiosLanding() {
   };
 
   const openChat = () => {
+    trackDominoEvent('chat_open', { vertical: '/Estudios', section: 'roi_simulator' });
     window.dispatchEvent(new CustomEvent('open-ai-chat'));
   };
 
@@ -166,21 +233,71 @@ export default function EstudiosLanding() {
   const faqs = [
     {
       q: 'A Inteligência Artificial parece um robô engessado com as minhas clientes?',
-      a: 'De forma alguma. Diferente daqueles chatbots antigos de "digite 1 para agendar", nossa IA conversa com linguagem natural, acolhedora e personalizada com o tom de voz do seu estúdio. Ela tira dúvidas de procedimentos, explica cuidados, contorna objeções de valor e conduz a cliente até o agendamento.'
+      a: 'De forma alguma. Diferente daqueles chatbots antigos de "digite 1 para agendar", nossa IA conversa com linguagem natural, acolhedora e personalizada com o tom de voz do seu estúdio. Ela tira dúvidas de procedimentos, explica cuidados, contorna objeções de valor e conduz a cliente até o agendamento.',
     },
     {
       q: 'Como funciona a redução de faltas e desmarcações (No-Show)?',
-      a: 'Nosso motor em n8n monitora sua agenda e envia lembretes estratégicos via WhatsApp 24h e 3h antes do procedimento, solicitando confirmação. Caso a cliente precise reagendar com antecedência, o sistema já aciona a fila de espera para não deixar sua maca ou cadeira vazia.'
+      a: 'Nosso motor em n8n monitora sua agenda e envia lembretes estratégicos via WhatsApp 24h e 3h antes do procedimento, solicitando confirmação. Caso a cliente precise reagendar com antecedência, o sistema já aciona a fila de espera para não deixar sua maca ou cadeira vazia.',
     },
     {
       q: 'E para clientes que precisam voltar para manutenção (cílios, sobrancelhas, botox, corte)?',
-      a: 'A automação identifica automaticamente há quantos dias a cliente realizou o procedimento e dispara uma mensagem carinhosa e personalizada no WhatsApp convidando-a para agendar o retorno antes que ela procure a concorrência.'
+      a: 'A automação identifica automaticamente há quantos dias a cliente realizou o procedimento e dispara uma mensagem carinhosa e personalizada no WhatsApp convidando-a para agendar o retorno antes que ela procure a concorrência.',
     },
     {
       q: 'Preciso entender de tecnologia ou programação para usar?',
-      a: 'Zero! A Domino Automate entrega tudo 100% configurado, testado e rodando (Landing Page + Fluxos n8n + Assistente IA no WhatsApp). Você continua cuidando das suas clientes enquanto o sistema trabalha nos bastidores.'
-    }
+      a: 'Zero! A Domino Automate entrega tudo 100% configurado, testado e rodando (Landing Page + Fluxos n8n + Assistente IA no WhatsApp). Você continua cuidando das suas clientes enquanto o sistema trabalha nos bastidores.',
+    },
   ];
+
+  const jsonLd = useMemo(
+    () => ({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Service',
+          name: 'Automação de WhatsApp, IA e Landing Pages para Estúdios de Beleza',
+          description:
+            'Recepcionista de IA 24/7 no WhatsApp, blindagem anti no-show via n8n e Landing Pages de alto padrão para estúdios de beleza e estética.',
+          provider: {
+            '@type': 'Organization',
+            name: 'Domino Automate',
+            url: 'https://domino-automate.com.br',
+          },
+          areaServed: 'BR',
+          url: 'https://domino-automate.com.br/Estudios',
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'Domino Automate',
+              item: 'https://domino-automate.com.br',
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: 'Estúdios de Beleza & Estética',
+              item: 'https://domino-automate.com.br/Estudios',
+            },
+          ],
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: faqs.map((f) => ({
+            '@type': 'Question',
+            name: f.q,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: f.a,
+            },
+          })),
+        },
+      ],
+    }),
+    []
+  );
 
   return (
     <div
@@ -188,9 +305,14 @@ export default function EstudiosLanding() {
         minHeight: '100vh',
         backgroundColor: '#110D10',
         color: '#FAF6F0',
-        fontFamily: "'Manrope', sans-serif"
+        fontFamily: "'Manrope', sans-serif",
       }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Header Luxury Beauty */}
       <header
         style={{
@@ -204,7 +326,7 @@ export default function EstudiosLanding() {
           alignItems: 'center',
           backgroundColor: 'rgba(17, 13, 16, 0.85)',
           backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.18)'
+          borderBottom: '1px solid rgba(212, 175, 55, 0.18)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
@@ -221,7 +343,7 @@ export default function EstudiosLanding() {
               color: '#E5C07B',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              textTransform: 'uppercase'
+              textTransform: 'uppercase',
             }}
           >
             ✨ Vertical Estúdios & Estética
@@ -232,18 +354,19 @@ export default function EstudiosLanding() {
           <Link href="/" className="label-sm desktop-only" style={{ opacity: 0.75, color: '#FAF6F0' }}>
             ← Portal Domino
           </Link>
-          <a href="#solucao-estudios" className="label-md desktop-only" style={{ color: '#FAF6F0' }}>Soluções</a>
           <a href="#case-lana" className="label-md desktop-only" style={{ color: '#FAF6F0' }}>Case Real</a>
+          <a href="#solucao-estudios" className="label-md desktop-only" style={{ color: '#FAF6F0' }}>Soluções</a>
           <a href="#calculadora-agenda" className="label-md desktop-only" style={{ color: '#FAF6F0' }}>Simulador de Agenda</a>
           <a
             href="#diagnostico-estudio"
+            onClick={() => trackDominoEvent('cta_primary_click', { vertical: '/Estudios', section: 'header' })}
             style={{
               padding: '0.65rem 1.35rem',
               fontSize: '0.85rem',
               fontWeight: 700,
               borderRadius: '4px',
               backgroundImage: 'linear-gradient(45deg, #D4AF37, #F3E5AB)',
-              color: '#110D10'
+              color: '#110D10',
             }}
             className="desktop-only"
           >
@@ -263,27 +386,27 @@ export default function EstudiosLanding() {
       <div className={`mobile-overlay ${menuOpen ? 'open' : ''}`} onClick={() => setMenuOpen(false)} />
       <nav className={`mobile-menu ${menuOpen ? 'open' : ''}`} style={{ backgroundColor: '#1A1318' }}>
         <Link href="/" onClick={() => setMenuOpen(false)}>← Voltar ao Portal Domino</Link>
-        <a href="#solucao-estudios" onClick={() => setMenuOpen(false)}>Como Funciona</a>
         <a href="#case-lana" onClick={() => setMenuOpen(false)}>Vitrine Case Real</a>
+        <a href="#solucao-estudios" onClick={() => setMenuOpen(false)}>Como Funciona</a>
         <a href="#calculadora-agenda" onClick={() => setMenuOpen(false)}>Simulador de Faturamento</a>
         <a href="#diagnostico-estudio" onClick={() => setMenuOpen(false)} style={{ color: '#E5C07B', fontWeight: 700 }}>
           Solicitar Orçamento no WhatsApp
         </a>
       </nav>
 
-      {/* BLOCK 1: HERO SECTION (Above the Fold) */}
+      {/* BLOCK 1: HERO SECTION (Portfolio-First Strategy) */}
       <section
         style={{
-          minHeight: '95vh',
-          padding: '8.5rem 2rem 4rem',
+          minHeight: '92vh',
+          padding: '7.5rem 1.25rem 3.5rem',
           display: 'flex',
           alignItems: 'center',
           position: 'relative',
           overflow: 'hidden',
-          background: 'radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.14) 0%, rgba(17, 13, 16, 1) 65%)'
+          background: 'radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.14) 0%, rgba(17, 13, 16, 1) 65%)',
         }}
       >
-        <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '3.5rem', alignItems: 'center', position: 'relative', zIndex: 2 }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '3rem', alignItems: 'center', position: 'relative', zIndex: 2 }}>
           <div>
             <div
               style={{
@@ -294,10 +417,10 @@ export default function EstudiosLanding() {
                 borderRadius: '50px',
                 backgroundColor: 'rgba(212, 175, 55, 0.12)',
                 border: '1px solid rgba(212, 175, 55, 0.35)',
-                marginBottom: '1.5rem'
+                marginBottom: '1.25rem',
               }}
             >
-              <span style={{ color: '#E5C07B', fontSize: '0.82rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span style={{ color: '#E5C07B', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 ✨ Para Estúdios de Beleza, Clínicas de Estética & Lash Designers
               </span>
             </div>
@@ -305,31 +428,32 @@ export default function EstudiosLanding() {
             <h1
               className="display-lg"
               style={{
-                fontSize: 'clamp(2.2rem, 4.2vw, 3.6rem)',
+                fontSize: 'clamp(2.1rem, 4.2vw, 3.6rem)',
                 lineHeight: 1.1,
                 color: '#FAF6F0',
-                marginBottom: '1.5rem'
+                marginBottom: '1.25rem',
               }}
             >
               Sua Agenda Cheia 24/7 no WhatsApp{' '}
               <span style={{ color: '#E5C07B' }}>Enquanto Você Atende em Maca.</span>
             </h1>
 
-            <p className="body-md" style={{ fontSize: '1.15rem', lineHeight: 1.7, color: '#DFD7CE', marginBottom: '2.25rem' }}>
+            <p className="body-md" style={{ fontSize: '1.1rem', lineHeight: 1.7, color: '#DFD7CE', marginBottom: '2rem' }}>
               Pare de perder clientes por demorar 2 horas para responder no WhatsApp ou por faltas de última hora. Implementamos sua <strong>Recepcionista de IA Humanizada + Automação Anti No-Show no n8n + Landing Page de Alto Padrão</strong>.
             </p>
 
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '2.25rem' }}>
               <a
                 href="#diagnostico-estudio"
+                onClick={() => trackDominoEvent('cta_primary_click', { vertical: '/Estudios', section: 'hero' })}
                 style={{
-                  padding: '1rem 2rem',
-                  fontSize: '1rem',
+                  padding: '1rem 1.85rem',
+                  fontSize: '0.98rem',
                   fontWeight: 700,
                   borderRadius: '4px',
                   backgroundImage: 'linear-gradient(45deg, #D4AF37, #F3E5AB)',
                   color: '#110D10',
-                  boxShadow: '0 8px 30px rgba(212, 175, 55, 0.28)'
+                  boxShadow: '0 8px 30px rgba(212, 175, 55, 0.28)',
                 }}
               >
                 Quero Automatizar Meu Estúdio →
@@ -338,9 +462,10 @@ export default function EstudiosLanding() {
                 href={whatsappDirectUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackDominoEvent('whatsapp_click', { vertical: '/Estudios', section: 'hero_secondary' })}
                 style={{
-                  padding: '1rem 1.75rem',
-                  fontSize: '1rem',
+                  padding: '1rem 1.5rem',
+                  fontSize: '0.95rem',
                   fontWeight: 600,
                   borderRadius: '4px',
                   backgroundColor: 'rgba(255, 255, 255, 0.06)',
@@ -348,7 +473,7 @@ export default function EstudiosLanding() {
                   color: '#FAF6F0',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.5rem'
+                  gap: '0.5rem',
                 }}
               >
                 <span>Falar no WhatsApp Agora</span>
@@ -363,7 +488,7 @@ export default function EstudiosLanding() {
               </div>
               <div>
                 <p style={{ fontSize: '1.4rem', fontWeight: 700, color: '#E5C07B', fontFamily: 'Space Grotesk, sans-serif' }}>-65%</p>
-                <p style={{ fontSize: '0.8rem', opacity: 0.75 }}>Redução média em faltas (No-Show)</p>
+                <p style={{ fontSize: '0.8rem', opacity: 0.75 }}>Redução operacional de faltas</p>
               </div>
               <div>
                 <p style={{ fontSize: '1.4rem', fontWeight: 700, color: '#E5C07B', fontFamily: 'Space Grotesk, sans-serif' }}>24/7</p>
@@ -379,10 +504,10 @@ export default function EstudiosLanding() {
               borderRadius: '16px',
               padding: '1.5rem',
               border: '1px solid rgba(212, 175, 55, 0.3)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)'
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
             }}
           >
-            <div style={{ position: 'relative', width: '100%', height: '320px', borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem' }}>
+            <div style={{ position: 'relative', width: '100%', height: '300px', borderRadius: '10px', overflow: 'hidden', marginBottom: '1.25rem' }}>
               <Image
                 src="/Book_Lana/Site1.png"
                 alt="Case Real Estúdio de Beleza - Lana Wolf"
@@ -399,6 +524,7 @@ export default function EstudiosLanding() {
                 <p style={{ fontSize: '0.85rem', color: '#DFD7CE', opacity: 0.8 }}>Veja por dentro as telas e o robô de agendamento em produção.</p>
               </div>
               <button
+                type="button"
                 onClick={() => { setCurrentImg(0); setLightboxOpen(true); }}
                 style={{
                   padding: '0.6rem 1rem',
@@ -408,7 +534,7 @@ export default function EstudiosLanding() {
                   color: '#E5C07B',
                   fontWeight: 600,
                   fontSize: '0.85rem',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Ver 7 Telas do Projeto ↗
@@ -418,124 +544,8 @@ export default function EstudiosLanding() {
         </div>
       </section>
 
-      {/* BLOCK 2: THE PROBLEM & AGITATION (PAS Framework) */}
-      <section style={{ padding: '5.5rem 2rem', backgroundColor: '#171115' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 3.5rem' }}>
-            <span className="label-sm" style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
-              O Gargalo Invisível dos Estúdios
-            </span>
-            <h2 className="display-lg" style={{ fontSize: 'clamp(1.9rem, 3.3vw, 2.85rem)', marginTop: '0.5rem', color: '#FAF6F0' }}>
-              Por Que Tantas Clientes Mandam &ldquo;Qual o Valor?&rdquo; e <span style={{ color: '#E5C07B' }}>Somem Sem Agendar?</span>
-            </h2>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-            <div style={{ padding: '2.25rem', borderRadius: '12px', backgroundColor: '#1F171C', borderLeft: '4px solid #E57373' }}>
-              <span style={{ fontSize: '2rem' }}>⏳</span>
-              <h3 className="headline-sm" style={{ fontSize: '1.25rem', margin: '0.75rem 0 0.5rem', color: '#FAF6F0' }}>
-                Demora Enquanto Você Está Atendendo
-              </h3>
-              <p className="body-sm" style={{ color: '#DFD7CE', opacity: 0.85, lineHeight: 1.65 }}>
-                Quando a cliente vê um Story seu e manda mensagem no impulso, ela quer resposta imediata. Se você está em procedimento e só responde 2 horas depois, o desejo esfriou ou ela já fechou com outro espaço.
-              </p>
-            </div>
-
-            <div style={{ padding: '2.25rem', borderRadius: '12px', backgroundColor: '#1F171C', borderLeft: '4px solid #E57373' }}>
-              <span style={{ fontSize: '2rem' }}>📉</span>
-              <h3 className="headline-sm" style={{ fontSize: '1.25rem', margin: '0.75rem 0 0.5rem', color: '#FAF6F0' }}>
-                Buracos na Agenda por Faltas (No-Show)
-              </h3>
-              <p className="body-sm" style={{ color: '#DFD7CE', opacity: 0.85, lineHeight: 1.65 }}>
-                Cada horário vago por esquecimento da cliente ou desmarcação sem aviso prévio é prejuízo líquido que nunca mais volta. Sem confirmação ativa automatizada, sua agenda fica refém da sorte.
-              </p>
-            </div>
-
-            <div style={{ padding: '2.25rem', borderRadius: '12px', backgroundColor: '#1F171C', borderLeft: '4px solid #E57373' }}>
-              <span style={{ fontSize: '2rem' }}>🔁</span>
-              <h3 className="headline-sm" style={{ fontSize: '1.25rem', margin: '0.75rem 0 0.5rem', color: '#FAF6F0' }}>
-                Clientes que Não Retornam na Manutenção
-              </h3>
-              <p className="body-sm" style={{ color: '#DFD7CE', opacity: 0.85, lineHeight: 1.65 }}>
-                O lucro real de um estúdio está na recorrência (manutenção de extensão de cílios, retoque, limpeza de pele, hidratação). Sem um sistema que chame a cliente de volta no dia exato, você precisa gastar sempre mais com anúncios.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BLOCK 3: THE TRANSFORMATION & METHOD (3 Pillars for Beauty Studios) */}
-      <section id="solucao-estudios" style={{ padding: '6rem 2rem', backgroundColor: '#110D10', scrollMarginTop: '80px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <span className="label-sm" style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
-              Engenharia Domino Automate para Beleza & Estética
-            </span>
-            <h2 className="display-lg" style={{ fontSize: 'clamp(2rem, 3.5vw, 3rem)', marginTop: '0.5rem', color: '#FAF6F0' }}>
-              O Ecossistema Completo que <span style={{ color: '#E5C07B' }}>Transforma Seu Estúdio</span>
-            </h2>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
-            <div style={{ padding: '2.5rem 2rem', borderRadius: '14px', backgroundColor: '#1B1418', borderTop: '4px solid #D4AF37', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.7rem', borderRadius: '4px', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#E5C07B' }}>
-                  PILAR 01 • ATENDIMENTO 24/7
-                </span>
-                <span style={{ fontSize: '2rem' }}>🤖</span>
-              </div>
-              <h3 className="headline-sm" style={{ fontSize: '1.35rem', color: '#FAF6F0' }}>
-                Recepcionista & SDR de IA no WhatsApp
-              </h3>
-              <p className="body-sm" style={{ color: '#DFD7CE', lineHeight: 1.65 }}>
-                Treinada com o catálogo de procedimentos, preços, pacotes e regras do seu estúdio. Atende com empatia em segundos, apresenta o valor do seu trabalho antes do preço e qualifica a cliente para agendamento imediato.
-              </p>
-              <div style={{ marginTop: 'auto', padding: '0.75rem 1rem', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: '#E5C07B', fontSize: '0.85rem', fontWeight: 700 }}>
-                ✓ Nunca perde um lead de madrugada ou fim de semana
-              </div>
-            </div>
-
-            <div style={{ padding: '2.5rem 2rem', borderRadius: '14px', backgroundColor: '#1B1418', borderTop: '4px solid #D4AF37', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.7rem', borderRadius: '4px', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#E5C07B' }}>
-                  PILAR 02 • ORQUESTRAÇÃO N8N
-                </span>
-                <span style={{ fontSize: '2rem' }}>📅</span>
-              </div>
-              <h3 className="headline-sm" style={{ fontSize: '1.35rem', color: '#FAF6F0' }}>
-                Blindagem Anti No-Show & Reativação
-              </h3>
-              <p className="body-sm" style={{ color: '#DFD7CE', lineHeight: 1.65 }}>
-                Fluxos automáticos no n8n que enviam lembretes de confirmação, orientações pré-procedimento, pesquisa de satisfação pós-atendimento e aviso automático de retorno de manutenção (15, 30 ou 45 dias).
-              </p>
-              <div style={{ marginTop: 'auto', padding: '0.75rem 1rem', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: '#E5C07B', fontSize: '0.85rem', fontWeight: 700 }}>
-                ✓ Agenda previsível e aumento da recorrência mensal
-              </div>
-            </div>
-
-            <div style={{ padding: '2.5rem 2rem', borderRadius: '14px', backgroundColor: '#1B1418', borderTop: '4px solid #D4AF37', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.7rem', borderRadius: '4px', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#E5C07B' }}>
-                  PILAR 03 • POSICIONAMENTO PREMIUM
-                </span>
-                <span style={{ fontSize: '2rem' }}>💎</span>
-              </div>
-              <h3 className="headline-sm" style={{ fontSize: '1.35rem', color: '#FAF6F0' }}>
-                Landing Page de Luxo & Alta Conversão
-              </h3>
-              <p className="body-sm" style={{ color: '#DFD7CE', lineHeight: 1.65 }}>
-                Substitua links genéricos na bio do Instagram por uma página exclusiva que valoriza seus resultados (antes/depois), transmite autoridade imediata, rastreia campanhas (UTM) e direciona a cliente pronta para fechar.
-              </p>
-              <div style={{ marginTop: 'auto', padding: '0.75rem 1rem', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: '#E5C07B', fontSize: '0.85rem', fontWeight: 700 }}>
-                ✓ Percepção de alto valor para cobrar o que você merece
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BLOCK 4: CASE REAL LANA WOLF (Social Proof & Authority) */}
-      <section id="case-lana" style={{ padding: '6rem 2rem', backgroundColor: '#171115', scrollMarginTop: '80px' }}>
+      {/* BLOCK 2: CASE REAL LANA WOLF (Portfolio-First Ordering) */}
+      <section id="case-lana" style={{ padding: '5.5rem 1.25rem', backgroundColor: '#171115', scrollMarginTop: '80px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '2rem', marginBottom: '3rem' }}>
             <div>
@@ -562,7 +572,7 @@ export default function EstudiosLanding() {
                   borderRadius: '12px',
                   padding: '0.85rem',
                   border: '1px solid rgba(212, 175, 55, 0.25)',
-                  transition: 'transform 0.2s ease'
+                  transition: 'transform 0.2s ease',
                 }}
               >
                 <div style={{ position: 'relative', width: '100%', height: '190px', borderRadius: '8px', overflow: 'hidden', marginBottom: '0.75rem' }}>
@@ -575,23 +585,172 @@ export default function EstudiosLanding() {
         </div>
       </section>
 
-      {/* BLOCK 5: INTERACTIVE ROI & AGENDA SIMULATOR FOR BEAUTY STUDIOS */}
-      <section id="calculadora-agenda" style={{ padding: '6rem 2rem', backgroundColor: '#110D10', scrollMarginTop: '80px' }}>
-        <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
+      {/* BLOCK 3: THE PROBLEM & AGITATION (PAS Framework) */}
+      <section style={{ padding: '5.5rem 1.25rem', backgroundColor: '#110D10' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto 3.5rem' }}>
+            <span className="label-sm" style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
+              O Gargalo Invisível dos Estúdios
+            </span>
+            <h2 className="display-lg" style={{ fontSize: 'clamp(1.9rem, 3.3vw, 2.85rem)', marginTop: '0.5rem', color: '#FAF6F0' }}>
+              Por Que Tantas Clientes Mandam &ldquo;Qual o Valor?&rdquo; e <span style={{ color: '#E5C07B' }}>Somem Sem Agendar?</span>
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.75rem' }}>
+            <div style={{ padding: '2rem', borderRadius: '12px', backgroundColor: '#1F171C', borderLeft: '4px solid #E57373' }}>
+              <span style={{ fontSize: '2rem' }}>⏳</span>
+              <h3 className="headline-sm" style={{ fontSize: '1.2rem', margin: '0.75rem 0 0.5rem', color: '#FAF6F0' }}>
+                Demora Enquanto Você Está Atendendo
+              </h3>
+              <p className="body-sm" style={{ color: '#DFD7CE', opacity: 0.85, lineHeight: 1.65 }}>
+                Quando a cliente vê um Story seu e manda mensagem no impulso, ela quer resposta imediata. Se você está em procedimento e só responde 2 horas depois, o desejo esfriou ou ela já fechou com outro espaço.
+              </p>
+            </div>
+
+            <div style={{ padding: '2rem', borderRadius: '12px', backgroundColor: '#1F171C', borderLeft: '4px solid #E57373' }}>
+              <span style={{ fontSize: '2rem' }}>📉</span>
+              <h3 className="headline-sm" style={{ fontSize: '1.2rem', margin: '0.75rem 0 0.5rem', color: '#FAF6F0' }}>
+                Buracos na Agenda por Faltas (No-Show)
+              </h3>
+              <p className="body-sm" style={{ color: '#DFD7CE', opacity: 0.85, lineHeight: 1.65 }}>
+                Cada horário vago por esquecimento da cliente ou desmarcação sem aviso prévio é prejuízo líquido que nunca mais volta. Sem confirmação ativa automatizada, sua agenda fica refém da sorte.
+              </p>
+            </div>
+
+            <div style={{ padding: '2rem', borderRadius: '12px', backgroundColor: '#1F171C', borderLeft: '4px solid #E57373' }}>
+              <span style={{ fontSize: '2rem' }}>🔁</span>
+              <h3 className="headline-sm" style={{ fontSize: '1.2rem', margin: '0.75rem 0 0.5rem', color: '#FAF6F0' }}>
+                Clientes que Não Retornam na Manutenção
+              </h3>
+              <p className="body-sm" style={{ color: '#DFD7CE', opacity: 0.85, lineHeight: 1.65 }}>
+                O lucro real de um estúdio está na recorrência (manutenção de extensão de cílios, retoque, limpeza de pele, hidratação). Sem um sistema que chame a cliente de volta no dia exato, você precisa gastar sempre mais com anúncios.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BLOCK 4: THE TRANSFORMATION & METHOD (3 Pillars for Beauty Studios) */}
+      <section id="solucao-estudios" style={{ padding: '5.5rem 1.25rem', backgroundColor: '#171115', scrollMarginTop: '80px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
             <span className="label-sm" style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
-              Calculadora de Receita do Estúdio
+              Engenharia Domino Automate para Beleza & Estética
+            </span>
+            <h2 className="display-lg" style={{ fontSize: 'clamp(2rem, 3.5vw, 3rem)', marginTop: '0.5rem', color: '#FAF6F0' }}>
+              O Ecossistema Completo que <span style={{ color: '#E5C07B' }}>Transforma Seu Estúdio</span>
+            </h2>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '1.75rem' }}>
+            <div style={{ padding: '2.25rem 1.75rem', borderRadius: '14px', backgroundColor: '#1B1418', borderTop: '4px solid #D4AF37', display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.7rem', borderRadius: '4px', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#E5C07B' }}>
+                  PILAR 01 • ATENDIMENTO 24/7
+                </span>
+                <span style={{ fontSize: '2rem' }}>🤖</span>
+              </div>
+              <h3 className="headline-sm" style={{ fontSize: '1.3rem', color: '#FAF6F0' }}>
+                Recepcionista & SDR de IA no WhatsApp
+              </h3>
+              <p className="body-sm" style={{ color: '#DFD7CE', lineHeight: 1.65 }}>
+                Treinada com o catálogo de procedimentos, preços, pacotes e regras do seu estúdio. Atende com empatia em segundos, apresenta o valor do seu trabalho antes do preço e qualifica a cliente para agendamento imediato.
+              </p>
+              <div style={{ marginTop: 'auto', padding: '0.75rem 1rem', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: '#E5C07B', fontSize: '0.85rem', fontWeight: 700 }}>
+                ✓ Nunca perde um lead de madrugada ou fim de semana
+              </div>
+            </div>
+
+            <div style={{ padding: '2.25rem 1.75rem', borderRadius: '14px', backgroundColor: '#1B1418', borderTop: '4px solid #D4AF37', display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.7rem', borderRadius: '4px', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#E5C07B' }}>
+                  PILAR 02 • ORQUESTRAÇÃO N8N
+                </span>
+                <span style={{ fontSize: '2rem' }}>📅</span>
+              </div>
+              <h3 className="headline-sm" style={{ fontSize: '1.3rem', color: '#FAF6F0' }}>
+                Blindagem Anti No-Show & Reativação
+              </h3>
+              <p className="body-sm" style={{ color: '#DFD7CE', lineHeight: 1.65 }}>
+                Fluxos automáticos no n8n que enviam lembretes de confirmação, orientações pré-procedimento, pesquisa de satisfação pós-atendimento e aviso automático de retorno de manutenção (15, 30 ou 45 dias).
+              </p>
+              <div style={{ marginTop: 'auto', padding: '0.75rem 1rem', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: '#E5C07B', fontSize: '0.85rem', fontWeight: 700 }}>
+                ✓ Agenda previsível e aumento da recorrência mensal
+              </div>
+            </div>
+
+            <div style={{ padding: '2.25rem 1.75rem', borderRadius: '14px', backgroundColor: '#1B1418', borderTop: '4px solid #D4AF37', display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.7rem', borderRadius: '4px', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: '#E5C07B' }}>
+                  PILAR 03 • POSICIONAMENTO PREMIUM
+                </span>
+                <span style={{ fontSize: '2rem' }}>💎</span>
+              </div>
+              <h3 className="headline-sm" style={{ fontSize: '1.3rem', color: '#FAF6F0' }}>
+                Landing Page de Luxo & Alta Conversão
+              </h3>
+              <p className="body-sm" style={{ color: '#DFD7CE', lineHeight: 1.65 }}>
+                Substitua links genéricos na bio do Instagram por uma página exclusiva que valoriza seus resultados (antes/depois), transmite autoridade imediata, rastreia campanhas (UTM) e direciona a cliente pronta para fechar.
+              </p>
+              <div style={{ marginTop: 'auto', padding: '0.75rem 1rem', borderRadius: '6px', backgroundColor: 'rgba(212, 175, 55, 0.1)', color: '#E5C07B', fontSize: '0.85rem', fontWeight: 700 }}>
+                ✓ Percepção de alto valor para cobrar o que você merece
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BLOCK 5: INTERACTIVE ROI & AGENDA SIMULATOR FOR BEAUTY STUDIOS */}
+      <section id="calculadora-agenda" style={{ padding: '5.5rem 1.25rem', backgroundColor: '#110D10', scrollMarginTop: '80px' }}>
+        <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <span className="label-sm" style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
+              Calculadora de Receita do Estúdio • 3 Cenários Auditáveis
             </span>
             <h2 className="display-lg" style={{ fontSize: 'clamp(1.9rem, 3.4vw, 2.85rem)', marginTop: '0.5rem', color: '#FAF6F0' }}>
               Quanto Dinheiro Seu Estúdio Está <span style={{ color: '#E5C07B' }}>Deixando na Mesa?</span>
             </h2>
-            <p className="body-md" style={{ color: '#DFD7CE', opacity: 0.85, maxWidth: '680px', margin: '0.75rem auto 0' }}>
+            <p className="body-md" style={{ color: '#DFD7CE', opacity: 0.85, maxWidth: '680px', margin: '0.75rem auto 1.25rem' }}>
               Simule abaixo o impacto financeiro de responder suas clientes em 5 segundos e reduzir as faltas semanais com nossa automação.
             </p>
+
+            {/* Scenario selector */}
+            <div style={{ display: 'inline-flex', gap: '0.4rem', padding: '0.35rem', borderRadius: '50px', backgroundColor: '#1B1418', border: '1px solid rgba(212, 175, 55, 0.25)' }}>
+              {(['conservador', 'referencia', 'otimista'] as ROIScenarioKey[]).map((scen) => {
+                const active = scenario === scen;
+                return (
+                  <button
+                    key={scen}
+                    type="button"
+                    onClick={() => {
+                      notifySimStart();
+                      setScenario(scen);
+                      trackDominoEvent('simulator_complete', {
+                        vertical: '/Estudios',
+                        scenario: scen,
+                        section: 'roi_simulator',
+                      });
+                    }}
+                    style={{
+                      padding: '0.5rem 1.15rem',
+                      borderRadius: '50px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      backgroundColor: active ? '#D4AF37' : 'transparent',
+                      color: active ? '#110D10' : '#FAF6F0',
+                    }}
+                  >
+                    Cenário {ESTUDIOS_SCENARIOS[scen].label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem', alignItems: 'center' }}>
-            <div style={{ backgroundColor: '#1B1418', padding: '2.25rem', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.25)', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '2.25rem', alignItems: 'start' }}>
+            <div style={{ backgroundColor: '#1B1418', padding: '2rem', borderRadius: '14px', border: '1px solid rgba(212, 175, 55, 0.25)', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                   <label className="label-md">Interessadas por dia no WhatsApp/Direct:</label>
@@ -603,7 +762,7 @@ export default function EstudiosLanding() {
                   max="80"
                   step="1"
                   value={mensagensDia}
-                  onChange={e => setMensagensDia(Number(e.target.value))}
+                  onChange={(e) => { notifySimStart(); setMensagensDia(Number(e.target.value)); }}
                 />
               </div>
 
@@ -618,7 +777,7 @@ export default function EstudiosLanding() {
                   max="1200"
                   step="20"
                   value={ticketMedio}
-                  onChange={e => setTicketMedio(Number(e.target.value))}
+                  onChange={(e) => { notifySimStart(); setTicketMedio(Number(e.target.value)); }}
                 />
               </div>
 
@@ -633,30 +792,51 @@ export default function EstudiosLanding() {
                   max="20"
                   step="1"
                   value={faltasSemana}
-                  onChange={e => setFaltasSemana(Number(e.target.value))}
+                  onChange={(e) => { notifySimStart(); setFaltasSemana(Number(e.target.value)); }}
+                />
+              </div>
+
+              <div style={{ paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <label className="label-sm" style={{ opacity: 0.85 }}>Premissa Editável: Margem Líquida (%)</label>
+                  <span style={{ color: '#E5C07B', fontWeight: 700, fontSize: '0.85rem' }}>{margemLiquidaPct}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="25"
+                  max="90"
+                  step="5"
+                  value={margemLiquidaPct}
+                  onChange={(e) => { notifySimStart(); setMargemLiquidaPct(Number(e.target.value)); }}
                 />
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.15rem' }}>
               <div style={{ padding: '1.75rem', borderRadius: '12px', backgroundColor: '#1B1418', borderLeft: '5px solid #D4AF37' }}>
-                <p className="label-sm" style={{ textTransform: 'uppercase', color: '#E5C07B' }}>Faturamento Extra Estimado / Mês</p>
-                <p className="display-sm" style={{ fontSize: '2.35rem', color: '#FAF6F0', margin: '0.35rem 0', fontWeight: 700 }}>
-                  + R$ {simResults.ganhoTotalMensal.toLocaleString('pt-BR')} <span style={{ fontSize: '1rem', opacity: 0.75 }}>/mês</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <p className="label-sm" style={{ textTransform: 'uppercase', color: '#E5C07B' }}>
+                    Faturamento Incremental Bruto ({simResults.cfg.label})
+                  </p>
+                  <span style={{ fontSize: '0.72rem', opacity: 0.7 }}>Receita Recuperada</span>
+                </div>
+                <p className="display-sm" style={{ fontSize: '2.25rem', color: '#FAF6F0', margin: '0.35rem 0', fontWeight: 700 }}>
+                  + R$ {simResults.ganhoBrutoMensal.toLocaleString('pt-BR')} <span style={{ fontSize: '1rem', opacity: 0.75 }}>/mês</span>
                 </p>
                 <p className="body-sm" style={{ color: '#DFD7CE', opacity: 0.85 }}>
-                  Recuperando aproximadamente <strong>+{simResults.novosAgendamentosMes} novos agendamentos/mês</strong> no WhatsApp e evitando <strong>{simResults.faltasEvitadasMes} faltas mensais</strong>.
+                  Lucro Líquido Estimado ({margemLiquidaPct}% margem): <strong>R$ {simResults.lucroLiquidoMensal.toLocaleString('pt-BR')}/mês</strong> • Recuperando <strong>+{simResults.novosAgendamentosMes} agendamentos/mês</strong> e evitando <strong>{simResults.faltasEvitadasMes} faltas/mês</strong>.
                 </p>
               </div>
 
-              <div style={{ padding: '1.5rem', borderRadius: '12px', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div style={{ padding: '1.4rem', borderRadius: '12px', backgroundColor: 'rgba(212, 175, 55, 0.1)', border: '1px solid rgba(212, 175, 55, 0.3)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <p className="label-sm" style={{ color: '#E5C07B' }}>Impacto Acumulado em 12 Meses:</p>
-                  <p style={{ fontSize: '1.5rem', fontWeight: 700, color: '#FAF6F0' }}>
+                  <p style={{ fontSize: '1.45rem', fontWeight: 700, color: '#FAF6F0' }}>
                     + R$ {simResults.ganhoAnual.toLocaleString('pt-BR')} / ano
                   </p>
                 </div>
                 <button
+                  type="button"
                   onClick={openChat}
                   style={{
                     padding: '0.75rem 1.25rem',
@@ -664,11 +844,40 @@ export default function EstudiosLanding() {
                     backgroundColor: '#D4AF37',
                     color: '#110D10',
                     fontWeight: 700,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                   }}
                 >
                   Simular com a IA ✨
                 </button>
+              </div>
+
+              {/* Calculation Memory Accordion */}
+              <div style={{ padding: '1rem 1.25rem', borderRadius: '10px', backgroundColor: '#1B1418', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowMemory(!showMemory)}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'transparent',
+                    color: '#FAF6F0',
+                    cursor: 'pointer',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                  }}
+                >
+                  <span>📐 Ver Memória de Cálculo ({simResults.cfg.label})</span>
+                  <span style={{ color: '#E5C07B' }}>{showMemory ? '−' : '+'}</span>
+                </button>
+                {showMemory && (
+                  <ul style={{ marginTop: '0.75rem', paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.78rem', color: '#DFD7CE', opacity: 0.9 }}>
+                    {simResults.memoriaDeCalculo.map((line, idx) => (
+                      <li key={idx}>{line}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           </div>
@@ -676,7 +885,7 @@ export default function EstudiosLanding() {
       </section>
 
       {/* BLOCK 6: N8N WEBHOOK + WHATSAPP CONVERSION FORM */}
-      <section id="diagnostico-estudio" style={{ padding: '6rem 2rem', backgroundColor: '#171115', scrollMarginTop: '80px' }}>
+      <section id="diagnostico-estudio" style={{ padding: '5.5rem 1.25rem', backgroundColor: '#171115', scrollMarginTop: '80px' }}>
         <div style={{ maxWidth: '840px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <span className="label-sm" style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
@@ -705,6 +914,7 @@ export default function EstudiosLanding() {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackDominoEvent('whatsapp_click', { vertical: '/Estudios', section: 'post_form_success' })}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -714,7 +924,7 @@ export default function EstudiosLanding() {
                   backgroundImage: 'linear-gradient(45deg, #D4AF37, #F3E5AB)',
                   color: '#110D10',
                   fontWeight: 700,
-                  fontSize: '1.05rem'
+                  fontSize: '1.05rem',
                 }}
               >
                 <span>Continuar no WhatsApp da Especialista</span>
@@ -726,12 +936,12 @@ export default function EstudiosLanding() {
               onSubmit={handleFormSubmit}
               style={{
                 backgroundColor: '#1B1418',
-                padding: '2.75rem',
+                padding: '2.5rem 2rem',
                 borderRadius: '16px',
                 border: '1px solid rgba(212, 175, 55, 0.25)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '2rem'
+                gap: '1.75rem',
               }}
             >
               {/* Honeypot anti-spam */}
@@ -739,7 +949,7 @@ export default function EstudiosLanding() {
                 type="text"
                 name="b_website_check"
                 value={honeypot}
-                onChange={e => setHoneypot(e.target.value)}
+                onChange={(e) => setHoneypot(e.target.value)}
                 style={{ display: 'none' }}
                 tabIndex={-1}
                 autoComplete="off"
@@ -750,11 +960,11 @@ export default function EstudiosLanding() {
                   1. Qual é o segmento do seu espaço?
                 </label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-                  {SEGMENTOS_ESTUDIO.map(item => (
+                  {SEGMENTOS_ESTUDIO.map((item) => (
                     <button
                       type="button"
                       key={item}
-                      onClick={() => setSegmento(item)}
+                      onClick={() => { notifyFormStart(); setSegmento(item); }}
                       style={{
                         padding: '0.6rem 1rem',
                         borderRadius: '50px',
@@ -763,7 +973,7 @@ export default function EstudiosLanding() {
                         cursor: 'pointer',
                         backgroundColor: segmento === item ? '#D4AF37' : '#261C22',
                         color: segmento === item ? '#110D10' : '#FAF6F0',
-                        border: '1px solid rgba(212, 175, 55, 0.3)'
+                        border: '1px solid rgba(212, 175, 55, 0.3)',
                       }}
                     >
                       {item}
@@ -777,7 +987,7 @@ export default function EstudiosLanding() {
                   2. Quais gargalos você quer resolver primeiro? (Pode marcar vários)
                 </label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
-                  {DORES_ESTUDIO.map(dor => {
+                  {DORES_ESTUDIO.map((dor) => {
                     const active = selectedDores.includes(dor);
                     return (
                       <button
@@ -793,7 +1003,7 @@ export default function EstudiosLanding() {
                           backgroundColor: active ? 'rgba(212, 175, 55, 0.2)' : '#261C22',
                           color: active ? '#E5C07B' : '#DFD7CE',
                           border: active ? '1px solid #D4AF37' : '1px solid rgba(255,255,255,0.08)',
-                          fontWeight: active ? 700 : 400
+                          fontWeight: active ? 700 : 400,
                         }}
                       >
                         {active ? '✓ ' : '+ '} {dor}
@@ -811,7 +1021,7 @@ export default function EstudiosLanding() {
                   className="input-field"
                   style={{ backgroundColor: '#110D10' }}
                   value={nome}
-                  onChange={e => setNome(e.target.value)}
+                  onChange={(e) => { notifyFormStart(); setNome(e.target.value); }}
                 />
                 <input
                   type="text"
@@ -819,7 +1029,7 @@ export default function EstudiosLanding() {
                   className="input-field"
                   style={{ backgroundColor: '#110D10' }}
                   value={nomeEstudio}
-                  onChange={e => setNomeEstudio(e.target.value)}
+                  onChange={(e) => setNomeEstudio(e.target.value)}
                 />
                 <input
                   required
@@ -828,7 +1038,7 @@ export default function EstudiosLanding() {
                   className="input-field"
                   style={{ backgroundColor: '#110D10' }}
                   value={whatsapp}
-                  onChange={e => setWhatsapp(e.target.value)}
+                  onChange={(e) => setWhatsapp(e.target.value)}
                 />
                 <input
                   required
@@ -837,7 +1047,7 @@ export default function EstudiosLanding() {
                   className="input-field"
                   style={{ backgroundColor: '#110D10' }}
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -845,16 +1055,29 @@ export default function EstudiosLanding() {
                 <textarea
                   placeholder="Conte brevemente quantas profissionais atendem hoje no espaço ou alguma necessidade específica (opcional)..."
                   className="input-field"
-                  style={{ backgroundColor: '#110D10', minHeight: '95px', resize: 'vertical' }}
+                  style={{ backgroundColor: '#110D10', minHeight: '90px', resize: 'vertical' }}
                   value={detalhes}
-                  onChange={e => setDetalhes(e.target.value)}
+                  onChange={(e) => setDetalhes(e.target.value)}
                 />
               </div>
+
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', fontSize: '0.8rem', color: '#DFD7CE', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={lgpdConsent}
+                  onChange={(e) => setLgpdConsent(e.target.checked)}
+                  required
+                  style={{ marginTop: '0.2rem', accentColor: '#D4AF37' }}
+                />
+                <span>
+                  Concordo em receber o diagnóstico comercial da Domino Automate via WhatsApp e e-mail em conformidade com a LGPD (Lei nº 13.709/2018).
+                </span>
+              </label>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !lgpdConsent}
                   style={{
                     padding: '1.1rem 2rem',
                     borderRadius: '4px',
@@ -862,14 +1085,11 @@ export default function EstudiosLanding() {
                     color: '#110D10',
                     fontWeight: 700,
                     fontSize: '1.05rem',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
                   }}
                 >
                   {loading ? 'Enviando para nossa Automação...' : 'Receber Proposta & Diagnóstico no WhatsApp →'}
                 </button>
-                <p style={{ fontSize: '0.78rem', opacity: 0.65, textAlign: 'center' }}>
-                  🔒 Ao enviar, você concorda em receber contato da Domino Automate via WhatsApp e e-mail em conformidade com a LGPD.
-                </p>
               </div>
             </form>
           )}
@@ -877,7 +1097,7 @@ export default function EstudiosLanding() {
       </section>
 
       {/* FAQ SECTION */}
-      <section style={{ padding: '5.5rem 2rem', backgroundColor: '#110D10' }}>
+      <section style={{ padding: '5rem 1.25rem', backgroundColor: '#110D10' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <h2 className="display-sm" style={{ textAlign: 'center', marginBottom: '3rem', color: '#FAF6F0' }}>
             Dúvidas Frequentes de <span style={{ color: '#E5C07B' }}>Gestoras de Estúdios</span>
@@ -892,7 +1112,7 @@ export default function EstudiosLanding() {
                   borderRadius: '10px',
                   backgroundColor: '#1B1418',
                   border: '1px solid rgba(212, 175, 55, 0.2)',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -921,7 +1141,13 @@ export default function EstudiosLanding() {
           </div>
           <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
             <Link href="/" style={{ fontSize: '0.85rem', color: '#E5C07B' }}>← Portal Domino Automate</Link>
-            <a href={whatsappDirectUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.85rem', color: '#FAF6F0' }}>
+            <a
+              href={whatsappDirectUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackDominoEvent('whatsapp_click', { vertical: '/Estudios', section: 'footer' })}
+              style={{ fontSize: '0.85rem', color: '#FAF6F0' }}
+            >
               WhatsApp: (61) 98117-1564
             </a>
           </div>
@@ -942,15 +1168,16 @@ export default function EstudiosLanding() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '2rem'
+            padding: '2rem',
           }}
         >
-          <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }} onClick={e => e.stopPropagation()}>
+          <div style={{ width: '100%', maxWidth: '1000px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }} onClick={(e) => e.stopPropagation()}>
             <div>
               <h4 style={{ color: '#E5C07B', fontSize: '1.1rem' }}>{BOOK_LANA_IMAGES[currentImg].label}</h4>
               <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>Imagem {currentImg + 1} de {BOOK_LANA_IMAGES.length}</p>
             </div>
             <button
+              type="button"
               onClick={() => setLightboxOpen(false)}
               style={{ background: 'transparent', border: '1px solid #D4AF37', color: '#FAF6F0', borderRadius: '50%', width: '38px', height: '38px', cursor: 'pointer', fontSize: '1.2rem' }}
             >
@@ -958,19 +1185,21 @@ export default function EstudiosLanding() {
             </button>
           </div>
 
-          <div style={{ position: 'relative', width: '100%', maxWidth: '1000px', height: '72vh' }} onClick={e => e.stopPropagation()}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: '1000px', height: '72vh' }} onClick={(e) => e.stopPropagation()}>
             <Image src={BOOK_LANA_IMAGES[currentImg].src} alt={BOOK_LANA_IMAGES[currentImg].label} fill style={{ objectFit: 'contain' }} />
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.25rem' }} onClick={e => e.stopPropagation()}>
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.25rem' }} onClick={(e) => e.stopPropagation()}>
             <button
-              onClick={() => setCurrentImg(prev => (prev > 0 ? prev - 1 : BOOK_LANA_IMAGES.length - 1))}
+              type="button"
+              onClick={() => setCurrentImg((prev) => (prev > 0 ? prev - 1 : BOOK_LANA_IMAGES.length - 1))}
               style={{ padding: '0.5rem 1.25rem', borderRadius: '4px', backgroundColor: '#1B1418', border: '1px solid #D4AF37', color: '#E5C07B', cursor: 'pointer' }}
             >
               ← Anterior
             </button>
             <button
-              onClick={() => setCurrentImg(prev => (prev < BOOK_LANA_IMAGES.length - 1 ? prev + 1 : 0))}
+              type="button"
+              onClick={() => setCurrentImg((prev) => (prev < BOOK_LANA_IMAGES.length - 1 ? prev + 1 : 0))}
               style={{ padding: '0.5rem 1.25rem', borderRadius: '4px', backgroundColor: '#1B1418', border: '1px solid #D4AF37', color: '#E5C07B', cursor: 'pointer' }}
             >
               Próxima →
@@ -984,4 +1213,3 @@ export default function EstudiosLanding() {
     </div>
   );
 }
-

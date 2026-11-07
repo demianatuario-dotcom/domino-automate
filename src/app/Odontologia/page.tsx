@@ -1,20 +1,26 @@
-import type { Metadata } from "next";
-import SegmentLandingTemplate from "@/components/segments/SegmentLandingTemplate";
-import { SEGMENTS_CONFIG } from "@/config/segmentsConfig";
+import type { Metadata } from 'next';
+import SegmentLandingTemplate from '@/components/segments/SegmentLandingTemplate';
+import { SEGMENTS_CONFIG } from '@/config/segmentsConfig';
 
-export const dynamic = "force-dynamic";
+const cfg = SEGMENTS_CONFIG.odontologia;
 
 export const metadata: Metadata = {
-  title: SEGMENTS_CONFIG.odontologia.metaTitle,
-  description: SEGMENTS_CONFIG.odontologia.metaDescription,
+  title: cfg.metaTitle,
+  description: cfg.metaDescription,
+  alternates: { canonical: `https://domino-automate.com.br${cfg.slug}` },
   openGraph: {
-    title: SEGMENTS_CONFIG.odontologia.metaTitle,
-    description: SEGMENTS_CONFIG.odontologia.metaDescription,
-    type: "website",
-    locale: "pt_BR",
+    title: cfg.metaTitle,
+    description: cfg.metaDescription,
+    url: `https://domino-automate.com.br${cfg.slug}`,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: cfg.metaTitle,
+    description: cfg.metaDescription,
   },
 };
 
 export default function OdontologiaPage() {
-  return <SegmentLandingTemplate config={SEGMENTS_CONFIG.odontologia} />;
+  return <SegmentLandingTemplate config={cfg} />;
 }

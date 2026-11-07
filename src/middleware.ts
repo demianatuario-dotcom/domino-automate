@@ -1,57 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { CANONICAL_ROUTES, resolveCanonicalRedirect } from './lib/canonicalRoutes.ts';
 
-const CANONICAL_ROUTES: Record<string, string> = {
-  '/atuaria': '/Atuaria',
-  '/atuária': '/Atuaria',
-  '/estudios': '/Estudios',
-  '/estúdios': '/Estudios',
-  '/saloes': '/Saloes',
-  '/salões': '/Saloes',
-  '/salao': '/Saloes',
-  '/salão': '/Saloes',
-  '/barbearias': '/Barbearias',
-  '/barbearia': '/Barbearias',
-  '/advocacia': '/Advocacia',
-  '/advogados': '/Advocacia',
-  '/contabilidade': '/Contabilidade',
-  '/contabil': '/Contabilidade',
-  '/contábil': '/Contabilidade',
-  '/farmacias': '/Farmacias',
-  '/farmácias': '/Farmacias',
-  '/farmacia': '/Farmacias',
-  '/farmácia': '/Farmacias',
-  '/oticas': '/Oticas',
-  '/óticas': '/Oticas',
-  '/otica': '/Oticas',
-  '/ótica': '/Oticas',
-  '/odontologia': '/Odontologia',
-  '/odonto': '/Odontologia',
-  '/dentistas': '/Odontologia',
-  '/varejo': '/Varejo',
-  '/lojas': '/Varejo',
-  '/comercio': '/Varejo',
-  '/comércio': '/Varejo',
-};
+export { CANONICAL_ROUTES, resolveCanonicalRedirect };
 
 export function middleware(request: NextRequest) {
-  const rawPathname = request.nextUrl.pathname;
-  let decoded = rawPathname;
-  try {
-    decoded = decodeURIComponent(rawPathname);
-  } catch {
-    decoded = rawPathname;
-  }
+  const targetCanonical = resolveCanonicalRedirect(request.nextUrl.pathname);
 
-  const trimmed = decoded.replace(/\/+$/, '');
-  if (!trimmed || trimmed === '') {
-    return NextResponse.next();
-  }
-
-  const lower = trimmed.toLowerCase();
-  const targetCanonical = CANONICAL_ROUTES[lower];
-
-  if (targetCanonical && trimmed !== targetCanonical) {
+  if (targetCanonical) {
     const url = request.nextUrl.clone();
     url.pathname = targetCanonical;
     return NextResponse.redirect(url, 308);
@@ -62,6 +18,6 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|Book_Lana|logo.png).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|Book_Lana|logo.png|robots.txt|sitemap.xml).*)',
   ],
 };

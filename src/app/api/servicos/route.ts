@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server';
-import { Client } from 'pg';
+import { getServicos } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const client = new Client({ connectionString: process.env.DATABASE_URL });
   try {
-    await client.connect();
-    const result = await client.query('SELECT gargalo, justificativa, pergunta FROM servicos ORDER BY id ASC');
-    return NextResponse.json(result.rows);
+    const rows = await getServicos();
+    return NextResponse.json(
+      rows.map((r) => ({
+        gargalo: r.gargalo,
+        justificativa: r.justificativa,
+        pergunta: r.pergunta,
+      }))
+    );
   } catch (error) {
-    console.error('Error fetching servicos:', error);
+    console.error('Error fetching servicos:', (error as Error).message);
     return NextResponse.json({ error: 'Failed to fetch from Database' }, { status: 500 });
-  } finally {
-    await client.end();
   }
 }
