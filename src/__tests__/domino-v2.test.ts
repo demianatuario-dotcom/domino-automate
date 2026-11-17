@@ -22,6 +22,7 @@ import {
   dispatchToN8NWithRetry,
   signWebhookPayloadHmac,
   verifyWebhookHmacSignature,
+  resolveTipoClienteFromVertical,
 } from '../lib/quoteOutbox.ts';
 import { buildControlledConversationContents, sanitizeIncomingPII } from '../lib/chatControl.ts';
 import { isSpamCommentContent } from '../lib/commentsDb.ts';
@@ -605,6 +606,24 @@ describe('Domino Automate V2.2 — Suite Completa de Engenharia, Segurança, Con
       assert.equal(verifyWebhookHmacSignature(rawBody, timestamp, sig, secret, now), true);
       assert.equal(verifyWebhookHmacSignature(rawBody, timestamp, 'invalid-sig', secret, now), false);
       assert.equal(verifyWebhookHmacSignature(rawBody + 'x', timestamp, sig, secret, now), false);
+    });
+
+    it('deve mapear todas as 10 verticais e aliases para o código Tipo_Cliente (A..J) em Contratos_Clientes', () => {
+      assert.equal(resolveTipoClienteFromVertical('/Atuaria'), 'A');
+      assert.equal(resolveTipoClienteFromVertical('atuária'), 'A');
+      assert.equal(resolveTipoClienteFromVertical('/Advocacia'), 'B');
+      assert.equal(resolveTipoClienteFromVertical('/Contabilidade'), 'C');
+      assert.equal(resolveTipoClienteFromVertical('/Estudios'), 'D');
+      assert.equal(resolveTipoClienteFromVertical('/Saloes'), 'E');
+      assert.equal(resolveTipoClienteFromVertical('/Barbearias'), 'F');
+      assert.equal(resolveTipoClienteFromVertical('/Odontologia'), 'G');
+      assert.equal(resolveTipoClienteFromVertical('/Farmacias'), 'H');
+      assert.equal(resolveTipoClienteFromVertical('/Oticas'), 'I');
+      assert.equal(resolveTipoClienteFromVertical('/Varejo'), 'J');
+      assert.equal(resolveTipoClienteFromVertical('lojas'), 'J');
+      assert.equal(resolveTipoClienteFromVertical('/'), null);
+      assert.equal(resolveTipoClienteFromVertical(''), null);
+      assert.equal(resolveTipoClienteFromVertical(undefined), null);
     });
   });
 

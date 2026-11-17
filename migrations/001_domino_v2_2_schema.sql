@@ -8,22 +8,23 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
   applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 1. Clientes (Leads)
-CREATE TABLE IF NOT EXISTS clientes (
-  id BIGSERIAL PRIMARY KEY,
-  email VARCHAR(160) NOT NULL,
-  whatsapp VARCHAR(32),
-  proposta TEXT,
-  nome VARCHAR(120),
-  empresa VARCHAR(150),
-  vertical VARCHAR(60) DEFAULT '/Atuaria',
-  lgpd_consent BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT uq_clientes_email UNIQUE (email)
+-- 1. Tipo_Cliente (Verticais de Negócio) e Contratos_Clientes (Leads / Contratos)
+CREATE TABLE IF NOT EXISTS public."Tipo_Cliente" (
+  "Tipo" VARCHAR(5) PRIMARY KEY CHECK ("Tipo" ~ '^[A-Z]+$'),
+  "Atividade" VARCHAR(150) NOT NULL UNIQUE
 );
 
-CREATE INDEX IF NOT EXISTS idx_clientes_vertical_created ON clientes (vertical, created_at DESC);
+CREATE TABLE IF NOT EXISTS public."Contratos_Clientes" (
+  id SERIAL NOT NULL,
+  email VARCHAR(50) PRIMARY KEY,
+  whatsapp VARCHAR(20),
+  proposta VARCHAR(30),
+  valor_fechamento NUMERIC(10, 2),
+  link_contrato VARCHAR(200),
+  "Tipo_Cliente" CHAR(1) REFERENCES public."Tipo_Cliente"("Tipo") ON UPDATE CASCADE ON DELETE RESTRICT
+);
+
+CREATE INDEX IF NOT EXISTS idx_contratos_clientes_tipo_cliente ON public."Contratos_Clientes" ("Tipo_Cliente");
 
 -- 2. Serviços / Gargalos Técnicos (/Atuaria)
 CREATE TABLE IF NOT EXISTS servicos (
@@ -65,7 +66,7 @@ CREATE TABLE IF NOT EXISTS quote_idempotency (
   id BIGSERIAL PRIMARY KEY,
   idempotency_key VARCHAR(64) NOT NULL,
   status VARCHAR(24) NOT NULL CHECK (status IN ('processing', 'succeeded', 'retryable', 'failed')),
-  lead_id BIGINT REFERENCES clientes(id) ON DELETE SET NULL,
+  lead_id BIGINT,
   last_error TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -79,7 +80,7 @@ CREATE INDEX IF NOT EXISTS idx_quote_idempotency_expires ON quote_idempotency (e
 CREATE TABLE IF NOT EXISTS quote_outbox (
   id BIGSERIAL PRIMARY KEY,
   idempotency_key VARCHAR(64) NOT NULL REFERENCES quote_idempotency(idempotency_key) ON DELETE CASCADE,
-  lead_id BIGINT REFERENCES clientes(id) ON DELETE SET NULL,
+  lead_id BIGINT,
   payload JSONB NOT NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'delivered', 'retryable', 'failed')),
   attempts INT NOT NULL DEFAULT 0,

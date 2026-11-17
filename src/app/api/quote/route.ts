@@ -11,6 +11,7 @@ import {
   claimLeadAndEnqueueOutbox,
   dispatchToN8NWithRetry,
   finalizeOutboxDeliveryStatus,
+  resolveTipoClienteFromVertical,
   type WebhookDispatchOutcome,
 } from '../../../lib/quoteOutbox.ts';
 
@@ -117,9 +118,12 @@ export async function POST(req: Request) {
       }
     }
 
+    const tipoCliente = resolveTipoClienteFromVertical(data.vertical || data.origem);
+
     const payloadToN8N: Record<string, unknown> = {
       vertical: data.vertical,
       origem: data.origem || data.vertical || '/Atuaria',
+      tipo_cliente: tipoCliente,
       nome: data.nome,
       empresa: data.empresa,
       email: data.email,

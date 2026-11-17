@@ -1,5 +1,38 @@
 import crypto from 'node:crypto';
 import { getPool, sanitizeDbErrorMessage } from './db.ts';
+import { CANONICAL_ROUTES } from './canonicalRoutes.ts';
+
+export const VERTICAL_TO_TIPO_CLIENTE: Record<string, string> = {
+  '/Atuaria': 'A',
+  '/Advocacia': 'B',
+  '/Contabilidade': 'C',
+  '/Estudios': 'D',
+  '/Saloes': 'E',
+  '/Barbearias': 'F',
+  '/Odontologia': 'G',
+  '/Farmacias': 'H',
+  '/Oticas': 'I',
+  '/Varejo': 'J',
+};
+
+/**
+ * Resolves the 1-character client segment code (`"Tipo_Cliente"`, `'A'`..`'J'`)
+ * from a vertical path or alias. Returns `null` for root (`/`) or unrecognized values.
+ */
+export function resolveTipoClienteFromVertical(vertical: string | undefined | null): string | null {
+  if (!vertical) return null;
+  const trimmed = vertical.trim().replace(/\/+$/, '');
+  if (!trimmed) return null;
+  const withSlash = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  if (VERTICAL_TO_TIPO_CLIENTE[withSlash]) {
+    return VERTICAL_TO_TIPO_CLIENTE[withSlash];
+  }
+  const canonical = CANONICAL_ROUTES[withSlash.toLowerCase()];
+  if (canonical && VERTICAL_TO_TIPO_CLIENTE[canonical]) {
+    return VERTICAL_TO_TIPO_CLIENTE[canonical];
+  }
+  return null;
+}
 
 export type IdempotencyStatus = 'processing' | 'succeeded' | 'retryable' | 'failed';
 export type OutboxStatus = 'pending' | 'processing' | 'delivered' | 'retryable' | 'failed';
@@ -322,7 +355,7 @@ async function ensureQuoteTablesOnClient(client: {
 }
 
 /**
- * Atomically claims the idempotency key, upserts the lead in `clientes`,
+ * Atomically claims the idempotency key, upserts the lead in `public."Contratos_Clientes"`,
  * and inserts the event in `quote_outbox` inside a single PostgreSQL transaction.
  * If PostgreSQL is not configured, falls back to serialized process-safe idempotency tracking.
  */
@@ -415,25 +448,29 @@ export async function claimLeadAndEnqueueOutbox(params: {
           }
         }
 
-        const lookupEmail =
-          params.email || `${params.telefone.replace(/\D/g, '')}@whatsapp.domino.local`;
+        const lookupEmail = (
+          params.email || `${params.telefone.replace(/\D/g, '')}@whatsapp.domino.local`
+        ).slice(0, 50);
+        const safeWhatsapp = params.telefone ? params.telefone.slice(0, 20) : null;
+        const safeProposta = servicosIds.slice(0, 30);
+        const tipoCliente = resolveTipoClienteFromVertical(params.vertical);
 
         let leadId: number | null = null;
         const clientRes = await client.query<{ id: number }>(
-          'SELECT id FROM clientes WHERE email = $1',
+          'SELECT id FROM public."Contratos_Clientes" WHERE email = $1',
           [lookupEmail]
         );
 
         if (clientRes.rows.length > 0) {
           leadId = clientRes.rows[0].id;
           await client.query(
-            'UPDATE clientes SET proposta = $1, whatsapp = COALESCE($2, whatsapp) WHERE email = $3',
-            [servicosIds, params.telefone || null, lookupEmail]
+            'UPDATE public."Contratos_Clientes" SET proposta = $1, whatsapp = COALESCE($2, whatsapp), "Tipo_Cliente" = COALESCE($3, "Tipo_Cliente") WHERE email = $4',
+            [safeProposta, safeWhatsapp, tipoCliente, lookupEmail]
           );
         } else {
           const insLead = await client.query<{ id: number }>(
-            'INSERT INTO clientes (email, whatsapp, proposta) VALUES ($1, $2, $3) RETURNING id',
-            [lookupEmail, params.telefone || null, servicosIds]
+            'INSERT INTO public."Contratos_Clientes" (email, whatsapp, proposta, "Tipo_Cliente") VALUES ($1, $2, $3, $4) RETURNING id',
+            [lookupEmail, safeWhatsapp, safeProposta, tipoCliente]
           );
           leadId = insLead.rows[0]?.id ?? null;
         }

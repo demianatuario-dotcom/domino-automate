@@ -14,6 +14,11 @@ export const MIGRATIONS: MigrationRecord[] = [
     description: 'Core tables, constraints, indexes, quote_idempotency and quote_outbox',
     sqlPath: path.resolve(process.cwd(), 'migrations', '001_domino_v2_2_schema.sql'),
   },
+  {
+    version: '002_contratos_clientes_e_tipo_cliente',
+    description: 'Create Tipo_Cliente domain table, rename clientes to Contratos_Clientes, add Tipo_Cliente CHAR(1) FK',
+    sqlPath: path.resolve(process.cwd(), 'migrations', '002_contratos_clientes_e_tipo_cliente.sql'),
+  },
 ];
 
 let migrationsAppliedInProcess = false;

@@ -2373,22 +2373,23 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
   applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 1. Clientes (Leads)
-CREATE TABLE IF NOT EXISTS clientes (
-  id BIGSERIAL PRIMARY KEY,
-  email VARCHAR(160) NOT NULL,
-  whatsapp VARCHAR(32),
-  proposta TEXT,
-  nome VARCHAR(120),
-  empresa VARCHAR(150),
-  vertical VARCHAR(60) DEFAULT '/Atuaria',
-  lgpd_consent BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT uq_clientes_email UNIQUE (email)
+-- 1. Tipo_Cliente (Verticais de Negócio) e Contratos_Clientes (Leads / Contratos)
+CREATE TABLE IF NOT EXISTS public."Tipo_Cliente" (
+  "Tipo" VARCHAR(5) PRIMARY KEY CHECK ("Tipo" ~ '^[A-Z]+$'),
+  "Atividade" VARCHAR(150) NOT NULL UNIQUE
 );
 
-CREATE INDEX IF NOT EXISTS idx_clientes_vertical_created ON clientes (vertical, created_at DESC);
+CREATE TABLE IF NOT EXISTS public."Contratos_Clientes" (
+  id SERIAL NOT NULL,
+  email VARCHAR(50) PRIMARY KEY,
+  whatsapp VARCHAR(20),
+  proposta VARCHAR(30),
+  valor_fechamento NUMERIC(10, 2),
+  link_contrato VARCHAR(200),
+  "Tipo_Cliente" CHAR(1) REFERENCES public."Tipo_Cliente"("Tipo") ON UPDATE CASCADE ON DELETE RESTRICT
+);
+
+CREATE INDEX IF NOT EXISTS idx_contratos_clientes_tipo_cliente ON public."Contratos_Clientes" ("Tipo_Cliente");
 
 -- 2. Serviços / Gargalos Técnicos (/Atuaria)
 CREATE TABLE IF NOT EXISTS servicos (
@@ -2430,7 +2431,7 @@ CREATE TABLE IF NOT EXISTS quote_idempotency (
   id BIGSERIAL PRIMARY KEY,
   idempotency_key VARCHAR(64) NOT NULL,
   status VARCHAR(24) NOT NULL CHECK (status IN ('processing', 'succeeded', 'retryable', 'failed')),
-  lead_id BIGINT REFERENCES clientes(id) ON DELETE SET NULL,
+  lead_id BIGINT,
   last_error TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -2444,7 +2445,7 @@ CREATE INDEX IF NOT EXISTS idx_quote_idempotency_expires ON quote_idempotency (e
 CREATE TABLE IF NOT EXISTS quote_outbox (
   id BIGSERIAL PRIMARY KEY,
   idempotency_key VARCHAR(64) NOT NULL REFERENCES quote_idempotency(idempotency_key) ON DELETE CASCADE,
-  lead_id BIGINT REFERENCES clientes(id) ON DELETE SET NULL,
+  lead_id BIGINT,
   payload JSONB NOT NULL,
   status VARCHAR(24) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'delivered', 'retryable', 'failed')),
   attempts INT NOT NULL DEFAULT 0,
@@ -2478,6 +2479,11 @@ export const MIGRATIONS: MigrationRecord[] = [
     version: '001_domino_v2_2_schema',
     description: 'Core tables, constraints, indexes, quote_idempotency and quote_outbox',
     sqlPath: path.resolve(process.cwd(), 'migrations', '001_domino_v2_2_schema.sql'),
+  },
+  {
+    version: '002_contratos_clientes_e_tipo_cliente',
+    description: 'Create Tipo_Cliente domain table, rename clientes to Contratos_Clientes, add Tipo_Cliente CHAR(1) FK',
+    sqlPath: path.resolve(process.cwd(), 'migrations', '002_contratos_clientes_e_tipo_cliente.sql'),
   },
 ];
 
@@ -2647,6 +2653,39 @@ export async function readJsonBodyWithLimit<T = unknown>(
 ```ts
 import crypto from 'node:crypto';
 import { getPool, sanitizeDbErrorMessage } from './db.ts';
+import { CANONICAL_ROUTES } from './canonicalRoutes.ts';
+
+export const VERTICAL_TO_TIPO_CLIENTE: Record<string, string> = {
+  '/Atuaria': 'A',
+  '/Advocacia': 'B',
+  '/Contabilidade': 'C',
+  '/Estudios': 'D',
+  '/Saloes': 'E',
+  '/Barbearias': 'F',
+  '/Odontologia': 'G',
+  '/Farmacias': 'H',
+  '/Oticas': 'I',
+  '/Varejo': 'J',
+};
+
+/**
+ * Resolves the 1-character client segment code (`"Tipo_Cliente"`, `'A'`..`'J'`)
+ * from a vertical path or alias. Returns `null` for root (`/`) or unrecognized values.
+ */
+export function resolveTipoClienteFromVertical(vertical: string | undefined | null): string | null {
+  if (!vertical) return null;
+  const trimmed = vertical.trim().replace(/\/+$/, '');
+  if (!trimmed) return null;
+  const withSlash = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  if (VERTICAL_TO_TIPO_CLIENTE[withSlash]) {
+    return VERTICAL_TO_TIPO_CLIENTE[withSlash];
+  }
+  const canonical = CANONICAL_ROUTES[withSlash.toLowerCase()];
+  if (canonical && VERTICAL_TO_TIPO_CLIENTE[canonical]) {
+    return VERTICAL_TO_TIPO_CLIENTE[canonical];
+  }
+  return null;
+}
 
 export type IdempotencyStatus = 'processing' | 'succeeded' | 'retryable' | 'failed';
 export type OutboxStatus = 'pending' | 'processing' | 'delivered' | 'retryable' | 'failed';
@@ -2969,7 +3008,7 @@ async function ensureQuoteTablesOnClient(client: {
 }
 
 /**
- * Atomically claims the idempotency key, upserts the lead in `clientes`,
+ * Atomically claims the idempotency key, upserts the lead in `public."Contratos_Clientes"`,
  * and inserts the event in `quote_outbox` inside a single PostgreSQL transaction.
  * If PostgreSQL is not configured, falls back to serialized process-safe idempotency tracking.
  */
@@ -3062,25 +3101,29 @@ export async function claimLeadAndEnqueueOutbox(params: {
           }
         }
 
-        const lookupEmail =
-          params.email || `${params.telefone.replace(/\D/g, '')}@whatsapp.domino.local`;
+        const lookupEmail = (
+          params.email || `${params.telefone.replace(/\D/g, '')}@whatsapp.domino.local`
+        ).slice(0, 50);
+        const safeWhatsapp = params.telefone ? params.telefone.slice(0, 20) : null;
+        const safeProposta = servicosIds.slice(0, 30);
+        const tipoCliente = resolveTipoClienteFromVertical(params.vertical);
 
         let leadId: number | null = null;
         const clientRes = await client.query<{ id: number }>(
-          'SELECT id FROM clientes WHERE email = $1',
+          'SELECT id FROM public."Contratos_Clientes" WHERE email = $1',
           [lookupEmail]
         );
 
         if (clientRes.rows.length > 0) {
           leadId = clientRes.rows[0].id;
           await client.query(
-            'UPDATE clientes SET proposta = $1, whatsapp = COALESCE($2, whatsapp) WHERE email = $3',
-            [servicosIds, params.telefone || null, lookupEmail]
+            'UPDATE public."Contratos_Clientes" SET proposta = $1, whatsapp = COALESCE($2, whatsapp), "Tipo_Cliente" = COALESCE($3, "Tipo_Cliente") WHERE email = $4',
+            [safeProposta, safeWhatsapp, tipoCliente, lookupEmail]
           );
         } else {
           const insLead = await client.query<{ id: number }>(
-            'INSERT INTO clientes (email, whatsapp, proposta) VALUES ($1, $2, $3) RETURNING id',
-            [lookupEmail, params.telefone || null, servicosIds]
+            'INSERT INTO public."Contratos_Clientes" (email, whatsapp, proposta, "Tipo_Cliente") VALUES ($1, $2, $3, $4) RETURNING id',
+            [lookupEmail, safeWhatsapp, safeProposta, tipoCliente]
           );
           leadId = insLead.rows[0]?.id ?? null;
         }
@@ -5250,6 +5293,7 @@ import {
   claimLeadAndEnqueueOutbox,
   dispatchToN8NWithRetry,
   finalizeOutboxDeliveryStatus,
+  resolveTipoClienteFromVertical,
   type WebhookDispatchOutcome,
 } from '../../../lib/quoteOutbox.ts';
 
@@ -5356,9 +5400,12 @@ export async function POST(req: Request) {
       }
     }
 
+    const tipoCliente = resolveTipoClienteFromVertical(data.vertical || data.origem);
+
     const payloadToN8N: Record<string, unknown> = {
       vertical: data.vertical,
       origem: data.origem || data.vertical || '/Atuaria',
+      tipo_cliente: tipoCliente,
       nome: data.nome,
       empresa: data.empresa,
       email: data.email,
@@ -14151,6 +14198,7 @@ import {
   dispatchToN8NWithRetry,
   signWebhookPayloadHmac,
   verifyWebhookHmacSignature,
+  resolveTipoClienteFromVertical,
 } from '../lib/quoteOutbox.ts';
 import { buildControlledConversationContents, sanitizeIncomingPII } from '../lib/chatControl.ts';
 import { isSpamCommentContent } from '../lib/commentsDb.ts';
@@ -14734,6 +14782,24 @@ describe('Domino Automate V2.2 — Suite Completa de Engenharia, Segurança, Con
       assert.equal(verifyWebhookHmacSignature(rawBody, timestamp, sig, secret, now), true);
       assert.equal(verifyWebhookHmacSignature(rawBody, timestamp, 'invalid-sig', secret, now), false);
       assert.equal(verifyWebhookHmacSignature(rawBody + 'x', timestamp, sig, secret, now), false);
+    });
+
+    it('deve mapear todas as 10 verticais e aliases para o código Tipo_Cliente (A..J) em Contratos_Clientes', () => {
+      assert.equal(resolveTipoClienteFromVertical('/Atuaria'), 'A');
+      assert.equal(resolveTipoClienteFromVertical('atuária'), 'A');
+      assert.equal(resolveTipoClienteFromVertical('/Advocacia'), 'B');
+      assert.equal(resolveTipoClienteFromVertical('/Contabilidade'), 'C');
+      assert.equal(resolveTipoClienteFromVertical('/Estudios'), 'D');
+      assert.equal(resolveTipoClienteFromVertical('/Saloes'), 'E');
+      assert.equal(resolveTipoClienteFromVertical('/Barbearias'), 'F');
+      assert.equal(resolveTipoClienteFromVertical('/Odontologia'), 'G');
+      assert.equal(resolveTipoClienteFromVertical('/Farmacias'), 'H');
+      assert.equal(resolveTipoClienteFromVertical('/Oticas'), 'I');
+      assert.equal(resolveTipoClienteFromVertical('/Varejo'), 'J');
+      assert.equal(resolveTipoClienteFromVertical('lojas'), 'J');
+      assert.equal(resolveTipoClienteFromVertical('/'), null);
+      assert.equal(resolveTipoClienteFromVertical(''), null);
+      assert.equal(resolveTipoClienteFromVertical(undefined), null);
     });
   });
 
