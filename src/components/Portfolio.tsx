@@ -4,22 +4,22 @@ import React from 'react';
 
 const corporateCases = [
   {
+    id: 'pericias-tjdft-trt10',
+    title: 'Perícias Judiciais e Assistência Técnica (TJDFT & TRT10)',
+    category: 'Perícia Judicial & Contencioso Estratégico',
+    badge: '10 Laudos Homologados com Sucesso',
+    icon: '⚖️',
+    description: 'Atuação como Perito Judicial e Assistente Técnico em litígios previdenciários, bancários e trabalhistas complexos. Foco em liquidação de sentença, recálculo de reserva matemática, apuração de diferenças salariais/previdenciárias e formulação de quesitos e impugnações fundamentadas.',
+    tags: ['TJDFT', 'TRT 10ª Região', 'Liquidação de Sentença', 'Reserva Matemática', 'Quesitos & Impugnações']
+  },
+  {
     id: 'funcef-modelagem',
-    title: 'Modelagem Atuarial em Python (FUNCEF)',
+    title: 'Engenharia Analítica e Modelagem em Python (FUNCEF)',
     category: 'Previdência Complementar Fechada',
     badge: '3º Maior Fundo de Pensão do Brasil',
     icon: '🐍',
-    description: 'Desenvolvimento e implementação de algoritmos de cálculo atuarial e projeção de solvência em Python para planos previdenciários complexos, integrando bases cadastrais massivas a modelos matemáticos de alta precisão.',
-    tags: ['Python', 'Cálculo Atuarial', 'Modelagem de Risco', 'Governança EFPC']
-  },
-  {
-    id: 'pericias-tjdft-trt10',
-    title: '10 Perícias Atuariais Homologadas (TJDFT & TRT10)',
-    category: 'Perícia Judicial & Assistência Técnica',
-    badge: '10 Laudos Concluídos com Sucesso',
-    icon: '⚖️',
-    description: 'Atuação especializada como Perito Judicial e Assistente Técnico em litígios previdenciários, bancários e trabalhistas de alta complexidade. Apuração rigorosa de reservas matemáticas, diferenças salariais e liquidações de sentença.',
-    tags: ['TJDFT', 'TRT 10ª Região', 'Perícia Contábil/Atuarial', 'Quesitos Estratégicos']
+    description: 'Desenvolvimento e validação matemática de motores de cálculo atuarial e projeção de solvência em Python para o 3º maior fundo de pensão do Brasil, processando bases cadastrais extensas com rastreabilidade integral e eliminação de erros materiais.',
+    tags: ['Python', 'Rastreabilidade', 'Bases Massivas', 'Validação Matemática', 'FUNCEF']
   },
   {
     id: 'consultoria-cpc33-previc',
@@ -27,8 +27,8 @@ const corporateCases = [
     category: 'Auditoria de Balanços e Solvência',
     badge: 'Conformidade e Mitigação de Déficits',
     icon: '📊',
-    description: 'Auditoria independente de passivos atuariais, validação de tábuas biométricas e hipóteses financeiras, testes de sensibilidade e pareceres técnicos fundamentados para patrocinadoras e conselhos deliberativos.',
-    tags: ['CPC 33 (R1)', 'IAS 19', 'PREVIC', 'Auditoria Independente']
+    description: 'Auditoria independente de passivos atuariais, testes de aderência de tábuas biométricas e hipóteses financeiras, e emissão de pareceres técnicos de solvência, liquidez e planos de equacionamento de déficit para patrocinadoras e conselhos deliberativos.',
+    tags: ['CPC 33 (R1)', 'IAS 19', 'PREVIC', 'Solvência & Liquidez', 'Equacionamento']
   }
 ];
 

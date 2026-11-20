@@ -4,31 +4,31 @@ import React, { useState } from 'react';
 export default function FAQ() {
   const faqs = [
     {
-      q: "Como funciona a atuação em perícias judiciais e assistência técnica atuarial?",
-      a: "Atuamos tanto como Perito do Juízo quanto como Assistente Técnico indicado por escritórios de advocacia e departamentos jurídicos corporativos. Elaboramos quesitos preliminares estratégicos, pareceres de viabilidade, cálculos de liquidação de sentença e impugnações técnicas fundamentadas a laudos divergentes perante o TRT10, TJDFT e demais jurisdições."
+      q: "Como funciona a contratação como Assistente Técnico por escritórios de advocacia (quesitos, acompanhamento de perícia e impugnação de laudos)?",
+      a: "Atuamos em todas as etapas probatórias ao lado da banca contratante: desde o parecer prévio de viabilidade econômica na fase inicial até a formulação de quesitos técnicos estratégicos (iniciais e suplementares), acompanhamento de diligências periciais, liquidação de sentença e elaboração de parecer divergente/impugnação técnica fundamentada contra laudos oficiais inconsistentes, em atuação presencial no DF ou remota em todo o Brasil."
     },
     {
-      q: "Qual a metodologia aplicada na auditoria independente de CPC 33 (R1) e IAS 19?",
-      a: "Realizamos a revisão rigorosa de tábuas biométricas, premissas econômico-financeiras (taxas de juros reais, inflação, crescimento de benefícios), apuração do valor presente das obrigações atuariais (VPA) e conciliação de passivos para notas explicativas de balanço de patrocinadoras e fundos de pensão (EFPCs), em conformidade com as normas contábeis e da PREVIC."
+      q: "Qual a diferença entre a atuação como Perito do Juízo e como Assistente Técnico / Parecerista?",
+      a: "A distinção ética e processual é rigorosamente respeitada: quando nomeado como Perito do Juízo, a atuação ocorre com absoluta imparcialidade técnica, equidistância e fidelidade estrita à prova dos autos para subsidiar a decisão do Magistrado. Já como Assistente Técnico ou Parecerista contratado por escritórios, empresas ou EFPCs, oferecemos suporte técnico especializado à parte para assegurar o rigor matemático da tese, blindar cálculos e apontar erros materiais em laudos contrários."
     },
     {
-      q: "Como é garantida a segurança dos dados e o sigilo atuarial/bancário (LGPD)?",
-      a: "Nossa infraestrutura opera sob padrões de sigilo bancário e governança de dados. Em automações e agentes de IA, implementamos ambientes privados onde dados confidenciais, cadastros de participantes e litígios nunca são utilizados para treinar modelos públicos de terceiros, atendendo com total rigor à Lei Geral de Proteção de Dados (LGPD)."
+      q: "Como o uso de Python, R e Excel/VBA aumenta a segurança jurídica e reduz o risco de impugnação de cálculos?",
+      a: "Planilhas manuais extensas são vulneráveis a fórmulas sobrescritas, erros de arredondamento em cadeia e falhas ao lidar com grandes volumes de registros. Ao estruturar os cálculos em scripts auditáveis em Python, R e Excel/VBA, entregamos memória de cálculo 100% reproduzível, com trilha de auditoria clara e conformidade exata aos índices e tábuas determinados no título judicial ou regulamento — reduzindo drasticamente a margem para impugnações bem-sucedidas."
     },
     {
-      q: "É possível integrar bases legadas e ERPs com automações em Python e n8n?",
-      a: "Sim. Construímos pipelines que conectam bancos legados, planilhas e sistemas de folha/benefícios a motores de cálculo em Python e orquestradores em n8n. O resultado é a geração de relatórios e conciliações automáticas com auditoria completa de cada etapa, eliminando retrabalho e inconsistências materiais."
+      q: "Como funciona a auditoria independente CPC 33 (R1) / IAS 19 e conformidade PREVIC?",
+      a: "Executamos a revisão independente de passivos atuariais em balanços de patrocinadoras e EFPCs, validando tábuas biométricas, hipóteses econômico-financeiras (juros reais, inflação, crescimento salarial), apuração do Valor Presente Atuarial (VPA), notas explicativas e planos de equacionamento de déficit, com pareceres técnicos objetivos para Conselhos Deliberativos, Fiscais e auditorias externas."
     },
     {
-      q: "Quais são as modalidades de contratação dos serviços?",
-      a: "Atendemos sob demanda (por parecer técnico atuarial, laudo pericial judicial ou projeto específico de engenharia de automação) e também em regime de assessoria técnica corporativa continuada para suporte permanente a comitês de risco, conselhos deliberativos e bancas de advocacia."
+      q: "Como automações em n8n e agentes de IA privados operam sob sigilo processual e LGPD?",
+      a: "Toda a arquitetura é desenhada para dados jurídicos e atuariais sensíveis: implementamos pipelines em n8n, scripts locais/em nuvem privada e agentes de IA isolados onde processos, peças e cadastros de participantes jamais alimentam modelos públicos de terceiros. Antes do envio de documentos sob segredo de justiça ou bases reais, formalizamos termo de confidencialidade (NDA) e canal criptografado em conformidade integral com a LGPD (Lei 13.709/2018)."
     }
   ];
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface-container-highest)' }}>
+    <section id="faq" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface-container-highest)', scrollMarginTop: '80px' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>

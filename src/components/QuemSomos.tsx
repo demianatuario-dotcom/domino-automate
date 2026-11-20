@@ -11,8 +11,8 @@ export default function QuemSomos() {
           <h2 className="display-lg" style={{ color: 'var(--secondary)', marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
             Liderança Atuarial & Pericial (MIBA 1807)
           </h2>
-          <p className="body-md" style={{ maxWidth: '750px', margin: '0 auto', opacity: 0.85 }}>
-            Experiência executiva em fundos de pensão, patrocinadoras estatais e privadas e atuação consolidada perante os tribunais superiores.
+          <p className="body-md" style={{ maxWidth: '800px', margin: '0 auto', opacity: 0.85 }}>
+            Formação multidisciplinar unindo Ciências Atuariais, Finanças Corporativas, Engenharia de Sistemas e prática homologada em perícias judiciais complexas.
           </p>
         </div>
 
@@ -32,31 +32,44 @@ export default function QuemSomos() {
                   Demian Lisboa Pereira
                 </h3>
                 <p className="label-md" style={{ color: 'var(--secondary)' }}>
-                  Atuário Registrado (MIBA 1807) & Perito Judicial
+                  Atuário (MIBA 1807) & Ex-Perito Judicial (TRT10 / TJDFT)
                 </p>
               </div>
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
+                ⚖️ Ex-Perito Judicial TRT 10ª Região & TJDFT (12/2014 a 01/2018)
+              </span>
+              <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
                 🏛️ +15 Anos Caixa Econômica Federal
               </span>
               <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
-                ⚖️ Ex-Perito Judicial TRT10 & TJDFT
+                🎓 MBA em Finanças (IBMEC)
               </span>
               <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
-                📊 Especialista CPC 33 (R1) & IAS 19
+                💻 Técnico em Sistemas de Informação (UFRGS)
               </span>
-              <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
-                🎓 MBA Finanças IBMEC • Técnico UFRGS
+              <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--secondary)' }}>
+                🐍 Python • R • Excel/VBA • Access • SQL • n8n • IA Generativa
               </span>
             </div>
 
-            <p className="body-sm" style={{ opacity: 0.85, lineHeight: 1.7, marginTop: '1rem' }}>
-              Mais de uma década e meia de atuação direta em modelagem de reservas, solvência, liquidez e governança de planos previdenciários patrocinados por uma das maiores instituições financeiras da América Latina.
+            <p className="body-sm" style={{ opacity: 0.85, lineHeight: 1.7, marginTop: '0.5rem' }}>
+              Mais de 15 anos de atuação na Caixa Econômica Federal em governança de passivos, solvência e liquidez previdenciária, aliados à experiência prática como Perito Judicial no TRT10 e TJDFT e à construção de motores de cálculo em Python para a FUNCEF.
             </p>
 
-            <div style={{ marginTop: 'auto', paddingTop: '1.5rem' }}>
+            <div style={{ padding: '1rem', borderRadius: '8px', background: 'rgba(233, 193, 118, 0.08)', border: '1px solid rgba(233, 193, 118, 0.25)' }}>
+              <p className="label-sm" style={{ color: 'var(--secondary)', fontWeight: 700, marginBottom: '0.35rem' }}>
+                ⚖️ Postura Ética e Imparcialidade Processual:
+              </p>
+              <p className="body-xs" style={{ opacity: 0.88, lineHeight: 1.6, margin: 0 }}>
+                • <strong>Perito do Juízo:</strong> Atuação com absoluta imparcialidade e equidistância técnica a serviço do Poder Judiciário.<br />
+                • <strong>Assistente Técnico / Parecerista:</strong> Suporte técnico especializado à parte ou escritório na elaboração de quesitos, recálculos e impugnações fundamentadas.
+              </p>
+            </div>
+
+            <div style={{ marginTop: 'auto', paddingTop: '1rem' }}>
               <a
                 href="https://domino-automate.com.br/curriculo/"
                 target="_blank"
@@ -76,17 +89,17 @@ export default function QuemSomos() {
             </h4>
 
             <p className="body-md" style={{ opacity: 0.9, lineHeight: 1.7 }}>
-              Enquanto pareceres tradicionais baseiam-se em planilhas manuais sujeitas a falhas operacionais e impugnações, nossa prática atuarial utiliza algoritmos auditáveis em <strong>Python e R</strong> para validar integralmente massas de participantes, fluxos de caixa futuros e reservas matemáticas sob as diretrizes da <strong>PREVIC e CPC 33 (R1) / IAS 19</strong>.
+              Enquanto cálculos tradicionais dependem de planilhas manuais sujeitas a falhas operacionais e impugnações, nossa prática combina domínio regulatório (<strong>CPC 33 / IAS 19 e PREVIC</strong>) com algoritmos auditáveis em <strong>Python, R, Excel/VBA, Access e SQL</strong> — além de fluxos <strong>n8n e IA Generativa privada</strong> sob estrito sigilo LGPD.
             </p>
 
             <div style={{ marginTop: '0.5rem', padding: '1.25rem', borderRadius: '8px', background: 'var(--surface-container-high)', borderLeft: '4px solid var(--secondary)' }}>
-              <h5 className="label-md" style={{ color: 'var(--on-surface)', marginBottom: '0.35rem' }}>
-                Credenciais e Marcos de Atuação Atuarial:
+              <h5 className="label-md" style={{ color: 'var(--on-surface)', marginBottom: '0.45rem' }}>
+                Credenciais e Marcos de Atuação Atuarial & Pericial:
               </h5>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', padding: 0, fontSize: '0.875rem', opacity: 0.9 }}>
-                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>⚖️</span><span><strong>10 Perícias Judiciais Homologadas</strong>: Laudos e quesitos que sustentaram decisões técnicas no TRT10 e TJDFT.</span></li>
-                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>🐍</span><span><strong>Modelagem FUNCEF</strong>: Motor de cálculo atuarial em Python para o 3º maior fundo de pensão do Brasil.</span></li>
-                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>📊</span><span><strong>Governança de Passivos CPC 33 / IAS 19</strong>: Pareceres preventivos e corretivos de equacionamento de déficit para conselhos corporativos.</span></li>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem', padding: 0, fontSize: '0.875rem', opacity: 0.9 }}>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>⚖️</span><span><strong>Perito Judicial (TRT10 & TJDFT — 12/2014 a 01/2018)</strong>: 10 perícias complexas homologadas em litígios previdenciários, financeiros e trabalhistas.</span></li>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>🐍</span><span><strong>Modelagem FUNCEF (Python)</strong>: Motor de cálculo atuarial e validação de massas extensas para o 3º maior fundo de pensão do Brasil.</span></li>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>📊</span><span><strong>Governança CPC 33 (R1) / IAS 19 & PREVIC</strong>: Auditorias independentes de passivos, solvência e planos de equacionamento para conselhos corporativos.</span></li>
               </ul>
             </div>
           </div>

@@ -4,16 +4,16 @@ import { trackDominoEvent, type LeadDeliveryAnalyticsStatus } from '@/lib/analyt
 
 const TIPOS_ORGANIZACAO = [
   'Escritório de Advocacia',
-  'Patrocinadora / EFPC',
-  'Consultoria / Perícia',
-  'Empresa / Startup',
+  'Vara Judicial / Perícia do Juízo',
+  'EFPC / Fundo de Pensão',
+  'Patrocinadora / Empresa Corporativa',
 ];
 
 const DEMANDAS_PRINCIPAIS = [
-  'Assistência Técnica / Parecer Judicial',
-  'Auditoria Independente CPC 33',
-  'Automação n8n / Agentes de IA',
-  'Outro',
+  'Assistência Técnica: Quesitos & Impugnação de Laudo',
+  'Liquidação de Sentença / Cálculo Previdenciário & Trabalhista',
+  'Parecer Atuarial / Auditoria CPC 33 & PREVIC',
+  'Auditoria de Bases / Automação Python, n8n & IA Jurídica',
 ];
 
 interface ServicoItem {
@@ -41,7 +41,7 @@ interface SimuladorSnapshot {
 export default function BudgetModule() {
   const [dores, setDores] = useState<{ dor: string; justificativa: string; pergunta?: string }[]>([]);
   const [tipoOrganizacao, setTipoOrganizacao] = useState<string>('Escritório de Advocacia');
-  const [demanda, setDemanda] = useState<string>('Assistência Técnica / Parecer Judicial');
+  const [demanda, setDemanda] = useState<string>('Assistência Técnica: Quesitos & Impugnação de Laudo');
   const [selectedDores, setSelectedDores] = useState<string[]>([]);
   const [nome, setNome] = useState('');
   const [empresa, setEmpresa] = useState('');
@@ -203,13 +203,15 @@ export default function BudgetModule() {
 
         {success ? (
           <div role="status" aria-live="polite" className="card-base ghost-border" style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px solid var(--secondary)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }} aria-hidden="true">🏛️</div>
-            <h3 className="headline-sm" style={{ color: 'var(--secondary)', marginBottom: '0.5rem' }}>Demanda Registrada com Sucesso!</h3>
-            <p className="body-md" style={{ maxWidth: '500px', margin: '0 auto 1.75rem', opacity: 0.9 }}>
-              Seu cenário será analisado pelo atuário responsável <strong>Demian Lisboa Pereira (MIBA 1807)</strong>. Entraremos em contato em até 24 horas úteis.
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }} aria-hidden="true">⚖️</div>
+            <h3 className="headline-sm" style={{ color: 'var(--secondary)', marginBottom: '0.5rem' }}>
+              Solicitação de {demanda} Registrada!
+            </h3>
+            <p className="body-md" style={{ maxWidth: '560px', margin: '0 auto 1.75rem', opacity: 0.9, lineHeight: 1.65 }}>
+              Sua demanda como <strong>{tipoOrganizacao}</strong> (<em>{demanda}</em>) foi recebida e será avaliada diretamente por <strong>Demian Lisboa Pereira (Atuário MIBA 1807)</strong> sob estrito sigilo profissional e LGPD. Retornaremos em até 24 horas úteis.
             </p>
             <a
-              href={`https://wa.me/5561981171564?text=${encodeURIComponent(`Olá, Demian! Acabei de registrar a solicitação de diagnóstico técnico na vertical de Atuária (${demanda}) em nome de ${nome || 'minha organização'}.`)}`}
+              href={`https://wa.me/5561981171564?text=${encodeURIComponent(`Olá, Demian! Acabei de registrar uma solicitação na vertical /Atuaria como ${tipoOrganizacao} para "${demanda}" em nome de ${nome || 'minha organização'}${empresa ? ` (${empresa})` : ''}.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackDominoEvent('whatsapp_click', { vertical: '/Atuaria', section: 'post_form_success' })}

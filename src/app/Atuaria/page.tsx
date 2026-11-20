@@ -15,16 +15,16 @@ import Footer from '@/components/Footer';
 import AIChat from '@/components/AIChat';
 
 export const metadata: Metadata = {
-  title: 'Vertical Atuária, Perícia Judicial & Governança CPC 33 (MIBA 1807)',
+  title: 'Perícia Judicial, Assistência Técnica & Atuária CPC 33 | MIBA 1807 | Domino Automate',
   description:
-    'Auditoria independente CPC 33 (R1) / IAS 19, conformidade PREVIC, perícia atuarial judicial (TRT10 / TJDFT) e motores de cálculo em Python conduzidos por Demian Lisboa Pereira (MIBA 1807).',
+    'Perícia Judicial e Assistência Técnica Atuarial/Financeira (TRT10, TJDFT e atuação nacional/remota). Quesitos, impugnação de laudos, liquidação de sentença e auditoria de bases de dados em Python/R/VBA. Consultoria CPC 33 (R1) / IAS 19 e conformidade PREVIC por Demian Lisboa Pereira (MIBA 1807).',
   alternates: {
     canonical: 'https://domino-automate.com.br/Atuaria',
   },
   openGraph: {
-    title: 'Domino Automate | Vertical Atuária, Perícia Judicial & Governança CPC 33 (MIBA 1807)',
+    title: 'Perícia Judicial, Assistência Técnica & Consultoria Atuarial (MIBA 1807)',
     description:
-      'Auditoria independente CPC 33 (R1) / IAS 19, conformidade PREVIC, perícia atuarial judicial e automação analítica em Python.',
+      'Suporte técnico especializado para escritórios de advocacia, varas judiciais e EFPCs: quesitos, impugnação de laudos, liquidação de sentença, auditoria de bases em Python/R/VBA e consultoria CPC 33 (R1) / IAS 19 e PREVIC.',
     url: 'https://domino-automate.com.br/Atuaria',
     siteName: 'Domino Automate',
     locale: 'pt_BR',
@@ -34,15 +34,15 @@ export const metadata: Metadata = {
         url: '/logo.png',
         width: 1024,
         height: 538,
-        alt: 'Domino Automate | Vertical Atuária & Previdência Complementar',
+        alt: 'Domino Automate | Perícia Judicial, Assistência Técnica & Atuária (MIBA 1807)',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Domino Automate | Vertical Atuária & Governança CPC 33 (MIBA 1807)',
+    title: 'Perícia Judicial & Assistência Técnica Atuarial (MIBA 1807)',
     description:
-      'Auditoria independente CPC 33, conformidade PREVIC e perícia atuarial judicial conduzida por Demian Lisboa Pereira (MIBA 1807).',
+      'Perícia Judicial (TRT10, TJDFT e atuação nacional/remota), quesitos, impugnação de laudos, liquidação de sentença, auditoria de bases em Python/R/VBA e consultoria CPC 33 / PREVIC.',
   },
 };
 
@@ -51,15 +51,15 @@ const atuariaJsonLd = {
   '@graph': [
     {
       '@type': 'ProfessionalService',
-      name: 'Domino Automate - Consultoria Atuarial e Perícia Judicial (MIBA 1807)',
+      name: 'Domino Automate - Perícia Judicial, Assistência Técnica & Consultoria Atuarial (MIBA 1807)',
       description:
-        'Auditoria atuarial independente CPC 33 (R1) / IAS 19, governança PREVIC, assistência técnica judicial e automação analítica em Python.',
+        'Perícia Judicial e Assistência Técnica Atuarial/Financeira (TRT10, TJDFT e atuação nacional/remota). Formulação de quesitos, impugnação técnica de laudos, liquidação de sentença, auditoria de bases de dados em Python/R/VBA e consultoria CPC 33 (R1) / IAS 19 e conformidade PREVIC.',
       url: 'https://domino-automate.com.br/Atuaria',
       areaServed: 'BR',
       founder: {
         '@type': 'Person',
         name: 'Demian Lisboa Pereira',
-        jobTitle: 'Atuário Responsável Técnico (MIBA 1807)',
+        jobTitle: 'Atuário Responsável Técnico (MIBA 1807) & Ex-Perito Judicial (TRT10/TJDFT)',
       },
     },
     {
@@ -74,7 +74,7 @@ const atuariaJsonLd = {
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'Atuária & Previdência Complementar',
+          name: 'Perícia Judicial, Assistência Técnica & Atuária',
           item: 'https://domino-automate.com.br/Atuaria',
         },
       ],

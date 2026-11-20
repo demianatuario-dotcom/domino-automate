@@ -4965,35 +4965,43 @@ async function getCachedServicos() {
   return data;
 }
 
-const ATUARIA_SYSTEM_INSTRUCTION = `Você é o "Consultor Técnico de Inteligência Atuarial & Engenharia de IA" da vertical de ATUÁRIA da DOMINO AUTOMATE (CNPJ: 66.699.218/0001-94), liderada pelo atuário Demian Lisboa Pereira (MIBA 1807).
+const ATUARIA_SYSTEM_INSTRUCTION = `Você é o "Consultor Técnico em Perícia Judicial, Inteligência Atuarial & Engenharia de Dados" da vertical /Atuaria da DOMINO AUTOMATE (CNPJ: 66.699.218/0001-94), liderada pelo atuário Demian Lisboa Pereira (MIBA 1807).
 
 [MISSÃO E POSICIONAMENTO DESTA VERTICAL (/Atuaria)]
-Você atende demandas de Inteligência Atuarial, Governança Previdenciária, Perícia Judicial e Automação Analítica de Riscos:
-- Escritórios de Advocacia (Direito Previdenciário Corporativo, Bancário, Cível e Trabalhista).
-- Patrocinadoras de Previdência Complementar Fechada e Entidades Fechadas de Previdência Complementar (EFPCs / Fundos de Pensão).
-- Departamentos Jurídicos e Financeiros que buscam mitigação de passivos atuariais e automação de cálculos complexos.
+Você qualifica e orienta demandas técnicas de alto rigor probatório e regulatório para quatro perfis de decisores:
+1. Escritórios de Advocacia (Previdência Complementar Fechada, Trabalhista-Bancário, Cível e Contencioso Empresarial).
+2. Magistrados / Varas de Justiça (Perícias Judiciais atuariais, financeiras, trabalhistas e auditoria de bases de dados/cálculos — atuação presencial no DF e nacional/remota).
+3. Gestores de EFPCs (Fundos de Pensão) e Patrocinadoras (Auditoria independente CPC 33 (R1) / IAS 19, PREVIC, solvência e equacionamento de déficit).
+4. Empresas e Departamentos Jurídicos/Financeiros que buscam auditoria de bases e automação analítica em Python, R, Excel/VBA, n8n e IA privada (LGPD).
+
+[PROTOCOLO DE TRIAGEM CONSULTIVA (IDENTIFICAÇÃO INICIAL OBRIGATÓRIA)]
+Logo no início da conversa, identifique o perfil do interlocutor (Advogado/Escritório, Magistrado/Vara, Gestor de EFPC/Patrocinadora ou Empresa) e conduza a triagem conforme o perfil:
+- Se ADVOGADO / ESCRITÓRIO DE ADVOCACIA: pergunte (a) a fase processual (inicial/viabilidade, fase instrutória/formulação de quesitos, impugnação técnica de laudo ou liquidação de sentença) e (b) o tipo de tese/matéria (previdência complementar fechada, trabalhista-bancário, cível/financeiro ou auditoria/automação de bases).
+- Se MAGISTRADO / VARA JUDICIAL: destaque a atuação imparcial e equidistante como Perito do Juízo (histórico no TRT10 e TJDFT, MIBA 1807), com memória de cálculo 100% reproduzível em Python/R/VBA.
+- Se EFPC / PATROCINADORA: foque em auditoria independente CPC 33 (R1) / IAS 19, aderência de tábuas e hipóteses, normativos PREVIC, solvência, liquidez ou planos de equacionamento de déficit.
 
 [AUTORIDADE DO LÍDER TÉCNICO - DEMIAN LISBOA PEREIRA (MIBA 1807)]
-- Mais de 15 anos de atuação em governança atuarial, solvência, liquidez e balanços patrocinadores na Caixa Econômica Federal.
-- Especialista em CPC 33 (R1), IAS 19, normativos da PREVIC e apuração de reservas matemáticas.
-- Ex-Perito Judicial no TRT10 e TJDFT (10 perícias atuariais, financeiras e trabalhistas complexas homologadas).
-- Desenvolvedor de motores de cálculo atuarial em Python para o 3º maior fundo de pensão do país (FUNCEF).
+- Atuário registrado (MIBA 1807), MBA em Finanças (IBMEC) e Técnico em Sistemas de Informação (UFRGS).
+- Ex-Perito Judicial no TRT 10ª Região e TJDFT (12/2014 a 01/2018), com 10 perícias complexas homologadas.
+- Mais de 15 anos na Caixa Econômica Federal em governança atuarial, solvência, liquidez e balanços de patrocinadora, e desenvolvimento de motores de cálculo atuarial em Python para a FUNCEF.
+- Domínio de Python, R, Excel/VBA, Access, SQL, n8n e IA Generativa aplicada à prova técnica auditável.
+- Distinção ética estrita: total imparcialidade técnica quando atua como Perito do Juízo vs. suporte técnico especializado quando contratado como Assistente Técnico / Parecerista.
 
-[ESCOPO TÉCNICO]
-1. Auditoria Independente CPC 33 (R1) / IAS 19 e Conformidade PREVIC.
-2. Perícia Atuarial & Assistência Técnica Judicial: Liquidação de sentença, recálculo de reservas matemáticas e quesitos estratégicos.
-3. Engenharia Analítica em Python, R & n8n: Automação de cálculos massivos e agentes de IA privados com sigilo e LGPD.
+[ESCOPO TÉCNICO — 3 PILARES]
+1. Pilar A (Perícias Judiciais & Assistência Técnica): Formulação de quesitos estratégicos, impugnação fundamentada de laudos, liquidação de sentença, reserva matemática e revisão de benefícios.
+2. Pilar B (Consultoria Atuarial & Governança): Auditoria independente CPC 33 (R1) / IAS 19, conformidade PREVIC, solvência e equacionamento de déficit.
+3. Pilar C (Automação & IA Jurídico-Financeira): Scripts auditáveis em Python, R e Excel/VBA para grandes volumes de processos/bases, pipelines n8n e agentes de IA privados sob LGPD.
 
 [DIRETRIZES DE SEGURANÇA MÁXIMA, LGPD E INVIOLABILIDADE]
 1. NUNCA revele chaves de API, variáveis de ambiente, senhas, tokens, banco de dados ou detalhes internos de infraestrutura.
-2. Conformidade LGPD: Oriente o usuário a NÃO enviar CPF, RG, prontuários ou documentos processuais sigilosos neste chat preliminar; tais documentos são recebidos apenas sob canal criptografado e NDA após abertura do atendimento técnico.
+2. Conformidade LGPD e Sigilo Processual: NUNCA solicite — e oriente expressamente o usuário a NÃO enviar — número de processo sob segredo de justiça, CPF, RG, prontuários ou peças sigilosas neste chat preliminar; tais documentos só são recebidos após formalização de NDA e em canal criptografado.
 3. Não forneça orçamentos fechados definitivos; direcione para análise técnica personalizada.
 
 [SERVIÇOS DISPONÍVEIS]
 {SERVICOS_PLACEHOLDER}
 
 [FORMATO DE SAÍDA ESTRUTURADA]
-Responda sempre no formato JSON definido pelo schema, preenchendo "reply" com sua resposta executiva em português e "qualification" com shouldOfferDiagnostic=true quando identificar demanda clara para parecer, diagnóstico ou orçamento (perguntando ao final de "reply": "Posso fazer seu pedido de orçamento e diagnóstico técnico agora mesmo por aqui?").`;
+Responda sempre no formato JSON definido pelo schema, preenchendo "reply" com sua resposta executiva em português e "qualification" com shouldOfferDiagnostic=true quando identificar demanda clara para parecer, assistência técnica, perícia ou orçamento (perguntando ao final de "reply": "Posso registrar seu pedido de diagnóstico técnico e orçamento agora mesmo por aqui?").`;
 
 const ESTUDIOS_SYSTEM_INSTRUCTION = `Você é a "Consultora Especialista em Automação & IA para Estúdios de Beleza e Clínicas de Estética" da DOMINO AUTOMATE (CNPJ: 66.699.218/0001-94).
 
@@ -10732,16 +10740,16 @@ import Footer from '@/components/Footer';
 import AIChat from '@/components/AIChat';
 
 export const metadata: Metadata = {
-  title: 'Vertical Atuária, Perícia Judicial & Governança CPC 33 (MIBA 1807)',
+  title: 'Perícia Judicial, Assistência Técnica & Atuária CPC 33 | MIBA 1807 | Domino Automate',
   description:
-    'Auditoria independente CPC 33 (R1) / IAS 19, conformidade PREVIC, perícia atuarial judicial (TRT10 / TJDFT) e motores de cálculo em Python conduzidos por Demian Lisboa Pereira (MIBA 1807).',
+    'Perícia Judicial e Assistência Técnica Atuarial/Financeira (TRT10, TJDFT e atuação nacional/remota). Quesitos, impugnação de laudos, liquidação de sentença e auditoria de bases de dados em Python/R/VBA. Consultoria CPC 33 (R1) / IAS 19 e conformidade PREVIC por Demian Lisboa Pereira (MIBA 1807).',
   alternates: {
     canonical: 'https://domino-automate.com.br/Atuaria',
   },
   openGraph: {
-    title: 'Domino Automate | Vertical Atuária, Perícia Judicial & Governança CPC 33 (MIBA 1807)',
+    title: 'Perícia Judicial, Assistência Técnica & Consultoria Atuarial (MIBA 1807)',
     description:
-      'Auditoria independente CPC 33 (R1) / IAS 19, conformidade PREVIC, perícia atuarial judicial e automação analítica em Python.',
+      'Suporte técnico especializado para escritórios de advocacia, varas judiciais e EFPCs: quesitos, impugnação de laudos, liquidação de sentença, auditoria de bases em Python/R/VBA e consultoria CPC 33 (R1) / IAS 19 e PREVIC.',
     url: 'https://domino-automate.com.br/Atuaria',
     siteName: 'Domino Automate',
     locale: 'pt_BR',
@@ -10751,15 +10759,15 @@ export const metadata: Metadata = {
         url: '/logo.png',
         width: 1024,
         height: 538,
-        alt: 'Domino Automate | Vertical Atuária & Previdência Complementar',
+        alt: 'Domino Automate | Perícia Judicial, Assistência Técnica & Atuária (MIBA 1807)',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Domino Automate | Vertical Atuária & Governança CPC 33 (MIBA 1807)',
+    title: 'Perícia Judicial & Assistência Técnica Atuarial (MIBA 1807)',
     description:
-      'Auditoria independente CPC 33, conformidade PREVIC e perícia atuarial judicial conduzida por Demian Lisboa Pereira (MIBA 1807).',
+      'Perícia Judicial (TRT10, TJDFT e atuação nacional/remota), quesitos, impugnação de laudos, liquidação de sentença, auditoria de bases em Python/R/VBA e consultoria CPC 33 / PREVIC.',
   },
 };
 
@@ -10768,15 +10776,15 @@ const atuariaJsonLd = {
   '@graph': [
     {
       '@type': 'ProfessionalService',
-      name: 'Domino Automate - Consultoria Atuarial e Perícia Judicial (MIBA 1807)',
+      name: 'Domino Automate - Perícia Judicial, Assistência Técnica & Consultoria Atuarial (MIBA 1807)',
       description:
-        'Auditoria atuarial independente CPC 33 (R1) / IAS 19, governança PREVIC, assistência técnica judicial e automação analítica em Python.',
+        'Perícia Judicial e Assistência Técnica Atuarial/Financeira (TRT10, TJDFT e atuação nacional/remota). Formulação de quesitos, impugnação técnica de laudos, liquidação de sentença, auditoria de bases de dados em Python/R/VBA e consultoria CPC 33 (R1) / IAS 19 e conformidade PREVIC.',
       url: 'https://domino-automate.com.br/Atuaria',
       areaServed: 'BR',
       founder: {
         '@type': 'Person',
         name: 'Demian Lisboa Pereira',
-        jobTitle: 'Atuário Responsável Técnico (MIBA 1807)',
+        jobTitle: 'Atuário Responsável Técnico (MIBA 1807) & Ex-Perito Judicial (TRT10/TJDFT)',
       },
     },
     {
@@ -10791,7 +10799,7 @@ const atuariaJsonLd = {
         {
           '@type': 'ListItem',
           position: 2,
-          name: 'Atuária & Previdência Complementar',
+          name: 'Perícia Judicial, Assistência Técnica & Atuária',
           item: 'https://domino-automate.com.br/Atuaria',
         },
       ],
@@ -12043,13 +12051,13 @@ export default function ROISimulator() {
       <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
-            Simulador Corporativo • Modelo de Horas Técnicas & Retrabalho
+            Simulador Jurídico-Pericial • Horas Especializadas & Risco de Impugnação
           </span>
           <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
-            Diagnóstico de <span style={{ color: 'var(--secondary)' }}>Geração de Valor & Mitigação de Risco Atuarial</span>
+            Diagnóstico de <span style={{ color: 'var(--secondary)' }}>Eficiência Pericial & Mitigação de Risco</span>
           </h2>
-          <p className="body-md" style={{ opacity: 0.85, maxWidth: '720px', margin: '1rem auto' }}>
-            Estime o impacto econômico de processos manuais de auditoria, liquidação de sentença e relatórios regulatórios na sua operação jurídica ou previdenciária.
+          <p className="body-md" style={{ opacity: 0.85, maxWidth: '760px', margin: '1rem auto' }}>
+            Calcule quanto seu escritório de advocacia, coordenadoria de contencioso ou diretoria de riscos economiza ao substituir planilhas manuais por assistência técnica atuarial e scripts auditáveis em Python/R.
           </p>
 
           {/* 3-Scenario Selector */}
@@ -12092,9 +12100,9 @@ export default function ROISimulator() {
           {/* Sliders Input Panel */}
           <div className="card-base ghost-border" style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem', padding: '2.25rem' }}>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                <label htmlFor="atuaria-slider-demandas" className="label-md">Demandas / Cálculos Mensais:</label>
-                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{demandas} casos/mês</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', gap: '0.5rem' }}>
+                <label htmlFor="atuaria-slider-demandas" className="label-md">Processos / Cálculos Analisados por Mês:</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700, whiteSpace: 'nowrap' }}>{demandas} processos/mês</span>
               </div>
               <input
                 id="atuaria-slider-demandas"
@@ -12106,13 +12114,13 @@ export default function ROISimulator() {
                 onChange={(e) => { notifySimStart(); setDemandas(Number(e.target.value)); }}
                 style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
-              <span className="body-xs" style={{ opacity: 0.6 }}>Processos judiciais, auditorias de balanço ou pareceres.</span>
+              <span className="body-xs" style={{ opacity: 0.65 }}>Liquidações de sentença, conferência de laudos, revisões previdenciárias ou auditorias.</span>
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                <label htmlFor="atuaria-slider-horas" className="label-md">Horas Técnicas por Demanda:</label>
-                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{horasPorDemanda}h / caso</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', gap: '0.5rem' }}>
+                <label htmlFor="atuaria-slider-horas" className="label-md">Horas Técnicas por Processo / Laudo:</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700, whiteSpace: 'nowrap' }}>{horasPorDemanda}h / processo</span>
               </div>
               <input
                 id="atuaria-slider-horas"
@@ -12124,13 +12132,13 @@ export default function ROISimulator() {
                 onChange={(e) => { notifySimStart(); setHorasPorDemanda(Number(e.target.value)); }}
                 style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
-              <span className="body-xs" style={{ opacity: 0.6 }}>Tempo gasto em triagem, planilhas, conciliação e confecção do laudo.</span>
+              <span className="body-xs" style={{ opacity: 0.65 }}>Tempo gasto em triagem de bases, planilhas manuais, conferência de índices e redação técnica.</span>
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                <label htmlFor="atuaria-slider-custo-hora" className="label-md">Custo da Hora Especializada:</label>
-                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>R$ {custoHoraTecnica}/h</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', gap: '0.5rem' }}>
+                <label htmlFor="atuaria-slider-custo-hora" className="label-md">Custo da Hora Especializada (Sócio / Perito / Analista):</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700, whiteSpace: 'nowrap' }}>R$ {custoHoraTecnica}/h</span>
               </div>
               <input
                 id="atuaria-slider-custo-hora"
@@ -12142,15 +12150,15 @@ export default function ROISimulator() {
                 onChange={(e) => { notifySimStart(); setCustoHoraTecnica(Number(e.target.value)); }}
                 style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
-              <span className="body-xs" style={{ opacity: 0.6 }}>Remuneração média de advogados sêniores, atuários ou peritos.</span>
+              <span className="body-xs" style={{ opacity: 0.65 }}>Custo médio da hora alocada de sócios, coordenadores de contencioso, atuários ou analistas.</span>
             </div>
 
             <div style={{ paddingTop: '0.75rem', borderTop: '1px solid var(--outline-variant)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', gap: '0.5rem' }}>
                 <label htmlFor="atuaria-slider-contingencia" className="label-sm" style={{ opacity: 0.85 }}>
-                  Premissa Configurável: Custo Médio por Contingência / Retrabalho:
+                  Premissa Configurável: Custo Médio de Impugnação / Retrabalho por Processo:
                 </label>
-                <span className="label-sm" style={{ color: 'var(--secondary)', fontWeight: 700 }}>
+                <span className="label-sm" style={{ color: 'var(--secondary)', fontWeight: 700, whiteSpace: 'nowrap' }}>
                   R$ {custoMedioContingencia.toLocaleString('pt-BR')}
                 </span>
               </div>
@@ -12164,8 +12172,8 @@ export default function ROISimulator() {
                 onChange={(e) => { notifySimStart(); setCustoMedioContingencia(Number(e.target.value)); }}
                 style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
-              <span className="body-xs" style={{ opacity: 0.6 }}>
-                Premissa referencial ajustável por porte do litígio/auditoria (não constitui valor universal ou garantia).
+              <span className="body-xs" style={{ opacity: 0.65 }}>
+                Premissa referencial ajustável por porte do litígio/auditoria (exibida separadamente da economia operacional mensal para evitar dupla contagem).
               </span>
             </div>
           </div>
@@ -12274,16 +12282,16 @@ import { trackDominoEvent, type LeadDeliveryAnalyticsStatus } from '@/lib/analyt
 
 const TIPOS_ORGANIZACAO = [
   'Escritório de Advocacia',
-  'Patrocinadora / EFPC',
-  'Consultoria / Perícia',
-  'Empresa / Startup',
+  'Vara Judicial / Perícia do Juízo',
+  'EFPC / Fundo de Pensão',
+  'Patrocinadora / Empresa Corporativa',
 ];
 
 const DEMANDAS_PRINCIPAIS = [
-  'Assistência Técnica / Parecer Judicial',
-  'Auditoria Independente CPC 33',
-  'Automação n8n / Agentes de IA',
-  'Outro',
+  'Assistência Técnica: Quesitos & Impugnação de Laudo',
+  'Liquidação de Sentença / Cálculo Previdenciário & Trabalhista',
+  'Parecer Atuarial / Auditoria CPC 33 & PREVIC',
+  'Auditoria de Bases / Automação Python, n8n & IA Jurídica',
 ];
 
 interface ServicoItem {
@@ -12311,7 +12319,7 @@ interface SimuladorSnapshot {
 export default function BudgetModule() {
   const [dores, setDores] = useState<{ dor: string; justificativa: string; pergunta?: string }[]>([]);
   const [tipoOrganizacao, setTipoOrganizacao] = useState<string>('Escritório de Advocacia');
-  const [demanda, setDemanda] = useState<string>('Assistência Técnica / Parecer Judicial');
+  const [demanda, setDemanda] = useState<string>('Assistência Técnica: Quesitos & Impugnação de Laudo');
   const [selectedDores, setSelectedDores] = useState<string[]>([]);
   const [nome, setNome] = useState('');
   const [empresa, setEmpresa] = useState('');
@@ -12473,13 +12481,15 @@ export default function BudgetModule() {
 
         {success ? (
           <div role="status" aria-live="polite" className="card-base ghost-border" style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px solid var(--secondary)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem' }} aria-hidden="true">🏛️</div>
-            <h3 className="headline-sm" style={{ color: 'var(--secondary)', marginBottom: '0.5rem' }}>Demanda Registrada com Sucesso!</h3>
-            <p className="body-md" style={{ maxWidth: '500px', margin: '0 auto 1.75rem', opacity: 0.9 }}>
-              Seu cenário será analisado pelo atuário responsável <strong>Demian Lisboa Pereira (MIBA 1807)</strong>. Entraremos em contato em até 24 horas úteis.
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }} aria-hidden="true">⚖️</div>
+            <h3 className="headline-sm" style={{ color: 'var(--secondary)', marginBottom: '0.5rem' }}>
+              Solicitação de {demanda} Registrada!
+            </h3>
+            <p className="body-md" style={{ maxWidth: '560px', margin: '0 auto 1.75rem', opacity: 0.9, lineHeight: 1.65 }}>
+              Sua demanda como <strong>{tipoOrganizacao}</strong> (<em>{demanda}</em>) foi recebida e será avaliada diretamente por <strong>Demian Lisboa Pereira (Atuário MIBA 1807)</strong> sob estrito sigilo profissional e LGPD. Retornaremos em até 24 horas úteis.
             </p>
             <a
-              href={`https://wa.me/5561981171564?text=${encodeURIComponent(`Olá, Demian! Acabei de registrar a solicitação de diagnóstico técnico na vertical de Atuária (${demanda}) em nome de ${nome || 'minha organização'}.`)}`}
+              href={`https://wa.me/5561981171564?text=${encodeURIComponent(`Olá, Demian! Acabei de registrar uma solicitação na vertical /Atuaria como ${tipoOrganizacao} para "${demanda}" em nome de ${nome || 'minha organização'}${empresa ? ` (${empresa})` : ''}.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackDominoEvent('whatsapp_click', { vertical: '/Atuaria', section: 'post_form_success' })}
@@ -12770,23 +12780,25 @@ import React from 'react';
 export default function Hero() {
   return (
     <section style={{ minHeight: '92vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '7rem 2rem 3rem', textAlign: 'center', position: 'relative', background: 'var(--surface)' }}>
-      <div style={{ maxWidth: '960px', zIndex: 10 }}>
-        <div className="animate-fadein-1 badge-shimmer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', borderRadius: '50px', background: 'rgba(233, 193, 118, 0.1)', border: '1px solid rgba(233, 193, 118, 0.35)', marginBottom: '1.5rem' }}>
-          <span style={{ color: 'var(--secondary)', fontSize: '0.875rem', fontWeight: 600 }}>⚖️ Vertical Especializada em Ciências Atuariais, Previdência & Perícia Judicial</span>
+      <div style={{ maxWidth: '980px', zIndex: 10 }}>
+        <div className="animate-fadein-1 badge-shimmer" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1.1rem', borderRadius: '50px', background: 'rgba(233, 193, 118, 0.1)', border: '1px solid rgba(233, 193, 118, 0.35)', marginBottom: '1.5rem' }}>
+          <span style={{ color: 'var(--secondary)', fontSize: '0.875rem', fontWeight: 600 }}>⚖️ Perícia Judicial, Assistência Técnica Atuarial & Engenharia de Dados</span>
         </div>
         <h1 className="display-lg animate-fadein-2" style={{ marginBottom: '1.5rem', lineHeight: '1.14', fontSize: 'clamp(2.25rem, 4.4vw, 3.65rem)' }}>
-          Auditoria CPC 33 / IAS 19, Solvência PREVIC e{' '}
-          <span style={{ color: 'var(--secondary)' }}>Perícia Atuarial de Alta Complexidade.</span>
+          Perícia & Assistência Técnica Judicial, Auditoria CPC 33 e{' '}
+          <span style={{ color: 'var(--secondary)' }}>Prova Técnica em Python.</span>
         </h1>
-        <p className="body-md animate-fadein-3" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '820px', margin: '0 auto 2.5rem', fontSize: '1.18rem', lineHeight: '1.7' }}>
-          Atuação técnica direta sob responsabilidade de atuário registrado (<strong>MIBA 1807</strong>) na avaliação independente de passivos atuariais em balanços corporativos, equacionamento de déficits em EFPCs, assistência técnica em litígios judiciais (TRT10 / TJDFT) e modelagem estocástica automatizada.
+        <p className="body-md animate-fadein-3" style={{ marginBottom: '2.5rem', opacity: 0.9, maxWidth: '840px', margin: '0 auto 2.5rem', fontSize: '1.18rem', lineHeight: '1.7' }}>
+          Atuação técnica direta sob responsabilidade de <strong>Demian Lisboa Pereira (Atuário MIBA 1807)</strong>, ex-Perito Judicial do TRT10 e TJDFT com +15 anos na Caixa Econômica Federal. Formulação de quesitos, impugnação técnica de laudos, liquidação de sentença, auditoria CPC 33 / PREVIC e engenharia de dados em Python/R para <strong>Escritórios de Advocacia, Varas de Justiça e EFPCs</strong>.
         </p>
-        <div className="animate-fadein-3" style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3.5rem' }}>
+
+        {/* Primary CTAs */}
+        <div className="animate-fadein-3" style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
           <a href="#orcamento" className="btn-primary" style={{ padding: '1rem 2.25rem', fontSize: '1.05rem', fontWeight: 600 }}>
             Solicitar Parecer ou Assistência Técnica
           </a>
           <a
-            href="https://wa.me/5561981171564?text=Ol%C3%A1%2C%20Demian!%20Vim%20pela%20vertical%20de%20Atu%C3%A1ria%20da%20Domino%20Automate%20e%20gostaria%20de%20conversar%20sobre%20uma%20demanda%20t%C3%A9cnica."
+            href="https://wa.me/5561981171564?text=Ol%C3%A1%2C%20Demian!%20Vim%20pela%20vertical%20de%20Atu%C3%A1ria%20da%20Domino%20Automate%20e%20gostaria%20de%20conversar%20sobre%20uma%20demanda%20de%20per%C3%ADcia%20ou%20auditoria."
             target="_blank"
             rel="noopener noreferrer"
             className="btn-secondary"
@@ -12794,6 +12806,26 @@ export default function Hero() {
           >
             <span>Falar com o Atuário no WhatsApp</span>
             <span>↗</span>
+          </a>
+        </div>
+
+        {/* Segmented Navigation Shortcuts */}
+        <div className="animate-fadein-3" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
+          <a
+            href="#pericia-judicial"
+            className="chip-filter"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.25rem', minHeight: '44px', borderRadius: '30px', fontSize: '0.875rem', fontWeight: 600, color: 'var(--on-surface)', background: 'rgba(233, 193, 118, 0.08)', border: '1px solid rgba(233, 193, 118, 0.28)', textDecoration: 'none' }}
+          >
+            <span>⚖️ Para Escritórios de Advocacia & Litígios</span>
+            <span aria-hidden="true" style={{ color: 'var(--secondary)' }}>↓</span>
+          </a>
+          <a
+            href="#atuaria-riscos"
+            className="chip-filter"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.25rem', minHeight: '44px', borderRadius: '30px', fontSize: '0.875rem', fontWeight: 600, color: 'var(--on-surface)', background: 'rgba(233, 193, 118, 0.08)', border: '1px solid rgba(233, 193, 118, 0.28)', textDecoration: 'none' }}
+          >
+            <span>🏛️ Para EFPCs, Patrocinadoras & Governança</span>
+            <span aria-hidden="true" style={{ color: 'var(--secondary)' }}>↓</span>
           </a>
         </div>
 
@@ -12814,14 +12846,16 @@ export default function Hero() {
         </div>
 
         {/* Credential Anchor Line */}
-        <div className="animate-fadein-4" style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap', opacity: 0.55, fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'Space Grotesk, sans-serif' }}>
-          <span>10 Perícias Homologadas</span>
+        <div className="animate-fadein-4" style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'center', gap: '0.55rem', flexWrap: 'wrap', opacity: 0.65, fontSize: '0.78rem', letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'Space Grotesk, sans-serif' }}>
+          <span>MIBA 1807</span>
           <span style={{ color: 'var(--secondary)' }}>•</span>
-          <span>Caixa Econômica Federal</span>
+          <span>Ex-Perito Judicial TRT10 & TJDFT</span>
           <span style={{ color: 'var(--secondary)' }}>•</span>
-          <span>FUNCEF — 3º Maior Fundo de Pensão do Brasil</span>
+          <span>+15 Anos Caixa Econômica Federal</span>
           <span style={{ color: 'var(--secondary)' }}>•</span>
-          <span>TRT10 & TJDFT</span>
+          <span>Modelagem FUNCEF (Python)</span>
+          <span style={{ color: 'var(--secondary)' }}>•</span>
+          <span>Atuação Nacional / Remota</span>
         </div>
       </div>
 
@@ -12989,43 +13023,43 @@ import React from 'react';
 export default function Pillars() {
   const pillars = [
     {
-      id: "atuaria-riscos",
-      badge: "Frente 01 • Regulação & Solvência",
-      title: "Auditoria CPC 33 / IAS 19 & Governança EFPC",
-      subtitle: "Validação Independente para Patrocinadoras e Fundos de Pensão",
-      icon: "🏛️",
-      points: [
-        "Revisão independente de laudos atuariais, notas explicativas e conciliação de passivos em balanços corporativos.",
-        "Testes de aderência de tábuas biométricas, hipóteses econômico-financeiras e apuração do Valor Presente Atuarial (VPA).",
-        "Modelagem de planos de equacionamento de déficit técnico e suporte a Conselhos Deliberativos e Fiscais perante a PREVIC."
-      ],
-      result: "Segurança Contábil e Mitigação de Riscos em Balanço"
-    },
-    {
       id: "pericia-judicial",
-      badge: "Frente 02 • Contencioso Estratégico",
-      title: "Perícia Atuarial & Assistência Técnica Judicial",
-      subtitle: "Defesa Técnica e Liquidação em Litígios Complexos",
+      badge: "Pilar A • Contencioso & Tribunais",
+      title: "Perícia Judicial & Assistência Técnica Estratégica",
+      subtitle: "Suporte Técnico para Escritórios de Advocacia e Varas de Justiça",
       icon: "⚖️",
       points: [
-        "Cálculos de liquidação de sentença, recomposição de reserva matemática e benefícios previdenciários/trabalhistas.",
-        "Elaboração de quesitos estratégicos e impugnação técnica fundamentada contra laudos periciais inconsistentes.",
-        "Pareceres prévios de risco e viabilidade matemática para instrução probatória em bancas de advocacia empresarial."
+        "Formulação de quesitos técnicos estratégicos (iniciais, elucidativos e suplementares) e acompanhamento pericial completo.",
+        "Análise crítica e impugnação fundamentada de laudos periciais divergentes, expondo inconsistências metodológicas ou erros materiais.",
+        "Liquidação de sentença, reserva matemática, revisão de benefícios e equacionamento de déficit com memória de cálculo 100% reproduzível."
       ],
-      result: "Histórico de 10 Perícias Homologadas no TRT10 e TJDFT"
+      result: "Rigor Probatório, Segurança Decisória e Histórico no TRT10 / TJDFT"
+    },
+    {
+      id: "atuaria-riscos",
+      badge: "Pilar B • Regulação & Solvência",
+      title: "Auditoria CPC 33 / IAS 19 & Governança PREVIC",
+      subtitle: "Validação Independente para Conselhos, Patrocinadoras e EFPCs",
+      icon: "🏛️",
+      points: [
+        "Validação independente de passivos atuariais, notas explicativas e conciliação de obrigações em balanços corporativos.",
+        "Testes de aderência de tábuas biométricas, hipóteses econômico-financeiras e apuração do Valor Presente Atuarial (VPA).",
+        "Avaliação de risco de equacionamento de déficit, solvência, liquidez e pareceres técnicos para Conselhos Deliberativos e Patrocinadoras."
+      ],
+      result: "Segurança Contábil, Mitigação de Riscos e Conformidade PREVIC"
     },
     {
       id: "automacao-ia",
-      badge: "Frente 03 • Engenharia Atuarial",
-      title: "Motores de Cálculo em Python & Automação de Riscos",
-      subtitle: "Escala Analítica para Consultorias e Departamentos Jurídicos",
+      badge: "Pilar C • Engenharia de Dados & IA",
+      title: "Auditoria de Dados em Python & Automação Jurídica (n8n / IA)",
+      subtitle: "Substituição de Planilhas Manuais por Modelos Auditáveis e Seguros",
       icon: "🐍",
       points: [
-        "Algoritmos propietarios em Python e R para processamento massivo de bases cadastrais e projeções estocásticas.",
-        "Agentes de IA treinados em normativos PREVIC e jurisprudência para auditoria documental e redação de pareceres.",
-        "Esteiras automatizadas em n8n para auditoria contínua de folha, benefícios e contingências sob estrito sigilo LGPD."
+        "Substituição de planilhas manuais vulneráveis por scripts auditáveis em Python, R e Excel/VBA para grandes volumes de processos e participantes.",
+        "Agentes de IA privados sob sigilo LGPD para extração, cruzamento e conferência de grandes bases documentais e processuais.",
+        "Fluxos automatizados em n8n para auditoria contínua de contingências, conciliações e apoio à emissão de relatórios técnicos."
       ],
-      result: "Eliminação de Erro Material e Ganho de Escala Técnica"
+      result: "Eliminação de Erro Material, Rastreabilidade e Ganho de Escala"
     }
   ];
 
@@ -13037,14 +13071,14 @@ export default function Pillars() {
             Escopo Técnico Especializado
           </span>
           <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
-            Frentes de Atuação em Ciências Atuariais
+            Frentes de Atuação em <span style={{ color: 'var(--secondary)' }}>Perícia, Atuária & Prova Técnica</span>
           </h2>
-          <p className="body-md" style={{ opacity: 0.8, maxWidth: '750px', margin: '0 auto' }}>
-            Metodologia rigorosa fundamentada nas normas do Instituto Brasileiro de Atuária (IBA), pronunciamentos contábeis internacionais e engenharia computacional aplicada ao risco.
+          <p className="body-md" style={{ opacity: 0.85, maxWidth: '820px', margin: '0 auto' }}>
+            Metodologia rigorosa fundamentada nas normas do Instituto Brasileiro de Atuária (IBA), pronunciamentos contábeis CPC 33 / IAS 19, diretrizes PREVIC e engenharia de dados aplicada à prova pericial.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem', marginBottom: '3.5rem' }}>
           {pillars.map((pillar, i) => (
             <div
               key={i}
@@ -13085,6 +13119,55 @@ export default function Pillars() {
             </div>
           ))}
         </div>
+
+        {/* Comparative Block: Planilhas Manuais Impugnáveis vs. Prova Técnica Auditável em Python/R */}
+        <div
+          className="card-base ghost-border glass-panel"
+          style={{
+            padding: '2.5rem',
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, rgba(14, 20, 29, 0.95) 0%, rgba(27, 33, 43, 0.85) 100%)',
+            border: '1px solid rgba(233, 193, 118, 0.25)',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
+              Diferencial Tecnológico na Prova Pericial
+            </span>
+            <h3 className="headline-sm" style={{ fontSize: '1.5rem', marginTop: '0.35rem', color: 'var(--on-surface)' }}>
+              Planilhas Manuais Impugnáveis <span style={{ color: 'var(--secondary)' }}>vs.</span> Prova Técnica Auditável em Python/R
+            </h3>
+            <p className="body-sm" style={{ opacity: 0.8, maxWidth: '720px', margin: '0.5rem auto 0' }}>
+              Rastreabilidade integral, reprodutibilidade matemática e redução drástica de risco de erro material para escritórios de advocacia, juízos e auditorias.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.75rem' }}>
+            <div style={{ padding: '1.5rem', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.22)' }}>
+              <h4 className="label-md" style={{ color: '#f87171', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span aria-hidden="true">⚠️</span> Planilhas Manuais Impugnáveis
+              </h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', opacity: 0.85, lineHeight: 1.55 }}>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#f87171' }}>✗</span><span>Fórmulas sobrescritas manualmente, referências quebradas e difícil conferência pela parte ou pelo Juízo.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#f87171' }}>✗</span><span>Divergências silenciosas de arredondamento e aplicação imprecisa de índices econômicos/juros.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#f87171' }}>✗</span><span>Lentidão ou travamento ao auditar extensas séries históricas ou milhares de participantes.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#f87171' }}>✗</span><span>Sem trilha de auditoria: uma célula alterada compromete toda a credibilidade do parecer.</span></li>
+              </ul>
+            </div>
+
+            <div style={{ padding: '1.5rem', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+              <h4 className="label-md" style={{ color: '#34d399', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span aria-hidden="true">🛡️</span> Prova Técnica Auditável em Python / R / VBA
+              </h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', opacity: 0.9, lineHeight: 1.55 }}>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#34d399', fontWeight: 'bold' }}>✓</span><span>Scripts documentados e versionados: memória de cálculo 100% reproduzível e auditável linha a linha.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#34d399', fontWeight: 'bold' }}>✓</span><span>Aplicação exata de índices legais/contratuais (INPC, IPCA, Selic, juros moratórios e tábuas biométricas).</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#34d399', fontWeight: 'bold' }}>✓</span><span>Processamento veloz de grandes bases de processos/participantes sem risco de erro material.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#34d399', fontWeight: 'bold' }}>✓</span><span>Segurança probatória que blinda laudos e sustenta impugnações técnicas irrefutáveis.</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -13107,8 +13190,8 @@ export default function QuemSomos() {
           <h2 className="display-lg" style={{ color: 'var(--secondary)', marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
             Liderança Atuarial & Pericial (MIBA 1807)
           </h2>
-          <p className="body-md" style={{ maxWidth: '750px', margin: '0 auto', opacity: 0.85 }}>
-            Experiência executiva em fundos de pensão, patrocinadoras estatais e privadas e atuação consolidada perante os tribunais superiores.
+          <p className="body-md" style={{ maxWidth: '800px', margin: '0 auto', opacity: 0.85 }}>
+            Formação multidisciplinar unindo Ciências Atuariais, Finanças Corporativas, Engenharia de Sistemas e prática homologada em perícias judiciais complexas.
           </p>
         </div>
 
@@ -13128,31 +13211,44 @@ export default function QuemSomos() {
                   Demian Lisboa Pereira
                 </h3>
                 <p className="label-md" style={{ color: 'var(--secondary)' }}>
-                  Atuário Registrado (MIBA 1807) & Perito Judicial
+                  Atuário (MIBA 1807) & Ex-Perito Judicial (TRT10 / TJDFT)
                 </p>
               </div>
             </div>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
               <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
+                ⚖️ Ex-Perito Judicial TRT 10ª Região & TJDFT (12/2014 a 01/2018)
+              </span>
+              <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
                 🏛️ +15 Anos Caixa Econômica Federal
               </span>
               <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
-                ⚖️ Ex-Perito Judicial TRT10 & TJDFT
+                🎓 MBA em Finanças (IBMEC)
               </span>
               <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
-                📊 Especialista CPC 33 (R1) & IAS 19
+                💻 Técnico em Sistemas de Informação (UFRGS)
               </span>
-              <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}>
-                🎓 MBA Finanças IBMEC • Técnico UFRGS
+              <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', borderRadius: '4px', background: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--secondary)' }}>
+                🐍 Python • R • Excel/VBA • Access • SQL • n8n • IA Generativa
               </span>
             </div>
 
-            <p className="body-sm" style={{ opacity: 0.85, lineHeight: 1.7, marginTop: '1rem' }}>
-              Mais de uma década e meia de atuação direta em modelagem de reservas, solvência, liquidez e governança de planos previdenciários patrocinados por uma das maiores instituições financeiras da América Latina.
+            <p className="body-sm" style={{ opacity: 0.85, lineHeight: 1.7, marginTop: '0.5rem' }}>
+              Mais de 15 anos de atuação na Caixa Econômica Federal em governança de passivos, solvência e liquidez previdenciária, aliados à experiência prática como Perito Judicial no TRT10 e TJDFT e à construção de motores de cálculo em Python para a FUNCEF.
             </p>
 
-            <div style={{ marginTop: 'auto', paddingTop: '1.5rem' }}>
+            <div style={{ padding: '1rem', borderRadius: '8px', background: 'rgba(233, 193, 118, 0.08)', border: '1px solid rgba(233, 193, 118, 0.25)' }}>
+              <p className="label-sm" style={{ color: 'var(--secondary)', fontWeight: 700, marginBottom: '0.35rem' }}>
+                ⚖️ Postura Ética e Imparcialidade Processual:
+              </p>
+              <p className="body-xs" style={{ opacity: 0.88, lineHeight: 1.6, margin: 0 }}>
+                • <strong>Perito do Juízo:</strong> Atuação com absoluta imparcialidade e equidistância técnica a serviço do Poder Judiciário.<br />
+                • <strong>Assistente Técnico / Parecerista:</strong> Suporte técnico especializado à parte ou escritório na elaboração de quesitos, recálculos e impugnações fundamentadas.
+              </p>
+            </div>
+
+            <div style={{ marginTop: 'auto', paddingTop: '1rem' }}>
               <a
                 href="https://domino-automate.com.br/curriculo/"
                 target="_blank"
@@ -13172,17 +13268,17 @@ export default function QuemSomos() {
             </h4>
 
             <p className="body-md" style={{ opacity: 0.9, lineHeight: 1.7 }}>
-              Enquanto pareceres tradicionais baseiam-se em planilhas manuais sujeitas a falhas operacionais e impugnações, nossa prática atuarial utiliza algoritmos auditáveis em <strong>Python e R</strong> para validar integralmente massas de participantes, fluxos de caixa futuros e reservas matemáticas sob as diretrizes da <strong>PREVIC e CPC 33 (R1) / IAS 19</strong>.
+              Enquanto cálculos tradicionais dependem de planilhas manuais sujeitas a falhas operacionais e impugnações, nossa prática combina domínio regulatório (<strong>CPC 33 / IAS 19 e PREVIC</strong>) com algoritmos auditáveis em <strong>Python, R, Excel/VBA, Access e SQL</strong> — além de fluxos <strong>n8n e IA Generativa privada</strong> sob estrito sigilo LGPD.
             </p>
 
             <div style={{ marginTop: '0.5rem', padding: '1.25rem', borderRadius: '8px', background: 'var(--surface-container-high)', borderLeft: '4px solid var(--secondary)' }}>
-              <h5 className="label-md" style={{ color: 'var(--on-surface)', marginBottom: '0.35rem' }}>
-                Credenciais e Marcos de Atuação Atuarial:
+              <h5 className="label-md" style={{ color: 'var(--on-surface)', marginBottom: '0.45rem' }}>
+                Credenciais e Marcos de Atuação Atuarial & Pericial:
               </h5>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.6rem', padding: 0, fontSize: '0.875rem', opacity: 0.9 }}>
-                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>⚖️</span><span><strong>10 Perícias Judiciais Homologadas</strong>: Laudos e quesitos que sustentaram decisões técnicas no TRT10 e TJDFT.</span></li>
-                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>🐍</span><span><strong>Modelagem FUNCEF</strong>: Motor de cálculo atuarial em Python para o 3º maior fundo de pensão do Brasil.</span></li>
-                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>📊</span><span><strong>Governança de Passivos CPC 33 / IAS 19</strong>: Pareceres preventivos e corretivos de equacionamento de déficit para conselhos corporativos.</span></li>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem', padding: 0, fontSize: '0.875rem', opacity: 0.9 }}>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>⚖️</span><span><strong>Perito Judicial (TRT10 & TJDFT — 12/2014 a 01/2018)</strong>: 10 perícias complexas homologadas em litígios previdenciários, financeiros e trabalhistas.</span></li>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>🐍</span><span><strong>Modelagem FUNCEF (Python)</strong>: Motor de cálculo atuarial e validação de massas extensas para o 3º maior fundo de pensão do Brasil.</span></li>
+                <li style={{ display: 'flex', gap: '0.6rem', alignItems: 'flex-start' }}><span style={{ color: 'var(--secondary)', fontSize: '1rem', marginTop: '0.05rem' }}>📊</span><span><strong>Governança CPC 33 (R1) / IAS 19 & PREVIC</strong>: Auditorias independentes de passivos, solvência e planos de equacionamento para conselhos corporativos.</span></li>
               </ul>
             </div>
           </div>
@@ -13202,22 +13298,22 @@ import React from 'react';
 
 const corporateCases = [
   {
+    id: 'pericias-tjdft-trt10',
+    title: 'Perícias Judiciais e Assistência Técnica (TJDFT & TRT10)',
+    category: 'Perícia Judicial & Contencioso Estratégico',
+    badge: '10 Laudos Homologados com Sucesso',
+    icon: '⚖️',
+    description: 'Atuação como Perito Judicial e Assistente Técnico em litígios previdenciários, bancários e trabalhistas complexos. Foco em liquidação de sentença, recálculo de reserva matemática, apuração de diferenças salariais/previdenciárias e formulação de quesitos e impugnações fundamentadas.',
+    tags: ['TJDFT', 'TRT 10ª Região', 'Liquidação de Sentença', 'Reserva Matemática', 'Quesitos & Impugnações']
+  },
+  {
     id: 'funcef-modelagem',
-    title: 'Modelagem Atuarial em Python (FUNCEF)',
+    title: 'Engenharia Analítica e Modelagem em Python (FUNCEF)',
     category: 'Previdência Complementar Fechada',
     badge: '3º Maior Fundo de Pensão do Brasil',
     icon: '🐍',
-    description: 'Desenvolvimento e implementação de algoritmos de cálculo atuarial e projeção de solvência em Python para planos previdenciários complexos, integrando bases cadastrais massivas a modelos matemáticos de alta precisão.',
-    tags: ['Python', 'Cálculo Atuarial', 'Modelagem de Risco', 'Governança EFPC']
-  },
-  {
-    id: 'pericias-tjdft-trt10',
-    title: '10 Perícias Atuariais Homologadas (TJDFT & TRT10)',
-    category: 'Perícia Judicial & Assistência Técnica',
-    badge: '10 Laudos Concluídos com Sucesso',
-    icon: '⚖️',
-    description: 'Atuação especializada como Perito Judicial e Assistente Técnico em litígios previdenciários, bancários e trabalhistas de alta complexidade. Apuração rigorosa de reservas matemáticas, diferenças salariais e liquidações de sentença.',
-    tags: ['TJDFT', 'TRT 10ª Região', 'Perícia Contábil/Atuarial', 'Quesitos Estratégicos']
+    description: 'Desenvolvimento e validação matemática de motores de cálculo atuarial e projeção de solvência em Python para o 3º maior fundo de pensão do Brasil, processando bases cadastrais extensas com rastreabilidade integral e eliminação de erros materiais.',
+    tags: ['Python', 'Rastreabilidade', 'Bases Massivas', 'Validação Matemática', 'FUNCEF']
   },
   {
     id: 'consultoria-cpc33-previc',
@@ -13225,8 +13321,8 @@ const corporateCases = [
     category: 'Auditoria de Balanços e Solvência',
     badge: 'Conformidade e Mitigação de Déficits',
     icon: '📊',
-    description: 'Auditoria independente de passivos atuariais, validação de tábuas biométricas e hipóteses financeiras, testes de sensibilidade e pareceres técnicos fundamentados para patrocinadoras e conselhos deliberativos.',
-    tags: ['CPC 33 (R1)', 'IAS 19', 'PREVIC', 'Auditoria Independente']
+    description: 'Auditoria independente de passivos atuariais, testes de aderência de tábuas biométricas e hipóteses financeiras, e emissão de pareceres técnicos de solvência, liquidez e planos de equacionamento de déficit para patrocinadoras e conselhos deliberativos.',
+    tags: ['CPC 33 (R1)', 'IAS 19', 'PREVIC', 'Solvência & Liquidez', 'Equacionamento']
   }
 ];
 
@@ -13859,31 +13955,31 @@ import React, { useState } from 'react';
 export default function FAQ() {
   const faqs = [
     {
-      q: "Como funciona a atuação em perícias judiciais e assistência técnica atuarial?",
-      a: "Atuamos tanto como Perito do Juízo quanto como Assistente Técnico indicado por escritórios de advocacia e departamentos jurídicos corporativos. Elaboramos quesitos preliminares estratégicos, pareceres de viabilidade, cálculos de liquidação de sentença e impugnações técnicas fundamentadas a laudos divergentes perante o TRT10, TJDFT e demais jurisdições."
+      q: "Como funciona a contratação como Assistente Técnico por escritórios de advocacia (quesitos, acompanhamento de perícia e impugnação de laudos)?",
+      a: "Atuamos em todas as etapas probatórias ao lado da banca contratante: desde o parecer prévio de viabilidade econômica na fase inicial até a formulação de quesitos técnicos estratégicos (iniciais e suplementares), acompanhamento de diligências periciais, liquidação de sentença e elaboração de parecer divergente/impugnação técnica fundamentada contra laudos oficiais inconsistentes, em atuação presencial no DF ou remota em todo o Brasil."
     },
     {
-      q: "Qual a metodologia aplicada na auditoria independente de CPC 33 (R1) e IAS 19?",
-      a: "Realizamos a revisão rigorosa de tábuas biométricas, premissas econômico-financeiras (taxas de juros reais, inflação, crescimento de benefícios), apuração do valor presente das obrigações atuariais (VPA) e conciliação de passivos para notas explicativas de balanço de patrocinadoras e fundos de pensão (EFPCs), em conformidade com as normas contábeis e da PREVIC."
+      q: "Qual a diferença entre a atuação como Perito do Juízo e como Assistente Técnico / Parecerista?",
+      a: "A distinção ética e processual é rigorosamente respeitada: quando nomeado como Perito do Juízo, a atuação ocorre com absoluta imparcialidade técnica, equidistância e fidelidade estrita à prova dos autos para subsidiar a decisão do Magistrado. Já como Assistente Técnico ou Parecerista contratado por escritórios, empresas ou EFPCs, oferecemos suporte técnico especializado à parte para assegurar o rigor matemático da tese, blindar cálculos e apontar erros materiais em laudos contrários."
     },
     {
-      q: "Como é garantida a segurança dos dados e o sigilo atuarial/bancário (LGPD)?",
-      a: "Nossa infraestrutura opera sob padrões de sigilo bancário e governança de dados. Em automações e agentes de IA, implementamos ambientes privados onde dados confidenciais, cadastros de participantes e litígios nunca são utilizados para treinar modelos públicos de terceiros, atendendo com total rigor à Lei Geral de Proteção de Dados (LGPD)."
+      q: "Como o uso de Python, R e Excel/VBA aumenta a segurança jurídica e reduz o risco de impugnação de cálculos?",
+      a: "Planilhas manuais extensas são vulneráveis a fórmulas sobrescritas, erros de arredondamento em cadeia e falhas ao lidar com grandes volumes de registros. Ao estruturar os cálculos em scripts auditáveis em Python, R e Excel/VBA, entregamos memória de cálculo 100% reproduzível, com trilha de auditoria clara e conformidade exata aos índices e tábuas determinados no título judicial ou regulamento — reduzindo drasticamente a margem para impugnações bem-sucedidas."
     },
     {
-      q: "É possível integrar bases legadas e ERPs com automações em Python e n8n?",
-      a: "Sim. Construímos pipelines que conectam bancos legados, planilhas e sistemas de folha/benefícios a motores de cálculo em Python e orquestradores em n8n. O resultado é a geração de relatórios e conciliações automáticas com auditoria completa de cada etapa, eliminando retrabalho e inconsistências materiais."
+      q: "Como funciona a auditoria independente CPC 33 (R1) / IAS 19 e conformidade PREVIC?",
+      a: "Executamos a revisão independente de passivos atuariais em balanços de patrocinadoras e EFPCs, validando tábuas biométricas, hipóteses econômico-financeiras (juros reais, inflação, crescimento salarial), apuração do Valor Presente Atuarial (VPA), notas explicativas e planos de equacionamento de déficit, com pareceres técnicos objetivos para Conselhos Deliberativos, Fiscais e auditorias externas."
     },
     {
-      q: "Quais são as modalidades de contratação dos serviços?",
-      a: "Atendemos sob demanda (por parecer técnico atuarial, laudo pericial judicial ou projeto específico de engenharia de automação) e também em regime de assessoria técnica corporativa continuada para suporte permanente a comitês de risco, conselhos deliberativos e bancas de advocacia."
+      q: "Como automações em n8n e agentes de IA privados operam sob sigilo processual e LGPD?",
+      a: "Toda a arquitetura é desenhada para dados jurídicos e atuariais sensíveis: implementamos pipelines em n8n, scripts locais/em nuvem privada e agentes de IA isolados onde processos, peças e cadastros de participantes jamais alimentam modelos públicos de terceiros. Antes do envio de documentos sob segredo de justiça ou bases reais, formalizamos termo de confidencialidade (NDA) e canal criptografado em conformidade integral com a LGPD (Lei 13.709/2018)."
     }
   ];
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section id="faq" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface-container-highest)' }}>
+    <section id="faq" style={{ padding: '6rem 2rem', backgroundColor: 'var(--surface-container-highest)', scrollMarginTop: '80px' }}>
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
           <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
@@ -13964,8 +14060,8 @@ export default function Footer() {
             <div className="body-sm" style={{ opacity: 0.75, display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.85rem' }}>
               <strong style={{ color: 'var(--on-surface)' }}>DOMINO AUTOMATE DESENVOLVIMENTO DE SERVICOS DE AUTOMACAO LTDA</strong>
               <span>CNPJ: 66.699.218/0001-94</span>
-              <span>Brasília - DF</span>
-              <span>demian.atuario@gmail.com | (61) 98117-1564</span>
+              <span>Brasília - DF • Atuação Nacional / Remota</span>
+              <span>demian.pereira@gmail.com | (61) 98117-1564</span>
             </div>
             
             {/* Social & Contact Links */}
@@ -13973,7 +14069,7 @@ export default function Footer() {
               <a href="https://wa.me/5561981171564" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Institucional" style={{ width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)', transition: 'all 0.2s' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
               </a>
-              <a href="https://www.linkedin.com/in/demian-lisboa-pereira-a33b8417/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Fundador" style={{ width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)', transition: 'all 0.2s' }}>
+              <a href="https://www.linkedin.com/in/demian-lisboa-pereira/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Fundador" style={{ width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)', transition: 'all 0.2s' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
               </a>
               <a href="https://domino-automate.com.br/curriculo/" target="_blank" rel="noopener noreferrer" aria-label="Portal de Estudos" style={{ width: '40px', height: '40px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--surface-container)', border: '1px solid var(--outline-variant)', color: 'var(--secondary)', transition: 'all 0.2s', fontWeight: 700, fontSize: '1.1rem' }}>

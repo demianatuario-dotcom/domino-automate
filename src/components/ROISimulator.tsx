@@ -85,13 +85,13 @@ export default function ROISimulator() {
       <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 700 }}>
-            Simulador Corporativo • Modelo de Horas Técnicas & Retrabalho
+            Simulador Jurídico-Pericial • Horas Especializadas & Risco de Impugnação
           </span>
           <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
-            Diagnóstico de <span style={{ color: 'var(--secondary)' }}>Geração de Valor & Mitigação de Risco Atuarial</span>
+            Diagnóstico de <span style={{ color: 'var(--secondary)' }}>Eficiência Pericial & Mitigação de Risco</span>
           </h2>
-          <p className="body-md" style={{ opacity: 0.85, maxWidth: '720px', margin: '1rem auto' }}>
-            Estime o impacto econômico de processos manuais de auditoria, liquidação de sentença e relatórios regulatórios na sua operação jurídica ou previdenciária.
+          <p className="body-md" style={{ opacity: 0.85, maxWidth: '760px', margin: '1rem auto' }}>
+            Calcule quanto seu escritório de advocacia, coordenadoria de contencioso ou diretoria de riscos economiza ao substituir planilhas manuais por assistência técnica atuarial e scripts auditáveis em Python/R.
           </p>
 
           {/* 3-Scenario Selector */}
@@ -134,9 +134,9 @@ export default function ROISimulator() {
           {/* Sliders Input Panel */}
           <div className="card-base ghost-border" style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem', padding: '2.25rem' }}>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                <label htmlFor="atuaria-slider-demandas" className="label-md">Demandas / Cálculos Mensais:</label>
-                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{demandas} casos/mês</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', gap: '0.5rem' }}>
+                <label htmlFor="atuaria-slider-demandas" className="label-md">Processos / Cálculos Analisados por Mês:</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700, whiteSpace: 'nowrap' }}>{demandas} processos/mês</span>
               </div>
               <input
                 id="atuaria-slider-demandas"
@@ -148,13 +148,13 @@ export default function ROISimulator() {
                 onChange={(e) => { notifySimStart(); setDemandas(Number(e.target.value)); }}
                 style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
-              <span className="body-xs" style={{ opacity: 0.6 }}>Processos judiciais, auditorias de balanço ou pareceres.</span>
+              <span className="body-xs" style={{ opacity: 0.65 }}>Liquidações de sentença, conferência de laudos, revisões previdenciárias ou auditorias.</span>
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                <label htmlFor="atuaria-slider-horas" className="label-md">Horas Técnicas por Demanda:</label>
-                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{horasPorDemanda}h / caso</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', gap: '0.5rem' }}>
+                <label htmlFor="atuaria-slider-horas" className="label-md">Horas Técnicas por Processo / Laudo:</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700, whiteSpace: 'nowrap' }}>{horasPorDemanda}h / processo</span>
               </div>
               <input
                 id="atuaria-slider-horas"
@@ -166,13 +166,13 @@ export default function ROISimulator() {
                 onChange={(e) => { notifySimStart(); setHorasPorDemanda(Number(e.target.value)); }}
                 style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
-              <span className="body-xs" style={{ opacity: 0.6 }}>Tempo gasto em triagem, planilhas, conciliação e confecção do laudo.</span>
+              <span className="body-xs" style={{ opacity: 0.65 }}>Tempo gasto em triagem de bases, planilhas manuais, conferência de índices e redação técnica.</span>
             </div>
 
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                <label htmlFor="atuaria-slider-custo-hora" className="label-md">Custo da Hora Especializada:</label>
-                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700 }}>R$ {custoHoraTecnica}/h</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', gap: '0.5rem' }}>
+                <label htmlFor="atuaria-slider-custo-hora" className="label-md">Custo da Hora Especializada (Sócio / Perito / Analista):</label>
+                <span className="label-md" style={{ color: 'var(--secondary)', fontWeight: 700, whiteSpace: 'nowrap' }}>R$ {custoHoraTecnica}/h</span>
               </div>
               <input
                 id="atuaria-slider-custo-hora"
@@ -184,15 +184,15 @@ export default function ROISimulator() {
                 onChange={(e) => { notifySimStart(); setCustoHoraTecnica(Number(e.target.value)); }}
                 style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
-              <span className="body-xs" style={{ opacity: 0.6 }}>Remuneração média de advogados sêniores, atuários ou peritos.</span>
+              <span className="body-xs" style={{ opacity: 0.65 }}>Custo médio da hora alocada de sócios, coordenadores de contencioso, atuários ou analistas.</span>
             </div>
 
             <div style={{ paddingTop: '0.75rem', borderTop: '1px solid var(--outline-variant)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', gap: '0.5rem' }}>
                 <label htmlFor="atuaria-slider-contingencia" className="label-sm" style={{ opacity: 0.85 }}>
-                  Premissa Configurável: Custo Médio por Contingência / Retrabalho:
+                  Premissa Configurável: Custo Médio de Impugnação / Retrabalho por Processo:
                 </label>
-                <span className="label-sm" style={{ color: 'var(--secondary)', fontWeight: 700 }}>
+                <span className="label-sm" style={{ color: 'var(--secondary)', fontWeight: 700, whiteSpace: 'nowrap' }}>
                   R$ {custoMedioContingencia.toLocaleString('pt-BR')}
                 </span>
               </div>
@@ -206,8 +206,8 @@ export default function ROISimulator() {
                 onChange={(e) => { notifySimStart(); setCustoMedioContingencia(Number(e.target.value)); }}
                 style={{ width: '100%', accentColor: 'var(--secondary)' }}
               />
-              <span className="body-xs" style={{ opacity: 0.6 }}>
-                Premissa referencial ajustável por porte do litígio/auditoria (não constitui valor universal ou garantia).
+              <span className="body-xs" style={{ opacity: 0.65 }}>
+                Premissa referencial ajustável por porte do litígio/auditoria (exibida separadamente da economia operacional mensal para evitar dupla contagem).
               </span>
             </div>
           </div>

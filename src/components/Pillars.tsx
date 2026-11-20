@@ -3,43 +3,43 @@ import React from 'react';
 export default function Pillars() {
   const pillars = [
     {
-      id: "atuaria-riscos",
-      badge: "Frente 01 • Regulação & Solvência",
-      title: "Auditoria CPC 33 / IAS 19 & Governança EFPC",
-      subtitle: "Validação Independente para Patrocinadoras e Fundos de Pensão",
-      icon: "🏛️",
-      points: [
-        "Revisão independente de laudos atuariais, notas explicativas e conciliação de passivos em balanços corporativos.",
-        "Testes de aderência de tábuas biométricas, hipóteses econômico-financeiras e apuração do Valor Presente Atuarial (VPA).",
-        "Modelagem de planos de equacionamento de déficit técnico e suporte a Conselhos Deliberativos e Fiscais perante a PREVIC."
-      ],
-      result: "Segurança Contábil e Mitigação de Riscos em Balanço"
-    },
-    {
       id: "pericia-judicial",
-      badge: "Frente 02 • Contencioso Estratégico",
-      title: "Perícia Atuarial & Assistência Técnica Judicial",
-      subtitle: "Defesa Técnica e Liquidação em Litígios Complexos",
+      badge: "Pilar A • Contencioso & Tribunais",
+      title: "Perícia Judicial & Assistência Técnica Estratégica",
+      subtitle: "Suporte Técnico para Escritórios de Advocacia e Varas de Justiça",
       icon: "⚖️",
       points: [
-        "Cálculos de liquidação de sentença, recomposição de reserva matemática e benefícios previdenciários/trabalhistas.",
-        "Elaboração de quesitos estratégicos e impugnação técnica fundamentada contra laudos periciais inconsistentes.",
-        "Pareceres prévios de risco e viabilidade matemática para instrução probatória em bancas de advocacia empresarial."
+        "Formulação de quesitos técnicos estratégicos (iniciais, elucidativos e suplementares) e acompanhamento pericial completo.",
+        "Análise crítica e impugnação fundamentada de laudos periciais divergentes, expondo inconsistências metodológicas ou erros materiais.",
+        "Liquidação de sentença, reserva matemática, revisão de benefícios e equacionamento de déficit com memória de cálculo 100% reproduzível."
       ],
-      result: "Histórico de 10 Perícias Homologadas no TRT10 e TJDFT"
+      result: "Rigor Probatório, Segurança Decisória e Histórico no TRT10 / TJDFT"
+    },
+    {
+      id: "atuaria-riscos",
+      badge: "Pilar B • Regulação & Solvência",
+      title: "Auditoria CPC 33 / IAS 19 & Governança PREVIC",
+      subtitle: "Validação Independente para Conselhos, Patrocinadoras e EFPCs",
+      icon: "🏛️",
+      points: [
+        "Validação independente de passivos atuariais, notas explicativas e conciliação de obrigações em balanços corporativos.",
+        "Testes de aderência de tábuas biométricas, hipóteses econômico-financeiras e apuração do Valor Presente Atuarial (VPA).",
+        "Avaliação de risco de equacionamento de déficit, solvência, liquidez e pareceres técnicos para Conselhos Deliberativos e Patrocinadoras."
+      ],
+      result: "Segurança Contábil, Mitigação de Riscos e Conformidade PREVIC"
     },
     {
       id: "automacao-ia",
-      badge: "Frente 03 • Engenharia Atuarial",
-      title: "Motores de Cálculo em Python & Automação de Riscos",
-      subtitle: "Escala Analítica para Consultorias e Departamentos Jurídicos",
+      badge: "Pilar C • Engenharia de Dados & IA",
+      title: "Auditoria de Dados em Python & Automação Jurídica (n8n / IA)",
+      subtitle: "Substituição de Planilhas Manuais por Modelos Auditáveis e Seguros",
       icon: "🐍",
       points: [
-        "Algoritmos propietarios em Python e R para processamento massivo de bases cadastrais e projeções estocásticas.",
-        "Agentes de IA treinados em normativos PREVIC e jurisprudência para auditoria documental e redação de pareceres.",
-        "Esteiras automatizadas em n8n para auditoria contínua de folha, benefícios e contingências sob estrito sigilo LGPD."
+        "Substituição de planilhas manuais vulneráveis por scripts auditáveis em Python, R e Excel/VBA para grandes volumes de processos e participantes.",
+        "Agentes de IA privados sob sigilo LGPD para extração, cruzamento e conferência de grandes bases documentais e processuais.",
+        "Fluxos automatizados em n8n para auditoria contínua de contingências, conciliações e apoio à emissão de relatórios técnicos."
       ],
-      result: "Eliminação de Erro Material e Ganho de Escala Técnica"
+      result: "Eliminação de Erro Material, Rastreabilidade e Ganho de Escala"
     }
   ];
 
@@ -51,14 +51,14 @@ export default function Pillars() {
             Escopo Técnico Especializado
           </span>
           <h2 className="display-lg" style={{ marginTop: '0.5rem', marginBottom: '1rem', fontSize: 'clamp(2rem, 3.5vw, 3rem)' }}>
-            Frentes de Atuação em Ciências Atuariais
+            Frentes de Atuação em <span style={{ color: 'var(--secondary)' }}>Perícia, Atuária & Prova Técnica</span>
           </h2>
-          <p className="body-md" style={{ opacity: 0.8, maxWidth: '750px', margin: '0 auto' }}>
-            Metodologia rigorosa fundamentada nas normas do Instituto Brasileiro de Atuária (IBA), pronunciamentos contábeis internacionais e engenharia computacional aplicada ao risco.
+          <p className="body-md" style={{ opacity: 0.85, maxWidth: '820px', margin: '0 auto' }}>
+            Metodologia rigorosa fundamentada nas normas do Instituto Brasileiro de Atuária (IBA), pronunciamentos contábeis CPC 33 / IAS 19, diretrizes PREVIC e engenharia de dados aplicada à prova pericial.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2rem', marginBottom: '3.5rem' }}>
           {pillars.map((pillar, i) => (
             <div
               key={i}
@@ -98,6 +98,55 @@ export default function Pillars() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Comparative Block: Planilhas Manuais Impugnáveis vs. Prova Técnica Auditável em Python/R */}
+        <div
+          className="card-base ghost-border glass-panel"
+          style={{
+            padding: '2.5rem',
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, rgba(14, 20, 29, 0.95) 0%, rgba(27, 33, 43, 0.85) 100%)',
+            border: '1px solid rgba(233, 193, 118, 0.25)',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <span className="label-sm" style={{ color: 'var(--secondary)', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 700 }}>
+              Diferencial Tecnológico na Prova Pericial
+            </span>
+            <h3 className="headline-sm" style={{ fontSize: '1.5rem', marginTop: '0.35rem', color: 'var(--on-surface)' }}>
+              Planilhas Manuais Impugnáveis <span style={{ color: 'var(--secondary)' }}>vs.</span> Prova Técnica Auditável em Python/R
+            </h3>
+            <p className="body-sm" style={{ opacity: 0.8, maxWidth: '720px', margin: '0.5rem auto 0' }}>
+              Rastreabilidade integral, reprodutibilidade matemática e redução drástica de risco de erro material para escritórios de advocacia, juízos e auditorias.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', gap: '1.75rem' }}>
+            <div style={{ padding: '1.5rem', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.22)' }}>
+              <h4 className="label-md" style={{ color: '#f87171', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span aria-hidden="true">⚠️</span> Planilhas Manuais Impugnáveis
+              </h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', opacity: 0.85, lineHeight: 1.55 }}>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#f87171' }}>✗</span><span>Fórmulas sobrescritas manualmente, referências quebradas e difícil conferência pela parte ou pelo Juízo.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#f87171' }}>✗</span><span>Divergências silenciosas de arredondamento e aplicação imprecisa de índices econômicos/juros.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#f87171' }}>✗</span><span>Lentidão ou travamento ao auditar extensas séries históricas ou milhares de participantes.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#f87171' }}>✗</span><span>Sem trilha de auditoria: uma célula alterada compromete toda a credibilidade do parecer.</span></li>
+              </ul>
+            </div>
+
+            <div style={{ padding: '1.5rem', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+              <h4 className="label-md" style={{ color: '#34d399', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span aria-hidden="true">🛡️</span> Prova Técnica Auditável em Python / R / VBA
+              </h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', opacity: 0.9, lineHeight: 1.55 }}>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#34d399', fontWeight: 'bold' }}>✓</span><span>Scripts documentados e versionados: memória de cálculo 100% reproduzível e auditável linha a linha.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#34d399', fontWeight: 'bold' }}>✓</span><span>Aplicação exata de índices legais/contratuais (INPC, IPCA, Selic, juros moratórios e tábuas biométricas).</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#34d399', fontWeight: 'bold' }}>✓</span><span>Processamento veloz de grandes bases de processos/participantes sem risco de erro material.</span></li>
+                <li style={{ display: 'flex', gap: '0.5rem' }}><span style={{ color: '#34d399', fontWeight: 'bold' }}>✓</span><span>Segurança probatória que blinda laudos e sustenta impugnações técnicas irrefutáveis.</span></li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>
